@@ -7,11 +7,26 @@ Source: [GORF — Matthew Garrett](https://www.professionalmagic.com/gorf) (coll
 - Programmed in **Nutting TERSE 78** (Forth-like with Nutting extensions); original Gorf was Forth.
 - Jamie showed it on a **development system** in *Before The Bubble Burst*; unfinished after the 1983 crash.
 - Disks recovered via museum with Jamie’s permission; Tim’s split is Bitsavers `MsGorf_floppy_files.zip` (already in this repo).
-- **Patterns and game code were separate disks** — matches our finding that `XC.LOGIC` / application logic is absent from the pattern floppies.
-- Hardware change near cancellation; Jamie: collision detection by **monitoring the write-cycle** (write one value over another → collision). Other details she no longer recalls.
+- **Patterns and game code were separate disks** — “load all of the patterns from one disk, then the game code from another.” Matches our finding that `XC.LOGIC` / application logic is absent from the pattern floppies. There was **no single disk with the whole game**.
+- **Mix of 8″ and 5¼″** media is called out as a recovery problem; the page suggests the 5¼″ set may come from different Astrocade/Zgrass-related hardware while keeping IceBox-like geometry.
+- Hardware change near cancellation; Jamie (quoted on the page): collision detection by **monitoring the write-cycle** (write one value over another → collision). Other details she no longer recalls.
 - Prototype panel: **two joysticks** (observer likens feel to Robotron + Star Castle). **Not** a Gorf mission clone with the same five-level structure.
-- One image reportedly needs reread: label **Ms Gorf – GORF4A** (Dysan #802067) — our `MSGORF/` set.
-- Geometry note on the page: 5¼″ media imaged with IceBox-like **8″ geometry** (2 heads × 77 tracks × 2 × 1024 ≈ 308K).
+
+## Floppy format / GORF4A redump (from the page)
+
+- One disk **needs to be reread**: labelled **Ms Gorf – GORF4A**, Dysan **#802067** — our `MSGORF/` set (Tim’s Readme also: reread of the third floppy).
+- Physical media look like **5¼″**, but image geometry matches **Terse 8″** layout: **2 heads × 77 tracks × 2 sectors × 1024 bytes ≈ 308K**.
+- Hypothesis on the page: **FD1771** on a later IceBox with an **80-track 5¼″** drive, still using the 8″ format.
+- (Our lab also notes FD1771 / bit-inverted sectors in IceBox docs — see `docs/findings/icebox-notes.md`, MAME `icebox.cpp`.)
+
+## People named on the page
+
+| Person | Role (as stated there) |
+|--------|-------------------------|
+| **Tim Giddens** | Main person who knows how; file split on Bitsavers; other projects first |
+| **Brendon Parker** | Interested; graphics designer, not programmer |
+| **Frank Palazzolo** | Computer Museum contact; MAME boot of a disk with **Gorf** binary; had disassembled / figured out how TERSE worked; had not looked at Ms. Gorf material for ~a year when quoted |
+| **Matthew Garrett** | Page author; museum retrieval with Jamie’s permission; `info@professionalmagic.com` |
 
 ## Linked TERSE / IceBox PDFs (Jamie → Matthew Garrett)
 
