@@ -11,3 +11,7 @@ User clarification: compiled ROM is better; web playable is an incredible first 
 ## Honesty
 
 Movement AI and wave order are still guessed. Art and names are not.
+
+## Display correction
+
+User: vertical game (screenshot). Set canvas to **240×352**; documented in `docs/findings/display.md`. Dual ships P1i/P2i.

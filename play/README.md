@@ -13,3 +13,8 @@ This is a **port in progress**, subordinate to the compiled-ROM goal:
 Asset bundle: `assets.json` (regenerate via future `tools/export_play_assets.py` if needed — currently produced inline by the build script in lab notes).
 
 See `docs/findings/goals.md`.
+
+
+## Display
+
+Vertical **240×352** player view (Gorf-family). See `docs/findings/display.md`.

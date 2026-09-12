@@ -23,7 +23,7 @@ class Hit:
 
 
 class Frame:
-    def __init__(self, w: int = 320, h: int = 240):
+    def __init__(self, w: int = 240, h: int = 352):  # Gorf-family vertical player view
         self.w, self.h = w, h
         self.pix = bytearray(w * h)  # color 0-3
         self.own = [0] * (w * h)
