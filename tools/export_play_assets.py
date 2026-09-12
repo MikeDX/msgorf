@@ -21,10 +21,10 @@ def main() -> None:
     for p in DISK.iterdir():
         if not p.is_file():
             continue
-        if not (p.name.endswith("-P") or p.name in {"BANG", "NULPAT", "PLY-P", "GORF-P", "CLONE-P"}):
+        if not (p.name.endswith("-P") or p.name in {"BANG", "NULPAT", "PLY-P", "GORF-P", "CLONE-P", "PLUP"}):
             continue
         text = "".join(chr(b) if 32 <= b < 127 else "\n" for b in p.read_bytes())
-        for m in re.finditer(r"PATTERN\s+([A-Za-z0-9\-]+)([\s\S]*?)(?=PATTERN\s+|$)", text):
+        for m in re.finditer(r"(?:PATTERN|DATA)\s+([A-Za-z0-9\-]+)([\s\S]*?)(?=(?:PATTERN|DATA)\s+|$)", text):
             name, body = m.group(1), m.group(2)
             rows = []
             for sm in re.finditer(r"~([^~^]*?)\^", body, re.S):
@@ -46,8 +46,8 @@ def main() -> None:
         "BANGA": "FBEXP4",
         "BANGP": "FBEXP1",
         "CLONETBL": "CLN0",
-        "P1UP": "INDICATING",
-        "P2UP": "INDICATING",
+        "P1UP": "P1UP",
+        "P2UP": "P2UP",
         "LAZON": "LAZON",
     }
     roster = []

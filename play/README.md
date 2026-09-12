@@ -1,20 +1,11 @@
-# Web port scaffold
+# Pattern lab (not a game)
 
-Open [`index.html`](index.html).
+`index.html` browses **only** INDEX / ANIM-MAP / pattern pixels from Tim’s Ms. Gorf disk extract.
 
-This is a **port in progress**, subordinate to the compiled-ROM goal:
+## Rules
 
-| Authentic | Guessed |
-|-----------|---------|
-| Pattern pixels from MSGORPAT | Wave recipes / movement AI |
-| INDEX ids + ANIM-MAP names | Scoring values, HP |
-| Write-overlay collision idea | Dual-stick (not in v0 controls yet) |
+- No invented gameplay, waves, VCR “PLAY” text, or simultaneous two-player control
+- P1i / P2i are ship *graphics* for 1P/2P slots
+- Reference frames (160×102, 204×320, 240×352) are scale guides only — see `docs/findings/display.md`
 
-Asset bundle: `assets.json` (regenerate via future `tools/export_play_assets.py` if needed — currently produced inline by the build script in lab notes).
-
-See `docs/findings/goals.md`.
-
-
-## Display
-
-Vertical **240×352** player view (Gorf-family). See `docs/findings/display.md`.
+Regenerate assets: `python3 tools/export_play_assets.py`

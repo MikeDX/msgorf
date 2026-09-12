@@ -1,22 +1,16 @@
 # Display / resolution
 
-## Evidence
+## Hard facts
 
-1. **`msgorf_screenshot.jpg` (CGE demo)** — portrait playfield; score/`PLAY` toward the top; **two distinct ships** near the bottom (P1/P2); Gorfian sprites in the field; debug strip on one edge.
-2. **Shipping sibling Gorf (same Astrocade family)** — MAME `gorf`: raster **352×240**, **rotate 270°** (vertical monitor). Player-facing size ≈ **240×352**.
-3. **Astrocade commercial hi-res mode** — often cited as **320×204** (4 colors / 2bpp). Home Astrocade low-res is 160×102 (not the arcade path).
+1. **`msgorf_screenshot.jpg`** — portrait playfield; two ship sprites near bottom; many Gorfian figures; light field (projection artifact possible). The on-screen word **PLAY** is almost certainly a **VCR/tape overlay**, not game HUD — it does **not** appear in the Ms. Gorf Terse sources we have.
+2. **Gorf (sibling, Astrocade family)** — MAME: 352×240 raster, rotate 270° → player view ≈ **240×352**.
+3. **Astrocade modes** — lo-res **160×102**; commercial hi-res often **320×204** (→ ≈ **204×320** if similarly rotated).
+4. Pattern art is **2bpp (digits 0–3)**.
 
-## Working assumption for Ms. Gorf port / ROM work
+## What we do *not* know yet
 
-| Layer | Value | Notes |
-|-------|------:|-------|
-| Orientation | **Vertical** | Confirmed by screenshot + Gorf cabinet |
-| Player-facing canvas | **240 × 352** | Gorf MAME after 270° rotate |
-| Framebuffer before rotate (hardware) | 352 × 240 | Match Gorf timing if we stay on that chipset |
-| Color | 2bpp / 4 colors | Matches pattern digit art 0–3 |
+Ms. Gorf’s late dual-Z80 board may not match Gorf timings. No `INITSCREEN` / mode-select screen has been found on the pattern floppies.
 
-Ms. Gorf’s late dual-Z80 board may differ slightly; until we have its timings, **inherit Gorf’s vertical 240×352 player view**.
+## Rule for UI / port code
 
-## Web port
-
-`play/index.html` uses a **240×352** canvas (CSS scaled up), not the old landscape 320×240.
+Do **not** hard-code a cabinet resolution into gameplay. The pattern lab offers optional reference frames (160×102 / 204×320 / 240×352) for eyeballing scale only. Pick a ROM framebuffer only when IceBox/XC.LOGIC or hardware docs prove it.

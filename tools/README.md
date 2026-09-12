@@ -1,26 +1,14 @@
 # Tools
 
-Run from the repository root (`Ms GORF/`).
-
 | Script | Purpose |
 |--------|---------|
-| `normalize_img.py` | XOR-correct disk images → `work/*.img.corrected` |
-| `extract_strings.py` | Strings + keyword hits → `extracted/strings/` |
-| `extract_blocks.py` | 1024-byte screens → `extracted/screens/<disk>/` |
-| `extract_patterns.py` | GORF4A PNG previews → `extracted/patterns/` |
-| `terse/mvp_compile.py` | Host MVP colon-def compiler → `out/mvp_object.msgx` |
-| `terse/test_mvp_compile.py` | Unit tests for MVP compiler |
-
-```bash
-python3 tools/normalize_img.py
-python3 tools/extract_blocks.py
-python3 tools/extract_strings.py
-python3 tools/extract_patterns.py
-python3 -m tools.terse.mvp_compile --demo
-python3 -m tools.terse.test_mvp_compile
-```
-
-| `assemble_rom_stub.py` | Phase 7 gate check → `out/assemble_report.json` (exit 2 while blocked) |
-
-| `terse/fload_chain.py` | Resolve FLOAD trees from Tim’s extract |
-| `terse/package_patterns_rom.py` | Place XC.PATTERNS at 0x4000 → `out/msgorf_patterns_at_4000.bin` |
+| `normalize_img.py` | Bit-correct disk images → `work/` |
+| `extract_blocks.py` / `extract_strings.py` / `extract_patterns.py` | Legacy dumps from corrected images |
+| `export_play_assets.py` | INDEX/ANIM-MAP/patterns → `play/assets.json` |
+| `assemble_rom_stub.py` | Gate check for full ROM |
+| `harness/blit_collision.py` | Overlay collision test |
+| `terse/parse.py` | Parse PATTERN / colon defs from a file |
+| `terse/fload_chain.py` | Resolve FLOAD trees |
+| `terse/mvp_compile.py` | Host MVP colon compile (experimental IR) |
+| `terse/package_patterns_rom.py` | XC.PATTERNS → 64K image @ 0x4000 |
+| `terse/runtime/` | C blit/collision stub for future SDL/WASM |

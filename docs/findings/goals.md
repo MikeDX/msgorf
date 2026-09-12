@@ -1,31 +1,32 @@
 # Goals
 
-## Primary (better)
+## Primary
 
-**Compiled Ms. Gorf ROM** — a binary that belongs on the dual-Z80 / Astrocade-derived hardware map (or the closest faithful image we can assemble), built from Nutting TERSE objects + reconstructed logic where sources are gone.
+**Compiled Ms. Gorf ROM** (or the closest faithful binary), built from recovered Nutting TERSE objects and only documented reconstructions where source is proven absent.
 
-## Secondary (first step, if we are truly porting)
+## Web / “port”
 
-**Web-playable port** — not a random shooter wearing Gorf skins. It must:
+The browser UI is a **source pattern lab**, not a game:
 
-1. Use authentic pattern pixels from the disks
-2. Use Jay’s `INDEX` roster / `ANIM-MAP` names
-3. Preserve write-overlay collision as the hit model
-4. Document every guessed behavior (`GUESS:`)
-5. Climb a fidelity ladder toward the same logic a ROM would run
+- Show INDEX / ANIM-MAP / pattern pixels from the disks
+- **Do not** invent waves, AI, HUD chrome, VCR overlays, or simultaneous 2P
+- P1i / P2i = alternate ship *graphics* (1P/2P slots), not co-op unless source says so
 
-If the web build drifts into “generic shmup with stolen sprites,” it stops being a port and stops helping the ROM path.
+A true playable port is allowed only when it executes decoded/compiled behavior from source (or a clearly labeled reconstruction module living outside `play/` until provenance is solid).
 
-## How they connect
+## Tooling path (preferred for playable + ROM)
 
 ```text
-disk patterns + INDEX
+TERSE screens / objects on disk
         │
-        ├─► play/     (port scaffold — validate art, roster, collision, feel)
+        ▼
+Python TERSE frontend (parse, dictionary, XC)
         │
-        └─► out/*.bin (XC.PATTERNS @ 0x4000) + future XC.LOGIC / harness
-                    │
-                    └─► compiled ROM (north star)
+        ▼
+C runtime / codegen (Z80 image and/or host IR)
+        │
+        ├─► arcade ROM image (north star)
+        └─► SDL2 desktop / WASM (validation harness)
 ```
 
-The web port is a **lab instrument** for the ROM: prove content and collision; then re-host the same assets under a Z80/VGER model.
+See `docs/architecture/terse-toolchain.md`.

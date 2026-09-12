@@ -1,69 +1,54 @@
 # Ms. Gorf — path to a compiled ROM
 
-Research lab for recovering and (eventually) compiling Midway / Dave Nutting Associates’ unfinished arcade sequel **Ms. Gorf** (Jamie Fenton, ~1982–83).
+Research lab for Midway / Dave Nutting Associates’ unfinished **Ms. Gorf** (Jamie Fenton, ~1982–83).
 
-**North star:** produce a **compiled arcade ROM** (preferred).
+## Goals
 
-**First step:** a **web port** that uses real disk patterns + INDEX roster (`play/index.html`) — a fidelity ladder toward the ROM, not a random shmup. See `docs/findings/goals.md`.
+- **Primary:** a **compiled arcade ROM** (or closest faithful binary).
+- **Browser UI:** a **source pattern lab** (`play/index.html`) — INDEX/ANIM-MAP/pixels only. **Not** an invented game.
+- Tooling path: **Python TERSE → C runtime → SDL/WASM + ROM emit** (`docs/architecture/terse-toolchain.md`).
 
-Preferred end state: a compiled arcade ROM (or the closest faithful binary) for the dual-Z80 / Astrocade-derived hardware.
+See `docs/findings/goals.md`, `docs/findings/source-extraction-status.md`, `docs/findings/display.md`.
 
 ## Current status
 
-| Phase | Status |
-|-------|--------|
-| 0 Lab bootstrap | Done |
-| 1 Inventory + completeness gate | Done |
-| 2 Mirror TERSE / ICE / Gorf refs | Done |
-| 3 Extract TERSE screens + patterns | Done |
-| 4 TERSE → Z80 model | Done |
-| 5 Host TERSE MVP toolchain | Done |
-| 6 Hardware model | Done |
-| 7 Assemble ROM | Stub done — full ROM blocked (see `out/ROM_STATUS.md`) |
+| Area | Status |
+|------|--------|
+| Disk normalize / extract | Done |
+| Pattern sources + XC.PATTERNS | Done |
+| Pattern lab (web) | Done — no fake gameplay |
+| Game/`XC.LOGIC` application source | **Missing** from these floppies |
+| TERSE Python compiler | MVP + parse stub |
+| C/SDL/WASM runtime | Stub (`tools/terse/runtime/`) |
+| Full ROM | Blocked on logic source / deeper XC |
 
-**Next action:** play the INDEX-based port in `play/index.html`. Keep climbing fidelity toward a compiled ROM (`docs/findings/goals.md`).
+**Next action:** deepen TERSE parse/dictionary toward compiling real screens; hunt `XC.LOGIC`; keep `play/` source-only.
 
 ## Original disks (do not modify)
 
 | Folder | Label | Role |
 |--------|--------|------|
-| `MSGORF/` | Ms. Gorf – GORF4A | Pattern data (`PATTERN GORF4A` / `QUADPAT`) |
-| `MSGORPAT/` | Ms. Gorf Pattern Disk | TERSE runtime + pattern tooling |
-| `MSGPATLD/` | PATLOAD / MS GORF / 5/17/83 | Pattern loader |
+| `MSGORF/` | Ms. Gorf – GORF4A | Pattern data |
+| `MSGORPAT/` | Pattern Disk | TERSE + pattern tooling |
+| `MSGPATLD/` | PATLOAD / 5/17/83 | Pattern loader |
 
-**Polarity warning:** decoded `.img` files are **bit-inverted**. Use `.inv` or XOR every byte with `0xFF` (see `tools/normalize_img.py` → `work/*.img.corrected`).
-
-Language is **TERSE** (Nutting Forth-ish), not stock Forth. Cross-compile related words appear on the pattern disks (`ARC-TERSE`, `BYTE-TERSE`, `XCLOAD`, `BINLOAD`, etc.).
+**Polarity:** `.img` is bit-inverted; use `tools/normalize_img.py` → `work/*.img.corrected`.
 
 ## Layout
 
-- `docs/lab-notebook/` — dated experiment log
-- `docs/inventory/` — checksums, geometry, labels
-- `docs/findings/` — durable conclusions
-- `docs/references/` — mirrored manuals + `SOURCES.md`
-- `extracted/` — screens, strings, dictionary, patterns (generated)
-- `tools/` — reproducible scripts
-- `work/` — corrected images and scratch (generated)
-- `out/` — compiled artifacts (when available)
-
-## Best artifact so far
-
-- `out/msgorf_patterns_at_4000.bin` — authentic `XC.PATTERNS` at `0x4000`
-- `extracted/msgorf_floppy_files/` — Tim’s per-file TERSE sources + listings
-- `extracted/patterns/*__*.png` — sprite previews from pattern sources
-
-## Known blockers
-
-1. These three floppies look like **pattern / TERSE tooling**, not a full game application source tree.
-2. Target hardware used dual Z80s and write-cycle collision detection that changed near cancellation.
-3. A full ROM compile needs a reconstructed TERSE cross-compiler and a hardware model (Phases 5–6).
+- `docs/` — lab notebook, inventory, findings, architecture
+- `extracted/` — screens, patterns, Tim’s file split, dictionary
+- `play/` — **pattern lab only**
+- `tools/terse/` — compiler / runtime experiments
+- `out/` — XC.PATTERNS ROM fragment, reports
+- `reconstructed/` — clearly labeled guesses only
 
 ## Quick start
 
 ```bash
 python3 tools/normalize_img.py
-python3 tools/extract_blocks.py
-python3 tools/extract_strings.py
-python3 -m tools.terse.mvp_compile --demo
-python3 tools/assemble_rom_stub.py
+python3 tools/export_play_assets.py
+# open play/index.html
+python3 tools/terse/parse.py extracted/msgorf_floppy_files/MSGORPAT_Disk/GORF-P
+python3 tools/harness/blit_collision.py
 ```
