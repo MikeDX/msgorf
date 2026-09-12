@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Ms. Gorf — reconstruction v0</title>
+<style>
+  :root { --bg:#0a0e14; --fg:#c8d0d8; --acc:#e8a54b; }
+  html,body { margin:0; height:100%; background:radial-gradient(ellipse at 30% 20%, #152033, var(--bg)); color:var(--fg);
+    font-family:"IBM Plex Mono", ui-monospace, monospace; }
+  main { max-width: 920px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-family: "Space Grotesk", "Futura", sans-serif; font-weight:700; letter-spacing:.04em;
+    font-size: clamp(1.8rem, 4vw, 2.6rem); margin:0 0 .25rem; color:#f2f5f8; }
+  .sub { opacity:.75; margin-bottom:1.25rem; max-width:42rem; line-height:1.45; }
+  .stage { position:relative; display:inline-block; border:1px solid #2a3544; box-shadow:0 20px 60px rgba(0,0,0,.45); }
+  canvas { display:block; background:#000; image-rendering: pixelated; width:640px; height:480px; max-width:100%; }
+  .hud { display:flex; gap:1.5rem; margin-top:.75rem; font-size:.9rem; }
+  .hud b { color:var(--acc); }
+  kbd { background:#1b2430; border:1px solid #334; padding:.1rem .35rem; border-radius:3px; }
+  .note { margin-top:1.25rem; font-size:.8rem; opacity:.65; line-height:1.4; }
+</style>
+</head>
+<body>
+<main>
+  <h1>MS. GORF</h1>
+  <p class="sub">Reconstruction v0 — authentic Nutting pattern pixels (GORF-PAT, PLY1-P), modern game loop.
+  Write-overlay collision: plotting onto a non-zero pixel counts as a hit (Jamie’s rule, simplified).</p>
+  <div class="stage"><canvas id="c" width="320" height="240"></canvas></div>
+  <div class="hud">
+    <div>Score <b id="score">0</b></div>
+    <div>Lives <b id="lives">3</b></div>
+    <div>Status <b id="status">PLAY</b></div>
+  </div>
+  <p class="note">Move <kbd>WASD</kbd> / arrows · Fire <kbd>Space</kbd> · Reset <kbd>R</kbd><br/>
+  Not the missing XC.LOGIC binary — a stand-in loop so the art can live. Patterns from MSGORPAT extract.</p>
+</main>
+<script>
+const RAW = {"gorf": {"name": "GORF-PAT", "w": 12, "h": 13, "rows": ["100033000100", "010333301000", "003333330000", "033333333000", "031133113000", "332133213300", "332133213300", "333333333300", "333211233300", "333112133300", "023333332000", "020333302000", "220000022000"]}, "player": {"name": "PLY1-P", "w": 16, "h": 15, "rows": ["0000000300000000", "0000003130000000", "0000031113000000", "0000333333300000", "0033331113333000", "2223311111332220", "2223311011332220", "2223110011132220", "2223111011132220", "2223111011132220", "2223110001132220", "2223311111332220", "2220331113302220", "2220033333002220", "2220002220002220"]}};
+
+const PAL = [[0,0,0,0],[40,90,220,255],[230,50,40,255],[245,245,245,255]];
+
+function bake(sprite) {
+  if (!sprite) return null;
+  const {w,h,rows} = sprite;
+  const img = new ImageData(w, h);
+  for (let y=0;y<h;y++) for (let x=0;x<w;x++) {
+    const v = +(rows[y][x]||'0');
+    const i = (y*w+x)*4;
+    const p = PAL[v];
+    img.data[i]=p[0]; img.data[i+1]=p[1]; img.data[i+2]=p[2]; img.data[i+3]=p[3];
+  }
+  // crop solid black margins lightly? keep as-is
+  const c = document.createElement('canvas');
+  c.width=w; c.height=h;
+  c.getContext('2d').putImageData(img,0,0);
+  return {canvas:c, w, h, rows};
+}
+
+const playerSpr = bake(RAW.player);
+const gorfSpr = bake(RAW.gorf);
+
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+
+const W=320, H=240;
+const keys = {};
+addEventListener('keydown', e => { keys[e.key]=true; if([' ','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) e.preventDefault(); });
+addEventListener('keyup', e => { keys[e.key]=false; });
+
+let score=0, lives=3, status='PLAY';
+const scoreEl=document.getElementById('score');
+const livesEl=document.getElementById('lives');
+const statusEl=document.getElementById('status');
+
+function hud(){ scoreEl.textContent=score; livesEl.textContent=lives; statusEl.textContent=status; }
+
+// Collision buffer: 0 empty, else owner id
+const col = new Uint16Array(W*H);
+let nextId=1;
+
+const state = {
+  player: {x:160, y:200, cooldown:0, id:0},
+  bullets: [],
+  enemies: [],
+  particles: [],
+};
+
+function spawnWave() {
+  for (let i=0;i<8;i++) {
+    state.enemies.push({
+      x: 30+i*35, y: 30+(i%2)*16,
+      vx: (i%2?1:-1)*0.4, vy:0.05,
+      id:0, hp:1, t:i*10
+    });
+  }
+}
+
+function reset() {
+  score=0; lives=3; status='PLAY';
+  state.bullets=[]; state.enemies=[]; state.particles=[];
+  state.player={x:160,y:200,cooldown:0,id:0};
+  spawnWave(); hud();
+}
+reset();
+
+function clearCol(){ col.fill(0); }
+
+function blit(spr, x, y, id) {
+  if (!spr) return;
+  const px=x|0, py=y|0;
+  ctx.drawImage(spr.canvas, px, py);
+  // stamp collision for non-zero pixels
+  for (let j=0;j<spr.h;j++) {
+    const yy=py+j; if (yy<0||yy>=H) continue;
+    const row=spr.rows[j];
+    for (let i=0;i<spr.w;i++) {
+      const xx=px+i; if (xx<0||xx>=W) continue;
+      const v=+row[i];
+      if (!v) continue;
+      const idx=yy*W+xx;
+      const prev=col[idx];
+      if (prev && prev !== id) {
+        // write-cycle collision
+        return {hit:true, other:prev, x:xx, y:yy};
+      }
+      col[idx]=id;
+    }
+  }
+  return {hit:false};
+}
+
+function boom(x,y) {
+  for (let i=0;i<12;i++) state.particles.push({
+    x,y, vx:(Math.random()-0.5)*3, vy:(Math.random()-0.5)*3, life:20+Math.random()*10
+  });
+}
+
+let last=performance.now();
+function frame(now) {
+  const dt=Math.min(32, now-last); last=now;
+  ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
+  clearCol();
+
+  if (status==='PLAY') {
+    const p=state.player;
+    const sp=1.6;
+    if (keys['ArrowLeft']||keys['a']||keys['A']) p.x-=sp;
+    if (keys['ArrowRight']||keys['d']||keys['D']) p.x+=sp;
+    if (keys['ArrowUp']||keys['w']||keys['W']) p.y-=sp;
+    if (keys['ArrowDown']||keys['s']||keys['S']) p.y+=sp;
+    p.x=Math.max(8, Math.min(W-24, p.x));
+    p.y=Math.max(8, Math.min(H-24, p.y));
+    if (p.cooldown>0) p.cooldown-=dt;
+    if ((keys[' ']||keys['Spacebar']) && p.cooldown<=0) {
+      state.bullets.push({x:p.x+(playerSpr?playerSpr.w/2:4), y:p.y, vy:-3.2, id:0});
+      p.cooldown=140;
+    }
+  }
+  if (keys['r']||keys['R']) { keys['r']=keys['R']=false; reset(); }
+
+  // assign ids each frame
+  nextId=1;
+  state.player.id = nextId++;
+  for (const b of state.bullets) b.id = nextId++;
+  for (const e of state.enemies) e.id = nextId++;
+
+  // update enemies
+  for (const e of state.enemies) {
+    e.t++; e.x += e.vx; e.y += e.vy;
+    if (e.x<10||e.x>W-20) e.vx*=-1;
+    if (e.y>H-40) e.y=20;
+  }
+
+  // bullets
+  state.bullets = state.bullets.filter(b => { b.y+=b.vy; return b.y>-8 && b.y<H+8; });
+
+  // draw order: enemies, player, bullets
+  const deadE=new Set(); const deadB=new Set();
+  for (const e of state.enemies) {
+    const r = blit(gorfSpr, e.x, e.y, e.id);
+    // no self
+  }
+  if (status==='PLAY' && playerSpr) {
+    const r = blit(playerSpr, state.player.x, state.player.y, state.player.id);
+    if (r.hit) {
+      // hit by enemy stamped earlier
+      lives--; boom(state.player.x, state.player.y); hud();
+      if (lives<=0) status='GAME OVER'; else { state.player.x=160; state.player.y=200; }
+    }
+  }
+  state.bullets.forEach((b,bi) => {
+    // 2x2 white bullet
+    ctx.fillStyle='#fff'; ctx.fillRect(b.x|0, b.y|0, 2, 3);
+    for (let j=0;j<3;j++) for (let i=0;i<2;i++) {
+      const xx=(b.x|0)+i, yy=(b.y|0)+j;
+      if (xx<0||yy<0||xx>=W||yy>=H) continue;
+      const idx=yy*W+xx; const prev=col[idx];
+      if (prev && prev !== b.id && prev !== state.player.id) {
+        // find enemy
+        for (const e of state.enemies) if (e.id===prev) { deadE.add(e); score+=100; boom(e.x,e.y); }
+        deadB.add(b); hud();
+      } else col[idx]=b.id;
+    }
+  });
+  state.enemies = state.enemies.filter(e => !deadE.has(e));
+  state.bullets = state.bullets.filter(b => !deadB.has(b));
+  if (state.enemies.length===0 && status==='PLAY') { score+=500; spawnWave(); hud(); }
+
+  // particles
+  state.particles = state.particles.filter(p => {
+    p.x+=p.vx; p.y+=p.vy; p.life--;
+    ctx.fillStyle=`rgba(230,80,40,${p.life/30})`;
+    ctx.fillRect(p.x|0,p.y|0,2,2);
+    return p.life>0;
+  });
+
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
