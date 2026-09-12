@@ -17,7 +17,7 @@ Research lab for recovering and (eventually) compiling Midway / Dave Nutting Ass
 | 6 Hardware model | Done |
 | 7 Assemble ROM | Stub done — full ROM blocked (see `out/ROM_STATUS.md`) |
 
-**Next action:** hunt `XC.LOGIC` / application sources; run pattern ROM fragment in a Z80 harness; deepen CFA-level TERSE RE using Gorf + Fasterse. See `docs/findings/source-completeness.md`.
+**Next action:** play `play/index.html` (authentic sprites + stub loop). Then harden harness / expand enemies. `XC.LOGIC` is a compiled game binary name — see `docs/findings/xc-logic.md`.
 
 ## Original disks (do not modify)
 
