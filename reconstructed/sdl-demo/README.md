@@ -61,3 +61,14 @@ onto buffer pixels before present — nothing moves in window/scaled space.
 
 `SDL_RenderSetLogicalSize` is intentionally **not** used (it allows fractional
 stretch). Resize keeps the largest integer scale that fits.
+
+## Motion constants (GUESS)
+
+Gorf speed / cloner Lissajous come from video tracks — see
+[`../../docs/findings/motion-fit-guess.md`](../../docs/findings/motion-fit-guess.md).
+Re-run:
+
+```bash
+source work/.venv_motion/bin/activate
+python3 tools/track_video_entities.py fit
+```

@@ -1,0 +1,188 @@
+{
+  "gorf_speed_px_per_s": {
+    "n": 242,
+    "p25": 37.84,
+    "p50": 68.35,
+    "p75": 82.21,
+    "mean": 59.43
+  },
+  "per_segment": {
+    "seg_a_play": {
+      "gorfs": {
+        "gorf_1": {
+          "n": 41,
+          "mean": 64.45,
+          "p50": 80.53
+        },
+        "gorf_2": {
+          "n": 6,
+          "mean": 105.48,
+          "p50": 100.93
+        },
+        "gorf_3": {
+          "n": 53,
+          "mean": 76.65,
+          "p50": 82.07
+        }
+      },
+      "cloner": {
+        "home_x": 204.15,
+        "home_y": 98.87,
+        "amp_x": 0.83,
+        "amp_y": 19.3,
+        "omega_x": 0.6,
+        "omega_y": 0.7,
+        "phase_x": -0.9438,
+        "phase_y": 2.1271,
+        "err": 105.252,
+        "n": 124,
+        "span_x": 6.21,
+        "span_y": 62.56
+      }
+    },
+    "seg_b_mid": {
+      "gorfs": {
+        "gorf_0": {
+          "n": 4,
+          "mean": 10.63,
+          "p50": 9.31
+        },
+        "gorf_1": {
+          "n": 12,
+          "mean": 44.36,
+          "p50": 37.36
+        },
+        "gorf_2": {
+          "n": 27,
+          "mean": 88.96,
+          "p50": 89.81
+        }
+      },
+      "cloner": {
+        "home_x": 256.5,
+        "home_y": 149.15,
+        "amp_x": 1.26,
+        "amp_y": 27.53,
+        "omega_x": 1.2,
+        "omega_y": 0.15,
+        "phase_x": 2.0254,
+        "phase_y": 2.6462,
+        "err": 4.903,
+        "n": 40,
+        "span_x": 3.28,
+        "span_y": 14.89
+      }
+    },
+    "seg_c_late": {
+      "gorfs": {
+        "gorf_0": {
+          "n": 17,
+          "mean": 83.01,
+          "p50": 82.38
+        },
+        "gorf_1": {
+          "n": 94,
+          "mean": 35.22,
+          "p50": 21.4
+        },
+        "gorf_2": {
+          "n": 77,
+          "mean": 94.11,
+          "p50": 95.44
+        },
+        "gorf_3": {
+          "n": 77,
+          "mean": 93.91,
+          "p50": 95.44
+        }
+      },
+      "cloner": {
+        "home_x": 90.73,
+        "home_y": 118.4,
+        "amp_x": 8.77,
+        "amp_y": 6.61,
+        "omega_x": 0.8,
+        "omega_y": 0.15,
+        "phase_x": 0.0979,
+        "phase_y": 2.1879,
+        "err": 6.518,
+        "n": 112,
+        "span_x": 24.83,
+        "span_y": 9.29
+      }
+    }
+  },
+  "cloner_fits": [
+    {
+      "segment": "seg_a_play",
+      "home_x": 204.15,
+      "home_y": 98.87,
+      "amp_x": 0.83,
+      "amp_y": 19.3,
+      "omega_x": 0.6,
+      "omega_y": 0.7,
+      "phase_x": -0.9438,
+      "phase_y": 2.1271,
+      "err": 105.252,
+      "n": 124,
+      "span_x": 6.21,
+      "span_y": 62.56
+    },
+    {
+      "segment": "seg_b_mid",
+      "home_x": 256.5,
+      "home_y": 149.15,
+      "amp_x": 1.26,
+      "amp_y": 27.53,
+      "omega_x": 1.2,
+      "omega_y": 0.15,
+      "phase_x": 2.0254,
+      "phase_y": 2.6462,
+      "err": 4.903,
+      "n": 40,
+      "span_x": 3.28,
+      "span_y": 14.89
+    },
+    {
+      "segment": "seg_c_late",
+      "home_x": 90.73,
+      "home_y": 118.4,
+      "amp_x": 8.77,
+      "amp_y": 6.61,
+      "omega_x": 0.8,
+      "omega_y": 0.15,
+      "phase_x": 0.0979,
+      "phase_y": 2.1879,
+      "err": 6.518,
+      "n": 112,
+      "span_x": 24.83,
+      "span_y": 9.29
+    }
+  ],
+  "recommend": {
+    "GORF_SPEED": 45.0,
+    "GORF_SPEED_SPREAD": 0.3,
+    "cloner": {
+      "segment": "seg_c_late",
+      "home_x": 90.73,
+      "home_y": 118.4,
+      "amp_x": 12.0,
+      "amp_y": 10.0,
+      "omega_x": 0.8,
+      "omega_y": 0.15,
+      "phase_x": 0.0979,
+      "phase_y": 2.1879,
+      "err": 6.518,
+      "n": 112,
+      "span_x": 24.83,
+      "span_y": 9.29,
+      "sdl_home_x": 160.0,
+      "sdl_home_y": 100.0,
+      "sdl_omega_x": 0.8,
+      "sdl_omega_y": 0.35,
+      "sdl_phase_x": 0.0979,
+      "sdl_phase_y": 2.1879
+    }
+  },
+  "note": "GUESS from template tracks \u2014 CRT noise, framing drift, lock losses"
+}

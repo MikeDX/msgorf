@@ -20,11 +20,22 @@
 #define MAX_GALAXY_STARS 512
 
 #define GORF_R 7
-#define GORF_SPEED 38.f
+/* GUESS: video fit — docs/findings/motion-fit-guess.md (windowed tracks). */
+#define GORF_SPEED 45.f
+#define GORF_SPEED_SPREAD 0.3f
 #define BULLET_MUZZLE 12.f
 #define CLONE_PROCESS_T 0.35f
 #define CLONE_EXIT_SPEED 55.f
 #define CLONE_COOL 0.75f
+/* GUESS: Lissajous from seg_c_late fit + readable omega floor. */
+#define CLONE_AMP_X 12.f
+#define CLONE_AMP_Y 10.f
+#define CLONE_OMEGA_X 0.8f
+#define CLONE_OMEGA_Y 0.35f
+#define CLONE_PHASE_X 0.0979f
+#define CLONE_PHASE_Y 2.1879f
+#define CLONE_HOME_X 160.f
+#define CLONE_HOME_Y 100.f
 
 #define GALAXY_ARMS 16
 #define GALAXY_SHELLS_IN 17
@@ -243,7 +254,7 @@ static float frand(void) { return (float)(rand() % 10000) / 10000.f; }
 
 static void rand_vel(float *vx, float *vy) {
   float a = frand() * (float)(M_PI * 2.0);
-  float s = GORF_SPEED * (0.75f + frand() * 0.5f);
+  float s = GORF_SPEED * (1.f - GORF_SPEED_SPREAD + frand() * (2.f * GORF_SPEED_SPREAD));
   *vx = cosf(a) * s;
   *vy = sinf(a) * s;
 }
@@ -264,8 +275,8 @@ static void spawn_gorf(float x, float y, float vx, float vy, const char *kind, f
 /* Keep gorfs moving after wall/pair bounce (elastic swaps can kill speed). */
 static void keep_gorf_speed(foe_t *e) {
   float sp = hypotf(e->vx, e->vy);
-  float lo = GORF_SPEED * 0.7f;
-  float hi = GORF_SPEED * 1.35f;
+  float lo = GORF_SPEED * (1.f - GORF_SPEED_SPREAD);
+  float hi = GORF_SPEED * (1.f + GORF_SPEED_SPREAD);
   if (sp < 8.f) {
     rand_vel(&e->vx, &e->vy);
     return;
@@ -315,11 +326,11 @@ static void reveal_player_and_clone(void) {
   player_x = FB_W * 0.5f;
   player_y = FB_H * 0.5f;
   clone_vis = 1;
-  /* GUESS: continuous Lissajous drift around a home near centre (footage). */
-  clone_home_x = FB_W * 0.5f + 20.f;
-  clone_home_y = FB_H * 0.5f - 6.f;
-  clone_x = clone_home_x;
-  clone_y = clone_home_y;
+  /* GUESS: continuous Lissajous — docs/findings/motion-fit-guess.md */
+  clone_home_x = CLONE_HOME_X;
+  clone_home_y = CLONE_HOME_Y;
+  clone_x = clone_home_x + CLONE_AMP_X * sinf(CLONE_PHASE_X);
+  clone_y = clone_home_y + CLONE_AMP_Y * cosf(CLONE_PHASE_Y);
   clone_frame = 0;
 }
 
@@ -503,9 +514,9 @@ static void process_clone_machine(float dt) {
   const int ncycle = (int)(sizeof CLONE_CYCLE / sizeof CLONE_CYCLE[0]);
   clone_frame = fmodf(clone_frame + dt * 2.4f, (float)ncycle);
   if (clone_frame < 0) clone_frame += ncycle;
-  /* Continuous path (not integrated+truncated — that stuttered). */
-  clone_x = clone_home_x + sinf(t_accum * 0.55f) * 28.f + sinf(t_accum * 0.19f) * 6.f;
-  clone_y = clone_home_y + cosf(t_accum * 0.37f) * 20.f + sinf(t_accum * 0.23f + 1.1f) * 5.f;
+  /* Continuous Lissajous (video fit). Floor only at blit — see pix(). */
+  clone_x = clone_home_x + CLONE_AMP_X * sinf(t_accum * CLONE_OMEGA_X + CLONE_PHASE_X);
+  clone_y = clone_home_y + CLONE_AMP_Y * cosf(t_accum * CLONE_OMEGA_Y + CLONE_PHASE_Y);
   if (clone_x < 48.f) clone_x = 48.f;
   if (clone_x > FB_W - 48.f) clone_x = FB_W - 48.f;
   if (clone_y < 48.f) clone_y = 48.f;

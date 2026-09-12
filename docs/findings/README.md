@@ -30,3 +30,6 @@ Working conclusions from the Ms. Gorf disks and references. Parent map: [`../REA
 - [`next-phase-plan.md`](next-phase-plan.md)
 - [`reconstruction-stubs.md`](reconstruction-stubs.md)
 - [`video-demo-assets.md`](video-demo-assets.md) — footage ↔ patterns; font/bullet gaps
+- [`video-segments.md`](video-segments.md) — usable `gameplay.mp4` stretches for tracking
+- [`motion-fit-guess.md`](motion-fit-guess.md) — gorf/cloner motion params from tracks (GUESS)
+- [`gorf-motion-from-video.md`](gorf-motion-from-video.md) — earlier noisy yellow-blob probe
