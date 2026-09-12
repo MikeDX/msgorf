@@ -1,6 +1,8 @@
-# GUESS: video-derived Ms. Gorf playable sketch
+# GUESS: video-derived Ms. Gorf playable sketch (JS proto)
 
-**Not** compiled Ms. Gorf. **Not** `XC.LOGIC`. Pattern art is from the floppies; motion, HUD font, bullets, and rules are estimated from Jamie Fenton 1982 footage (`work/video_refs/gameplay.mp4`) plus human judgment.
+**Prefer [`../sdl-demo/`](../sdl-demo/)** for ongoing work — real 320×204 buffer + SDL/Emscripten.
+
+This folder is the browser prototype rules were worked out in. **Not** compiled Ms. Gorf. **Not** `XC.LOGIC`.
 
 Open [`index.html`](index.html) in a browser (needs `play/assets.js` beside this tree).
 

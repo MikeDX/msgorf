@@ -4,6 +4,10 @@ These are **not** from the floppies. They exist so the host toolchain has someth
 
 Each file starts with `( GUESS: ... )`.
 
-## Video playable sketch
+## Playable sketch (primary)
 
-[`video-demo/`](video-demo/) — browser remake using **authentic pattern art** + HUD/bullets/motion estimated from `work/video_refs/gameplay.mp4`. See that folder’s README and [`../docs/findings/video-demo-assets.md`](../docs/findings/video-demo-assets.md).
+[`sdl-demo/`](sdl-demo/) — **SDL2** remake with a real **320×204** RGB buffer and disk patterns (`assets_gen` from `play/assets.json`). Builds native and via Emscripten for web. Gameplay ported from the JS proto.
+
+## JS proto (reference)
+
+[`video-demo/`](video-demo/) — earlier browser sketch used to nail rules/feel. Prefer `sdl-demo/` for further work.

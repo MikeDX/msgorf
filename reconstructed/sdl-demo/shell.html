@@ -1,0 +1,28 @@
+/* Minimal Emscripten shell — canvas sized for 320×204 × scale. */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ms. Gorf (GUESS SDL / web)</title>
+  <style>
+    html, body { margin: 0; background: #111; color: #ccc; font-family: ui-monospace, monospace; }
+    #wrap { display: flex; flex-direction: column; align-items: center; padding: 1rem; gap: 0.5rem; }
+    canvas.emscripten { image-rendering: pixelated; image-rendering: crisp-edges; background: #000; }
+    .note { font-size: 12px; max-width: 40rem; text-align: center; }
+  </style>
+</head>
+<body>
+  <div id="wrap">
+    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+    <p class="note">GUESS remake — disk patterns, video-derived rules. Not XC.LOGIC.
+      Keys: 1 start · WASD move · mouse aim · click/space fire</p>
+  </div>
+  <script>
+    var Module = {
+      canvas: (function () { return document.getElementById('canvas'); })()
+    };
+  </script>
+  {{{ SCRIPT }}}
+</body>
+</html>
