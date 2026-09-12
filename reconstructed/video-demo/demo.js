@@ -59,12 +59,12 @@
     if (p.rows) sprites[name] = patternToCanvas(p);
   }
 
-  // CLONE cycle from footage: 1 → 2 → 3 → 2(hflip)
+  // CLONE cycle reversed from footage read: 2(hflip) → 3 → 2 → 1
   const CLONE_CYCLE = [
-    { name: "CLN0", flip: false },
-    { name: "CLN32", flip: false },
-    { name: "CLN64", flip: false },
     { name: "CLN32", flip: true },
+    { name: "CLN64", flip: false },
+    { name: "CLN32", flip: false },
+    { name: "CLN0", flip: false },
   ];
 
   const keys = Object.create(null);
@@ -135,7 +135,7 @@
   let t = 0;
   let fireCd = 0;
   let spawnCd = 0;
-  const player = { x: W * 0.35, y: H * 0.55, visible: false };
+  const player = { x: W * 0.5, y: H * 0.5, visible: false };
   /** @type {{x:number,y:number,vx:number,vy:number,life:number}[]} */
   let bullets = [];
   /** @type {{x:number,y:number,vx:number,vy:number,kind:string,hp:number,r:number}[]} */
@@ -215,11 +215,32 @@
     return { vx: Math.cos(a) * s, vy: Math.sin(a) * s };
   }
 
+  function spawnGorfAtEdge() {
+    // Bias toward screen edges (footage: gorfs arrive at perimeter)
+    const margin = 18;
+    const side = Math.floor(Math.random() * 4);
+    let x, y;
+    if (side === 0) {
+      x = margin + Math.random() * (W - margin * 2);
+      y = margin + 22 + Math.random() * 20;
+    } else if (side === 1) {
+      x = margin + Math.random() * (W - margin * 2);
+      y = H - margin - Math.random() * 24;
+    } else if (side === 2) {
+      x = margin + Math.random() * 24;
+      y = margin + 28 + Math.random() * (H - margin * 2 - 28);
+    } else {
+      x = W - margin - Math.random() * 24;
+      y = margin + 28 + Math.random() * (H - margin * 2 - 28);
+    }
+    spawnGorf(x, y);
+  }
+
   function spawnGorf(x, y) {
     const v = randVel();
     foes.push({
-      x: x ?? W * 0.5 + (Math.random() - 0.5) * 80,
-      y: y ?? H * 0.35 + (Math.random() - 0.5) * 60,
+      x,
+      y,
       vx: v.vx,
       vy: v.vy,
       kind: "GORF-PAT",
@@ -228,21 +249,8 @@
     });
   }
 
-  function beginPlayfield() {
-    player.visible = true;
-    player.x = W * 0.28;
-    player.y = H * 0.55;
-    clone.visible = true;
-    clone.x = W * 0.62;
-    clone.y = H * 0.45;
-    clone.frame = 0;
-    spawnCd = 1.5;
-    foes = [];
-    for (let i = 0; i < 4; i++) spawnGorf();
-    mode = "play";
-  }
-
-  function resetPlay() {
+  /** Level start: gorfs on edges immediately, then galaxy; player/clone when galaxy ends. */
+  function beginLevel() {
     score = 0;
     shipsLeft = 3;
     bullets = [];
@@ -250,6 +258,8 @@
     fx = [];
     player.visible = false;
     clone.visible = false;
+    spawnCd = 2.0;
+    for (let i = 0; i < 5; i++) spawnGorfAtEdge();
     galaxy.phase = "in";
     galaxy.age = 0;
     galaxy.starsDrawn = 0;
@@ -258,13 +268,23 @@
     mode = "intro";
   }
 
+  function revealPlayerAndClone() {
+    player.visible = true;
+    player.x = W * 0.5;
+    player.y = H * 0.5;
+    clone.visible = true;
+    clone.x = W * 0.5 + 28;
+    clone.y = H * 0.5 - 10;
+    clone.frame = 0;
+  }
+
   function spawnBurst(x, y) {
     fx.push({ x, y, kind: "_BANG", hp: 0.45 });
   }
 
   addEventListener("keydown", (e) => {
     if (mode === "select") {
-      if (e.key === "1" || e.key === "2") resetPlay();
+      if (e.key === "1" || e.key === "2") beginLevel();
     } else if (mode === "dead" && (e.key === "Enter" || e.key === "1")) {
       mode = "select";
     }
@@ -291,6 +311,16 @@
     t += dt;
     galaxy.age += dt;
 
+    // Gorfs bounce while galaxy plays
+    for (const f of foes) {
+      f.x += f.vx * dt;
+      f.y += f.vy * dt;
+      bounceWalls(f);
+    }
+    for (let i = 0; i < foes.length; i++) {
+      for (let j = i + 1; j < foes.length; j++) bouncePair(foes[i], foes[j]);
+    }
+
     if (galaxy.phase === "in") {
       galaxy.starsDrawn = Math.min(
         GALAXY_STARS.length,
@@ -309,7 +339,8 @@
       );
       if (galaxy.shellsPeeled >= GALAXY_SHELLS_IN + GALAXY_SHELLS_OVER) {
         galaxy.phase = "done";
-        beginPlayfield();
+        revealPlayerAndClone();
+        mode = "play";
       }
     }
   }
@@ -422,7 +453,7 @@
       return b.life > 0 && b.x > -10 && b.x < W + 10 && b.y > -10 && b.y < H + 10;
     });
 
-    // Clone machine: animate + drift; not destroyable; spawns gorfs
+    // Clone machine: animate + drift; not destroyable; spawns gorfs at edges
     if (clone.visible) {
       clone.frame = (clone.frame + dt * 2.4) % CLONE_CYCLE.length;
       clone.x += Math.sin(t * 0.55) * 10 * dt;
@@ -433,7 +464,7 @@
       spawnCd -= dt;
       if (spawnCd <= 0) {
         spawnCd = 2.2 + Math.random() * 1.5;
-        spawnGorf(clone.x + (Math.random() - 0.5) * 20, clone.y + (Math.random() - 0.5) * 20);
+        spawnGorfAtEdge();
       }
     }
 
@@ -466,8 +497,8 @@
       if (Math.hypot(f.x - player.x, f.y - player.y) < f.r + 8) {
         shipsLeft -= 1;
         spawnBurst(player.x, player.y);
-        player.x = W * 0.3;
-        player.y = H * 0.55;
+        player.x = W * 0.5;
+        player.y = H * 0.5;
         if (shipsLeft <= 0) mode = "dead";
         break;
       }
@@ -490,6 +521,8 @@
   function drawIntro() {
     ctx.fillStyle = "#000";
     ctx.fillRect(0, 0, W, H);
+    // Order: gorfs already present, galaxy animates over them
+    for (const f of foes) blit(f.kind, f.x, f.y);
     drawGalaxy();
     drawHud();
   }
@@ -499,14 +532,14 @@
     ctx.fillRect(0, 0, W, H);
     // no galaxy during play — intro-only
 
+    for (const f of foes) blit(f.kind, f.x, f.y);
+    for (const e of fx) blit(e.hp > 0.22 ? "FBEXP5" : "FBEXP6", e.x, e.y);
+
     if (clone.visible) {
       const ci = Math.floor(clone.frame) % CLONE_CYCLE.length;
       const cf = CLONE_CYCLE[ci];
       blit(cf.name, clone.x, clone.y, { flip: cf.flip });
     }
-
-    for (const f of foes) blit(f.kind, f.x, f.y);
-    for (const e of fx) blit(e.hp > 0.22 ? "FBEXP5" : "FBEXP6", e.x, e.y);
 
     if (player.visible) blit("PLY1-P", player.x, player.y);
 

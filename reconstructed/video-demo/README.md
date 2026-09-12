@@ -19,6 +19,6 @@ Sprites / animations via `play/assets.json`: PLY*, GORF-PAT, CLONE frames, LAZON
 | Spiral / warp field | Procedural paint | **Intro only:** 17×16 stars from ~10 o’clock CCW (~7/frame, OR blit), 3 overrun shells through centre, peel outer→inner |
 | Playfield size | Footage is **horizontal** | **320×204** Astrocade hi-res landscape (GUESS) |
 | Dual-stick feel | Wooden prototype in video | WASD move + mouse aim; **ship art stays upright** |
-| Clone anim | `CLN0/32/64` | Cycle `1 → 2 → 3 → 2(hflip)` |
+| Clone anim | `CLN0/32/64` | Cycle `2(hflip) → 3 → 2 → 1` (reversed) |
 
 See also: [`../findings/reconstruction-stubs.md`](../../docs/findings/reconstruction-stubs.md), [`../../docs/references/jamie-fenton-1982-video.md`](../../docs/references/jamie-fenton-1982-video.md).
