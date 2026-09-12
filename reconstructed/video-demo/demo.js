@@ -144,21 +144,25 @@
   let fx = [];
   let clone = { x: W * 0.62, y: H * 0.42, frame: 0, visible: false };
 
-  /** Level-start galaxy (yellow, 16 arms) — not present during play. */
+  /** Level-start galaxy: 15 perimeter shells × 16 yellow stars. Intro only. */
   const galaxy = {
     phase: "in", // in | bang | out | done
     age: 0,
-    rot: 0,
-    bangT: 0,
+    /** How many shells are currently drawn (0..15). In: grow; out: shrink from outside. */
+    shellsShown: 0,
+    /** During out: how many outer shells have been peeled away. */
+    shellsPeeled: 0,
   };
   const GALAXY_CX = W * 0.5;
   const GALAXY_CY = H * 0.52;
   const GALAXY_ARMS = 16;
-  const GALAXY_R0 = 95;
-  const GALAXY_R1 = 5;
-  const GALAXY_IN_DUR = 2.8;
+  const GALAXY_SHELLS = 15;
+  const GALAXY_R0 = 92; // outermost shell radius
+  const GALAXY_R1 = 6; // innermost shell radius
+  /** Anti-clockwise twist per shell (radians). */
+  const GALAXY_SHELL_TWIST = (Math.PI * 2) / GALAXY_ARMS / 3; // ~7.5°
+  const GALAXY_SHELL_DT = 0.11; // seconds per shell appear/remove
   const GALAXY_BANG_DUR = 0.55;
-  const GALAXY_OUT_DUR = 1.1;
 
   const GORF_R = 7;
   const GORF_SPEED = 38;
@@ -206,8 +210,8 @@
     clone.visible = false;
     galaxy.phase = "in";
     galaxy.age = 0;
-    galaxy.rot = 0;
-    galaxy.bangT = 0;
+    galaxy.shellsShown = 0;
+    galaxy.shellsPeeled = 0;
     mode = "intro";
   }
 
@@ -223,50 +227,59 @@
     }
   });
 
+  function shellRadius(shellIndex) {
+    // shell 0 = outermost, shell 14 = innermost
+    if (GALAXY_SHELLS <= 1) return GALAXY_R0;
+    const u = shellIndex / (GALAXY_SHELLS - 1);
+    return GALAXY_R0 + (GALAXY_R1 - GALAXY_R0) * u;
+  }
+
   /**
-   * Intro galaxy: 16 yellow spiral arms → small centre (CCW), bang, then peel
-   * outer→inner and vanish. GUESS from footage.
+   * Draw discrete perimeter shells.
+   * firstShell..lastShell inclusive; 0 = outer.
    */
-  function drawGalaxy() {
+  function drawGalaxyShells(firstShell, lastShell) {
     const [yr, yg, yb] = YELLOW;
     ctx.fillStyle = `rgb(${yr},${yg},${yb})`;
-
-    let rMax = GALAXY_R0;
-    let rMin = GALAXY_R1;
-    if (galaxy.phase === "in") {
-      // collapse toward centre: outer radius shrinks
-      const u = Math.min(1, galaxy.age / GALAXY_IN_DUR);
-      rMax = GALAXY_R0 + (GALAXY_R1 + 2 - GALAXY_R0) * u;
-    } else if (galaxy.phase === "bang") {
-      rMax = GALAXY_R1 + 4;
-    } else if (galaxy.phase === "out") {
-      // disappear biggest → smallest: raise the minimum drawn radius
-      const u = Math.min(1, galaxy.age / GALAXY_OUT_DUR);
-      rMin = GALAXY_R1 + (GALAXY_R0 - GALAXY_R1) * u;
-      rMax = GALAXY_R0;
-      if (rMin >= rMax) return;
-    } else {
-      return;
-    }
-
-    const steps = 36;
-    const twist = Math.PI * 1.35; // arm curvature toward centre
-    for (let arm = 0; arm < GALAXY_ARMS; arm++) {
-      const base = (arm / GALAXY_ARMS) * Math.PI * 2 + galaxy.rot;
-      for (let i = 0; i < steps; i++) {
-        const v = i / (steps - 1); // 0 = outer, 1 = inner
-        const r = rMax + (rMin - rMax) * v;
-        if (r < rMin - 0.01 || r > rMax + 0.01) continue;
-        // anti-clockwise spiral (positive angle with decreasing r)
-        const a = base + (1 - v) * twist;
+    for (let s = firstShell; s <= lastShell; s++) {
+      if (s < 0 || s >= GALAXY_SHELLS) continue;
+      const r = shellRadius(s);
+      // each closer shell is rotated slightly anti-clockwise vs the previous
+      const rot = s * GALAXY_SHELL_TWIST;
+      for (let arm = 0; arm < GALAXY_ARMS; arm++) {
+        const a = rot + (arm / GALAXY_ARMS) * Math.PI * 2;
         const x = GALAXY_CX + Math.cos(a) * r;
         const y = GALAXY_CY + Math.sin(a) * r;
         ctx.fillRect(x | 0, y | 0, 1, 1);
       }
     }
+  }
+
+  /**
+   * Intro: shells appear outer→inner (15×16), bang at centre, then peel
+   * outer→inner one perimeter at a time. GUESS from footage.
+   */
+  function drawGalaxy() {
+    if (galaxy.phase === "done") return;
+
+    let first = 0;
+    let last = -1;
+    if (galaxy.phase === "in") {
+      // shellsShown = how many complete shells (1..15)
+      last = galaxy.shellsShown - 1;
+    } else if (galaxy.phase === "bang") {
+      first = 0;
+      last = GALAXY_SHELLS - 1;
+    } else if (galaxy.phase === "out") {
+      // peel outer shells: start drawing after shellsPeeled
+      first = galaxy.shellsPeeled;
+      last = GALAXY_SHELLS - 1;
+    }
+
+    if (last >= first) drawGalaxyShells(first, last);
 
     if (galaxy.phase === "bang") {
-      const bangName = galaxy.bangT < GALAXY_BANG_DUR * 0.5 ? "FBEXP5" : "FBEXP6";
+      const bangName = galaxy.age < GALAXY_BANG_DUR * 0.5 ? "FBEXP5" : "FBEXP6";
       blit(bangName, GALAXY_CX, GALAXY_CY);
     }
   }
@@ -274,23 +287,29 @@
   function updateIntro(dt) {
     t += dt;
     galaxy.age += dt;
-    // anti-clockwise: increasing angle
-    galaxy.rot += dt * 1.1;
 
     if (galaxy.phase === "in") {
-      if (galaxy.age >= GALAXY_IN_DUR) {
+      const want = Math.min(
+        GALAXY_SHELLS,
+        1 + Math.floor(galaxy.age / GALAXY_SHELL_DT)
+      );
+      galaxy.shellsShown = want;
+      if (galaxy.shellsShown >= GALAXY_SHELLS && galaxy.age >= GALAXY_SHELLS * GALAXY_SHELL_DT) {
         galaxy.phase = "bang";
         galaxy.age = 0;
-        galaxy.bangT = 0;
       }
     } else if (galaxy.phase === "bang") {
-      galaxy.bangT += dt;
       if (galaxy.age >= GALAXY_BANG_DUR) {
         galaxy.phase = "out";
         galaxy.age = 0;
+        galaxy.shellsPeeled = 0;
       }
     } else if (galaxy.phase === "out") {
-      if (galaxy.age >= GALAXY_OUT_DUR) {
+      galaxy.shellsPeeled = Math.min(
+        GALAXY_SHELLS,
+        Math.floor(galaxy.age / GALAXY_SHELL_DT)
+      );
+      if (galaxy.shellsPeeled >= GALAXY_SHELLS) {
         galaxy.phase = "done";
         beginPlayfield();
       }

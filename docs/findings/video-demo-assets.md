@@ -25,7 +25,7 @@ Source clip: `work/video_refs/gameplay.mp4` (~163 s chopped Media Burn fullscr
 | Thin shot streaks | Always 1-px-ish lines, any angle | Hardware line / `BULLETS` verb path — `FS.XC` only has stub `: BULLETS  p-i @ -2 P-I ;` |
 | Purple life diamonds | HUD next to score | **Wrong earlier:** those are INDEX `SBi` → pattern `SBASE` (ships remaining), not a separate diamond glyph |
 | Flashing mark by score | Near `$` | INDEX `P1Ui` → `P1UP` (alternates with `NULPAT`) |
-| Green/yellow spiral / warp field | Level-start only in footage | **16 yellow arms**, curve into small centre (CCW), centre bang, then vanish outer→inner; not during play |
+| Green/yellow spiral / warp field | Level-start only in footage | **15 perimeter shells × 16 yellow stars**; appear one shell at a time outer→inner (each shell rotated slightly CCW); centre bang; peel one shell at a time outer→inner; gone during play |
 
 ## Demo policy
 
