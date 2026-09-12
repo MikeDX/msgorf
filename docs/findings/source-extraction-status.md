@@ -26,11 +26,11 @@ Dictionary on MSGORPAT *names* `XC.LOGIC` as a cross-compile target — that fil
 
 ## Extraction next steps
 
-1. Continue CFA/dictionary RE on MSGORPAT kernel + `FS.XC` (Python TERSE tools)
-2. Hunt museum / Bitsavers / collectors for any `XC.LOGIC` or non-pattern Ms. Gorf floppies
+1. **Acquire missing media** — see `docs/findings/missing-files-hunt.md` (museum catalog, 8″ “RIP Ms. GORF” set, Garrett/Tim/Frank). Not findable inside current zips.
+2. Continue CFA/dictionary RE on MSGORPAT kernel + `FS.XC` (Python TERSE tools)
 3. Use Gorf `GORFOS.txt` + Roto sources as Rosetta for VGER verbs only — do not paste into Ms. Gorf as if authentic
-4. Decode `XC.PATTERNS` heap format so ROM fragment is interpretable, not only relocatable
+4. Decode remaining XC animation tables so ROM fragment is fully interpretable
 
 ## Honesty bar
 
-Until game screens exist, **do not** ship a “Ms. Gorf game” UI that pretends to be the arcade logic. Pattern lab + toolchain only.
+Until game screens / `XC.LOGIC` exist, **do not** ship a “Ms. Gorf game” UI that pretends to be the arcade logic. Pattern lab + toolchain only.

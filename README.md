@@ -22,7 +22,7 @@ See `docs/findings/goals.md`, `docs/findings/source-extraction-status.md`, `docs
 | C/SDL runtime | Runnable harness (`make -C tools/terse/runtime run`) |
 | Full ROM | Blocked on logic source / deeper XC |
 
-**Next action:** deepen dictionary/CFA toward real codegen; hunt `XC.LOGIC`; keep `play/` source-only.
+**Next action:** acquire missing logic/8″ media (`docs/findings/missing-files-hunt.md`); keep toolchain/pattern work source-only.
 
 ## Original disks (do not modify)
 
