@@ -21,6 +21,8 @@
 
 **Chopped gameplay (gitignored):** `work/video_refs/gameplay.mp4` (~163 s fullscreen). Drives the labeled remake in [`reconstructed/video-demo/`](../../reconstructed/video-demo/).
 
+**Frame dump 4–10s:** `work/video_refs/gameplay_4to10/` — 180 JPEGs @ ~29.97 fps (`f0001` ≈ 4.0 s … `f0180` ≈ 10.0 s). For CRT crop / HUD lining.
+
 **Licensing:** Media Burn requires a license to *use* archive video in a project (`info@mediaburn.org`). Keep the full reel under `work/`; do not publish it on GitHub. Still grabs for private motion notes are research-oriented; ask Media Burn before redistributing frames widely.
 
 ### Probe notes (480p file wall time)

@@ -157,8 +157,9 @@
   const GALAXY_CY = H * 0.52;
   const GALAXY_ARMS = 16;
   const GALAXY_SHELLS = 15;
-  const GALAXY_R0 = 92; // outermost shell radius
-  const GALAXY_R1 = 6; // innermost shell radius
+  const GALAXY_R1 = 5; // innermost shell
+  const GALAXY_SHELL_GAP = 3.5; // pixels between perimeter shells
+  const GALAXY_R0 = GALAXY_R1 + (GALAXY_SHELLS - 1) * GALAXY_SHELL_GAP; // ~54 — compact near centre
   /** Clockwise-on-screen twist per shell (canvas Y-down; negative = CCW on CRT). */
   const GALAXY_SHELL_TWIST = -((Math.PI * 2) / GALAXY_ARMS / 3); // ~−7.5°
   const GALAXY_SHELL_DT = 0.075; // seconds per shell appear/remove
@@ -228,10 +229,8 @@
   });
 
   function shellRadius(shellIndex) {
-    // shell 0 = outermost, shell 14 = innermost
-    if (GALAXY_SHELLS <= 1) return GALAXY_R0;
-    const u = shellIndex / (GALAXY_SHELLS - 1);
-    return GALAXY_R0 + (GALAXY_R1 - GALAXY_R0) * u;
+    // shell 0 = outermost, shell 14 = innermost; fixed ~3.5px gaps
+    return GALAXY_R0 - shellIndex * GALAXY_SHELL_GAP;
   }
 
   /**
