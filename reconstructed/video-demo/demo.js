@@ -159,9 +159,9 @@
   const GALAXY_SHELLS = 15;
   const GALAXY_R0 = 92; // outermost shell radius
   const GALAXY_R1 = 6; // innermost shell radius
-  /** Anti-clockwise twist per shell (radians). */
-  const GALAXY_SHELL_TWIST = (Math.PI * 2) / GALAXY_ARMS / 3; // ~7.5°
-  const GALAXY_SHELL_DT = 0.11; // seconds per shell appear/remove
+  /** Clockwise-on-screen twist per shell (canvas Y-down; negative = CCW on CRT). */
+  const GALAXY_SHELL_TWIST = -((Math.PI * 2) / GALAXY_ARMS / 3); // ~−7.5°
+  const GALAXY_SHELL_DT = 0.075; // seconds per shell appear/remove
   const GALAXY_BANG_DUR = 0.55;
 
   const GORF_R = 7;
