@@ -1,18 +1,19 @@
 # Reference sources
 
-Fetched locally on 2026-09-12 (browser User-Agent required; bare curl got HTTP 403).
+Updated 2026-09-12.
 
-Base URLs:
-- https://bitsavers.org/pdf/nuttingAssoc/terse/
-- https://bitsavers.org/pdf/nuttingAssoc/icebox/
-- https://bitsavers.org/pdf/nuttingAssoc/gorf/
-- https://bitsavers.org/bits/Nutting_Assoc/
-- https://ballyalley.com/documentation/TERSE/TERSE_Language_Documentation.html
+Important extra (not in Nutting_Assoc bits root):
+- https://bitsavers.org/pdf/nuttingAssoc/icebox/floppies/MsGorf_floppy_files.zip
+- https://raw.githubusercontent.com/mamedev/mame/master/src/mame/skeleton/icebox.cpp
 
 | Relative path | Bytes | SHA256 |
 |---------------|------:|--------|
+| `bits/ICE.IMD` | 219025 | `680d57343a427a7479e7aa8b9635e69b7bb41a9452ef1f5430f0004f3a8e6aa6` |
 | `bits/MSGORF.zip` | 4977246 | `44b1dba2f8a7c3040fd31c4e08ace131153765edc4547741c3138d95e0374ded` |
+| `bits/MsGorf_floppy_files.zip` | 214788 | `1f29977d85201dfdd9dcfe5a9256648109991aeda8fafb0d50511374d851f2a3` |
 | `bits/Nutting_ICE.zip` | 2560559 | `c2851a91b939d158094966264efdb028cc950da939d6756182c9a82e710a322b` |
+| `bits/ice0.bin` | 2048 | `9e0670a10c1a3242e9e70ca7260df66e31af856c296bc269105f17623a4f8260` |
+| `bits/ice1.bin` | 2048 | `60acbf36f8e992282007bf98592dcf8e3dc24a39070147cc5dc3959fca8fc231` |
 | `gorf/GORFOS.txt` | 1290384 | `395eb749f7f8c888aa9a051d4808d0321ba062eba1f7850bc523eb6097272f62` |
 | `gorf/Gorf_wo_speech.pdf` | 17595725 | `09f4112bc0b080057b10e0f60cdf66d2ad184dc34ee237778fe57f3e2ce0908a` |
 | `gorf/gorf_atf.pdf` | 701828 | `9c641e7d0258581dbc904a16c1e3bde483cbe7de754906505acd2d8247d9d306` |
@@ -25,6 +26,7 @@ Base URLs:
 | `icebox/ICE5.pdf` | 3743095 | `cc1dfb422d0f01e99d48020a015d087e3b773ef3260dbabb44ad01b6add7a024` |
 | `icebox/TERSE_VOCAB.pdf` | 11323148 | `03e297ec6b265d527dc6e946144d07cde6dd176200fdee5e48593bd4d4217897` |
 | `icebox/io_ports.pdf` | 228103 | `1660b903f37e340366b489f1cef706fcc9ce73586f9122ba5775fd9be6a85c5d` |
+| `mame/icebox.cpp` | 14660 | `a181e3576d48d6b1a5fd39688e6828a487babb52a147b11d5812463fee8564de` |
 | `terse/Addin_Mar1979.pdf` | 6060779 | `0f499a985c64cbbf0aa6db1f03a0db4070c15e51bfa5065131fca9bdd85f3505` |
 | `terse/Caltech_Forth.pdf` | 664071 | `b84d40bcb8f5082a4cddfc9ea22a0984018d0c18be3951ab45a53dd24776d5d2` |
 | `terse/Discussion_with_Rickey_Spiece.txt` | 11635 | `1e1864ff4d290814b87a36335ec16c864f78a332280cd38d72515b7b98ddd554` |

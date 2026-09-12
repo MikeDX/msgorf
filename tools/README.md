@@ -21,3 +21,6 @@ python3 -m tools.terse.test_mvp_compile
 ```
 
 | `assemble_rom_stub.py` | Phase 7 gate check → `out/assemble_report.json` (exit 2 while blocked) |
+
+| `terse/fload_chain.py` | Resolve FLOAD trees from Tim’s extract |
+| `terse/package_patterns_rom.py` | Place XC.PATTERNS at 0x4000 → `out/msgorf_patterns_at_4000.bin` |

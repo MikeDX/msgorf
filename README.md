@@ -17,7 +17,7 @@ Research lab for recovering and (eventually) compiling Midway / Dave Nutting Ass
 | 6 Hardware model | Done |
 | 7 Assemble ROM | Stub done — full ROM blocked (see `out/ROM_STATUS.md`) |
 
-**Next action:** obtain additional Ms. Gorf application source disks (shopping list in `docs/findings/source-completeness.md`), then deepen TERSE dictionary RE and extend `tools/terse/` toward real `XCFSYSAVE` semantics.
+**Next action:** hunt `XC.LOGIC` / application sources; run pattern ROM fragment in a Z80 harness; deepen CFA-level TERSE RE using Gorf + Fasterse. See `docs/findings/source-completeness.md`.
 
 ## Original disks (do not modify)
 
@@ -41,6 +41,12 @@ Language is **TERSE** (Nutting Forth-ish), not stock Forth. Cross-compile relate
 - `tools/` — reproducible scripts
 - `work/` — corrected images and scratch (generated)
 - `out/` — compiled artifacts (when available)
+
+## Best artifact so far
+
+- `out/msgorf_patterns_at_4000.bin` — authentic `XC.PATTERNS` at `0x4000`
+- `extracted/msgorf_floppy_files/` — Tim’s per-file TERSE sources + listings
+- `extracted/patterns/*__*.png` — sprite previews from pattern sources
 
 ## Known blockers
 

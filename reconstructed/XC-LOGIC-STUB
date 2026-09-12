@@ -1,0 +1,13 @@
+( GUESS: placeholder for missing XC.LOGIC application unit )
+( Authentic INDEX / patterns live on MSGORPAT; game loop does not. )
+DECIMAL
+( hooks — bodies intentionally empty / abort )
+: PLAYER-TASK ; 
+: ENEMY-TASK ;
+: BULLET-TASK ;
+: COLLIDE-CHECK ;  ( write-cycle collision — needs hardware model )
+: HUD-UPDATE ;
+: MISSION-STEP ;
+: MSGORF-MAIN
+  PLAYER-TASK ENEMY-TASK BULLET-TASK COLLIDE-CHECK HUD-UPDATE ;
+;S

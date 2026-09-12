@@ -1,19 +1,19 @@
 # ROM assembly status
 
-**Status: BLOCKED (source incomplete)**
+**Status: PARTIAL SUCCESS on patterns — game logic still blocked**
 
-Per `docs/findings/source-completeness.md`, the three local disks are the Bitsavers Ms. Gorf **pattern / TERSE tooling** set. They expose a cross-compile LOAD block and pattern sources, but not a full game application tree.
+## Have
 
-## What was produced instead
+- Authentic pattern object in a 64K image: `msgorf_patterns_at_4000.bin`
+  - Contents: historical `XC.PATTERNS` at `ROMSTART 0x4000`
+  - Built by: `python3 tools/terse/package_patterns_rom.py`
+- Full FLOAD order: `out/fload_chain.json`
+- Sprite previews: `extracted/patterns/`
 
-1. Corrected images in `work/`
-2. Full screen extraction in `extracted/screens/`
-3. GORF4A pattern previews in `extracted/patterns/`
-4. MVP host object `mvp_object.msgx` proving the compile harness path
-5. Manifest `pattern_object_manifest.json` capturing XC bases / FLOAD order from screen 0086
+## Still blocked for full Ms. Gorf
 
-## Next unblockers
+- No `XC.LOGIC` / mission / player-loop sources in Tim’s extract
+- Dual-Z80 + write-cycle collision harness not implemented
+- Host MVP bytecode ≠ authentic ARC-TERSE
 
-- Additional Ms. Gorf source disks with application LOAD chains
-- Deeper TERSE dictionary reverse engineering (glossaries + Gorf ROM Rosetta)
-- Hardware harness implementing write-cycle collision + dual Z80 roles
+See `docs/findings/source-completeness.md` and `docs/findings/reconstruction-stubs.md`.

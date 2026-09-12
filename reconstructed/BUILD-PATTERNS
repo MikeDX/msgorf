@@ -1,0 +1,3 @@
+( GUESS: host-side reminder of authentic XCLOAD order — do not edit floppies )
+( Real build on IceBox: load XCLOAD then XCFSYSAVE FS.PAT )
+( Our package tool: python3 tools/terse/package_patterns_rom.py )
