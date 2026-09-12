@@ -1,0 +1,34 @@
+# Notes from professionalmagic.com/gorf
+
+Source: [GORF — Matthew Garrett](https://www.professionalmagic.com/gorf) (collected 2026-09-12). Host is a Gorf collector/magician page with Ms. Gorf recovery notes, not Nutting primary docs. Cross-check against disks / Bitsavers.
+
+## Ms. Gorf facts useful to this lab
+
+- Programmed in **Nutting TERSE 78** (Forth-like with Nutting extensions); original Gorf was Forth.
+- Jamie showed it on a **development system** in *Before The Bubble Burst*; unfinished after the 1983 crash.
+- Disks recovered via museum with Jamie’s permission; Tim’s split is Bitsavers `MsGorf_floppy_files.zip` (already in this repo).
+- **Patterns and game code were separate disks** — matches our finding that `XC.LOGIC` / application logic is absent from the pattern floppies.
+- Hardware change near cancellation; Jamie: collision detection by **monitoring the write-cycle** (write one value over another → collision). Other details she no longer recalls.
+- Prototype panel: **two joysticks** (observer likens feel to Robotron + Star Castle). **Not** a Gorf mission clone with the same five-level structure.
+- One image reportedly needs reread: label **Ms Gorf – GORF4A** (Dysan #802067) — our `MSGORF/` set.
+- Geometry note on the page: 5¼″ media imaged with IceBox-like **8″ geometry** (2 heads × 77 tracks × 2 × 1024 ≈ 308K).
+
+## Linked TERSE / IceBox PDFs (on that site)
+
+Relative to `https://www.professionalmagic.com`:
+
+| Link text | Path |
+|-----------|------|
+| TERSE VOCAB | `/s/TERSE_VOCAB.pdf` |
+| TERSE MISC 6 | `/s/MISC6.pdf` |
+| ICE5 | `/s/ICE5.pdf` |
+| GAS MONITOR | `/s/GAS_MONITOR4.pdf` |
+| EDIT VOCAB | `/s/EDIT_VOCAB2.pdf` |
+| ASSEMBLER | `/s/ASSEMBLER3.pdf` |
+
+Several overlap Bitsavers / `docs/references/` (`TERSE_VOCAB.pdf`, `ICE5.pdf`, `GAS_MONITOR4.pdf`, `EDIT_VOCAB2.pdf`). Prefer local hashed copies in `docs/references/SOURCES.md` when present.
+
+## What this does *not* authorize
+
+- Inventing missions, dual-stick play, speech, or a “Gorf II” redesign (the page’s speculative sequel section is opinion, not Ms. Gorf source).
+- Treating the SDL atlas / `--probe` keyboard as cabinet controls.

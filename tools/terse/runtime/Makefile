@@ -32,5 +32,9 @@ sdl_main.o: sdl_main.c assets_gen.h
 run: $(BIN)
 	./$(BIN) --xc "$(ROM)"
 
+# Optional: overlay-collision ABI probe (lab motion only — not game logic)
+probe: $(BIN)
+	./$(BIN) --xc "$(ROM)" --probe
+
 clean:
 	rm -f $(OBJS) $(BIN) assets_gen.c assets_gen.h

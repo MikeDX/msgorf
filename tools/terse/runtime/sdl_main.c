@@ -1,7 +1,11 @@
 /*
- * Source-faithful pattern harness (not a game).
- * Authentic pixels from disk pack and/or XC.PATTERNS decode.
- * WASD moves ship; Gorf drifts; overlay collision counted.
+ * Pattern decode/blit validator — NOT Ms. Gorf gameplay.
+ *
+ * Faithful: pixel bytes from XC.PATTERNS (or source pack matching disk art),
+ *           write-overlay collision count (Jamie's write-cycle model).
+ * Not faithful / lab-only: window size guess, display palette, keyboard,
+ *           any motion or layout. Dual-stick / missions / HUD are absent
+ *           because XC.LOGIC is missing (see docs/findings/).
  */
 #include "terse_rt.h"
 #include "assets_gen.h"
@@ -20,63 +24,99 @@
 #endif
 #define SCALE 2
 
+/* Lab greyscale for digits 0–3 — not claimed cabinet colors */
 static const uint8_t PAL[4][3] = {
     {0, 0, 0},
-    {40, 90, 220},
-    {230, 50, 40},
-    {245, 245, 245},
+    {85, 85, 85},
+    {170, 170, 170},
+    {255, 255, 255},
 };
 
-static const terse_asset_t *find_asset(const char *name) {
-  for (int i = 0; i < TERSE_ASSET_COUNT; i++) {
-    if (strcmp(terse_assets[i]->name, name) == 0) return terse_assets[i];
+typedef struct {
+  const char *name;
+  const uint8_t *pix;
+  int w, h;
+  int owned; /* 1 if pix needs xc_pattern_free */
+  xc_pattern_t xc;
+} slot_t;
+
+#define MAX_SLOTS 24
+
+static void blit_atlas(terse_frame_t *fr, slot_t *slots, int n) {
+  int x = 4, y = 4, row_h = 0;
+  for (int i = 0; i < n; i++) {
+    if (x + slots[i].w + 4 > fr->w) {
+      x = 4;
+      y += row_h + 4;
+      row_h = 0;
+    }
+    if (y + slots[i].h > fr->h) break;
+    terse_blit_u8(fr, slots[i].pix, slots[i].w, slots[i].h, x, y,
+                  (uint16_t)(i + 1));
+    x += slots[i].w + 4;
+    if (slots[i].h > row_h) row_h = slots[i].h;
   }
-  return NULL;
 }
 
 int main(int argc, char **argv) {
   int use_xc = 0;
+  int probe = 0;
   const char *rom_path = NULL;
   for (int i = 1; i < argc; i++) {
     if (!strcmp(argv[i], "--xc") && i + 1 < argc) {
       use_xc = 1;
       rom_path = argv[++i];
+    } else if (!strcmp(argv[i], "--probe")) {
+      probe = 1;
     }
   }
 
-  const terse_asset_t *ship_src = find_asset("PLY1-P");
-  const terse_asset_t *gorf_src = find_asset("GORF-PAT");
-  if (!ship_src || !gorf_src) {
-    fprintf(stderr, "missing packed assets\n");
-    return 1;
-  }
-
-  const uint8_t *ship_pix = ship_src->pix;
-  const uint8_t *gorf_pix = gorf_src->pix;
-  int ship_w = ship_src->w, ship_h = ship_src->h;
-  int gorf_w = gorf_src->w, gorf_h = gorf_src->h;
-  const char *pix_source = "source pack (assets.json)";
-
+  slot_t slots[MAX_SLOTS];
+  int nslots = 0;
   uint8_t *xc_mem = NULL;
-  xc_pattern_t xc_ship = {0}, xc_gorf = {0};
+  const char *pix_source = "source pack (assets.json / disk PATTERN art)";
+
+  /* Prefer XC decode for every simple ATBL slot we can read */
   if (use_xc && rom_path) {
     xc_mem = xc_load_64k(rom_path);
     if (!xc_mem) {
-      fprintf(stderr, "failed to load XC image %s (using source pack)\n", rom_path);
-    } else if (xc_decode_simple(xc_mem, XC_ATBL_PLY1, &xc_ship) == 0 &&
-               xc_decode_simple(xc_mem, XC_ATBL_GORF, &xc_gorf) == 0) {
-      ship_pix = xc_ship.pix;
-      ship_w = xc_ship.w;
-      ship_h = xc_ship.h;
-      gorf_pix = xc_gorf.pix;
-      gorf_w = xc_gorf.w;
-      gorf_h = xc_gorf.h;
-      pix_source = "XC.PATTERNS decode @ ROMSTART";
-      printf("XC decode OK: PLY1-P %dx%d @ ATBL[1], GORF-PAT %dx%d @ ATBL[9]\n",
-             ship_w, ship_h, gorf_w, gorf_h);
+      fprintf(stderr, "failed to load %s\n", rom_path);
     } else {
-      fprintf(stderr, "XC decode failed; falling back to source pack\n");
+      static const int indices[] = {1, 2, 3, 4, 5, 9, 10, 13, 14, 15, 16, 17, 18, 19};
+      static const char *names[] = {
+          "PLY1-P", "PLY2-P", "SBASE",  "P1UP",   "P2UP",   "GORF-PAT", "LAZON",
+          "SHLD-P", "MITE-P", "TRION-P", "DEB-P",  "HK-P",   "GB-P",     "GRD-P"};
+      for (size_t i = 0; i < sizeof indices / sizeof indices[0] && nslots < MAX_SLOTS;
+           i++) {
+        xc_pattern_t p;
+        if (xc_decode_simple(xc_mem, indices[i], &p) != 0) continue;
+        slots[nslots].name = names[i];
+        slots[nslots].pix = p.pix;
+        slots[nslots].w = p.w;
+        slots[nslots].h = p.h;
+        slots[nslots].owned = 1;
+        slots[nslots].xc = p;
+        nslots++;
+      }
+      if (nslots > 0) pix_source = "XC.PATTERNS decode @ ROMSTART (authentic object)";
     }
+  }
+
+  if (nslots == 0) {
+    for (int i = 0; i < TERSE_ASSET_COUNT && nslots < MAX_SLOTS; i++) {
+      const terse_asset_t *a = terse_assets[i];
+      slots[nslots].name = a->name;
+      slots[nslots].pix = a->pix;
+      slots[nslots].w = a->w;
+      slots[nslots].h = a->h;
+      slots[nslots].owned = 0;
+      nslots++;
+    }
+  }
+
+  if (nslots == 0) {
+    fprintf(stderr, "no patterns loaded\n");
+    return 1;
   }
 
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -85,7 +125,7 @@ int main(int argc, char **argv) {
   }
 
   SDL_Window *win = SDL_CreateWindow(
-      "Ms. Gorf TERSE harness (patterns only)", SDL_WINDOWPOS_CENTERED,
+      "Ms. Gorf pattern validator (not a game)", SDL_WINDOWPOS_CENTERED,
       SDL_WINDOWPOS_CENTERED, FRAME_W * SCALE, FRAME_H * SCALE, 0);
   if (!win) {
     fprintf(stderr, "window: %s\n", SDL_GetError());
@@ -101,17 +141,35 @@ int main(int argc, char **argv) {
   terse_frame_init(&fr, FRAME_W, FRAME_H);
   uint8_t *rgb = malloc((size_t)FRAME_W * FRAME_H * 3);
 
-  float ship_x = (float)(FRAME_W / 2 - ship_w / 2);
-  float ship_y = (float)(FRAME_H - ship_h - 24);
-  float gorf_x = 40.0f, gorf_y = 60.0f, gorf_vx = 0.6f;
+  /* Probe mode: two authentic sprites; arrows move A over B for collision ABI */
+  int ai = 0, bi = (nslots > 1) ? 1 : 0;
+  for (int i = 0; i < nslots; i++) {
+    if (!strcmp(slots[i].name, "PLY1-P")) ai = i;
+    if (!strcmp(slots[i].name, "GORF-PAT")) bi = i;
+  }
+  int ax = FRAME_W / 2 - slots[ai].w / 2;
+  int ay = FRAME_H - slots[ai].h - 16;
+  int bx = 24, by = 48;
+  int hits = 0;
   int running = 1;
-  int total_hits = 0;
-  Uint32 last = SDL_GetTicks();
 
-  printf("Controls: WASD move ship · Esc quit\n");
+  printf("=== pattern validator (not Ms. Gorf) ===\n");
   printf("Pixels: %s\n", pix_source);
-  printf("Frame %dx%d (harness default; see docs/findings/display.md)\n", FRAME_W,
+  printf("Frame %dx%d = lab guess only (docs/findings/display.md)\n", FRAME_W,
          FRAME_H);
+  printf("Palette: lab greyscale (cabinet colors unknown)\n");
+  printf("Loaded %d pattern(s):", nslots);
+  for (int i = 0; i < nslots; i++)
+    printf(" %s(%dx%d)", slots[i].name, slots[i].w, slots[i].h);
+  printf("\n");
+  if (probe) {
+    printf("PROBE: arrows move %s over %s; overlay hits counted (write-cycle model)\n",
+           slots[ai].name, slots[bi].name);
+    printf("       This motion is lab input — not source game logic.\n");
+  } else {
+    printf("Keys: Esc quit · --probe for overlay-collision ABI test\n");
+  }
+  printf("Missing: XC.LOGIC / missions / dual-stick (see professionalmagic.com/gorf notes)\n");
 
   while (running) {
     SDL_Event e;
@@ -119,29 +177,25 @@ int main(int argc, char **argv) {
       if (e.type == SDL_QUIT) running = 0;
       if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE) running = 0;
     }
-    const Uint8 *k = SDL_GetKeyboardState(NULL);
-    float sp = 1.8f;
-    if (k[SDL_SCANCODE_A] || k[SDL_SCANCODE_LEFT]) ship_x -= sp;
-    if (k[SDL_SCANCODE_D] || k[SDL_SCANCODE_RIGHT]) ship_x += sp;
-    if (k[SDL_SCANCODE_W] || k[SDL_SCANCODE_UP]) ship_y -= sp;
-    if (k[SDL_SCANCODE_S] || k[SDL_SCANCODE_DOWN]) ship_y += sp;
-    if (ship_x < 0) ship_x = 0;
-    if (ship_y < 0) ship_y = 0;
-    if (ship_x > FRAME_W - ship_w) ship_x = (float)(FRAME_W - ship_w);
-    if (ship_y > FRAME_H - ship_h) ship_y = (float)(FRAME_H - ship_h);
-
-    gorf_x += gorf_vx;
-    if (gorf_x < 8 || gorf_x > FRAME_W - gorf_w - 8) gorf_vx = -gorf_vx;
-    gorf_y += 0.15f;
-    if (gorf_y > FRAME_H / 2) gorf_y = 40.0f;
+    if (probe) {
+      const Uint8 *k = SDL_GetKeyboardState(NULL);
+      if (k[SDL_SCANCODE_LEFT] || k[SDL_SCANCODE_A]) ax--;
+      if (k[SDL_SCANCODE_RIGHT] || k[SDL_SCANCODE_D]) ax++;
+      if (k[SDL_SCANCODE_UP] || k[SDL_SCANCODE_W]) ay--;
+      if (k[SDL_SCANCODE_DOWN] || k[SDL_SCANCODE_S]) ay++;
+      if (ax < 0) ax = 0;
+      if (ay < 0) ay = 0;
+      if (ax > FRAME_W - slots[ai].w) ax = FRAME_W - slots[ai].w;
+      if (ay > FRAME_H - slots[ai].h) ay = FRAME_H - slots[ai].h;
+    }
 
     terse_frame_clear(&fr);
-    terse_blit_u8(&fr, gorf_pix, gorf_w, gorf_h, (int)gorf_x, (int)gorf_y, 2);
-    int h2 = terse_blit_u8(&fr, ship_pix, ship_w, ship_h, (int)ship_x,
-                           (int)ship_y, 1);
-    if (h2 > 0) {
-      total_hits += h2;
-      ship_y += 4;
+    if (probe) {
+      terse_blit_u8(&fr, slots[bi].pix, slots[bi].w, slots[bi].h, bx, by, 2);
+      hits += terse_blit_u8(&fr, slots[ai].pix, slots[ai].w, slots[ai].h, ax, ay,
+                            1);
+    } else {
+      blit_atlas(&fr, slots, nslots);
     }
 
     terse_frame_to_rgb24(&fr, rgb, PAL);
@@ -150,19 +204,18 @@ int main(int argc, char **argv) {
     SDL_RenderCopy(ren, tex, NULL, NULL);
     SDL_RenderPresent(ren);
 
-    Uint32 now = SDL_GetTicks();
-    if (now - last > 500) {
-      char title[192];
-      snprintf(title, sizeof title, "Ms. Gorf harness | hits=%d | %s", total_hits,
-               pix_source);
-      SDL_SetWindowTitle(win, title);
-      last = now;
-    }
+    char title[200];
+    if (probe)
+      snprintf(title, sizeof title, "probe hits=%d | %s", hits, pix_source);
+    else
+      snprintf(title, sizeof title, "atlas %d pats | %s", nslots, pix_source);
+    SDL_SetWindowTitle(win, title);
     SDL_Delay(16);
   }
 
-  xc_pattern_free(&xc_ship);
-  xc_pattern_free(&xc_gorf);
+  for (int i = 0; i < nslots; i++) {
+    if (slots[i].owned) xc_pattern_free(&slots[i].xc);
+  }
   free(xc_mem);
   free(rgb);
   terse_frame_free(&fr);

@@ -21,15 +21,15 @@ Target pipeline:
 Requires SDL2 (`brew install sdl2` on macOS).
 
 ```bash
-make -C tools/terse/runtime run
-# equivalent:
-#   make -C tools/terse/runtime
-#   ./tools/terse/runtime/terse_harness --xc out/msgorf_patterns_at_4000.bin
+make -C tools/terse/runtime run     # static atlas of XC-decoded patterns
+make -C tools/terse/runtime probe   # optional overlay-collision ABI test
 ```
 
-- Frame default **240×352**, nearest-neighbor scale ×2 (configurable via `FRAME_W` / `FRAME_H`)
-- Pixels: XC decode when `--xc` works; else `pack_assets.py` from `play/assets.json`
-- Overlay collision counted on write of non-zero over another owner
+**Useful only as a validator:** authentic pixels + blit/collision ABI. It is **not** a preview of Ms. Gorf play (no `XC.LOGIC`, no dual-stick, no missions). See `docs/references/professionalmagic-gorf.md`.
+
+- Frame default **240×352** = sibling-Gorf-informed **guess** only (`docs/findings/display.md`)
+- Greyscale lab palette — cabinet colors unproven
+- `--probe` arrow motion is lab input, not source controls
 
 ## Python compile path
 

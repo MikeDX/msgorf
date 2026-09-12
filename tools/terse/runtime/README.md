@@ -1,12 +1,16 @@
-# C runtime — SDL2 pattern harness
+# C runtime — pattern validator
 
-Source-faithful blit + overlay collision. **Not** a game loop.
+Validates **authentic** decode/blit only. **Not** Ms. Gorf gameplay.
 
 ```bash
-make -C tools/terse/runtime run
+make -C tools/terse/runtime run          # XC atlas, static
+make -C tools/terse/runtime probe        # lab overlay-collision ABI (arrows)
 ```
 
-- `pack_assets.py` — authentic patterns from `play/assets.json` (cross-checks `GORF-P` parse)
-- `sdl_main.c` — 240×352 frame, WASD ship, drifting Gorf, collision count in title
-- `xc_map.c` — load `out/msgorf_patterns_at_4000.bin`, decode simple ATBL patterns
-- WASM / Emscripten: later; same `terse_rt` ABI
+| Faithful | Not faithful (labelled lab) |
+|----------|-----------------------------|
+| Pixel bytes from `XC.PATTERNS` / disk `PATTERN` art | Frame size 240×352 guess |
+| ATBL simple-record decode | Greyscale display palette |
+| Write-over-owner collision count | Arrow/`--probe` motion |
+
+Missing for a game: `XC.LOGIC`, dual-stick input map, missions, cabinet colors. See `docs/references/professionalmagic-gorf.md`.

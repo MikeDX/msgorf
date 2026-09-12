@@ -46,7 +46,7 @@ See `docs/findings/goals.md`, `docs/findings/source-extraction-status.md`, `docs
 ## Quick start
 
 ```bash
-# Desktop pattern harness (needs SDL2: brew install sdl2)
+# Pattern validator — authentic XC pixels only (not a game; needs SDL2)
 make -C tools/terse/runtime run
 
 # Pattern lab (browse-only)
@@ -56,7 +56,6 @@ python3 tools/export_play_assets.py
 # Host IR + tests
 python3 -m tools.terse.compile_host --bullets
 python3 -m unittest tools.terse.test_compile_host
-python3 tools/terse/parse.py extracted/msgorf_floppy_files/MSGORPAT_Disk/GORF-P
 ```
 
-See `docs/architecture/terse-toolchain.md` and `docs/lab-notebook/2026-09-12-sdl-runtime.md`.
+`make run` is useful for **decode/blit fidelity**, not as Ms. Gorf gameplay. See `docs/architecture/terse-toolchain.md`, `docs/references/professionalmagic-gorf.md`.

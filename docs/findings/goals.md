@@ -29,6 +29,6 @@ C runtime / codegen (Z80 image and/or host IR)
         └─► SDL2 desktop / WASM (validation harness)
 ```
 
-**Runnable today:** SDL2 pattern harness (`make -C tools/terse/runtime run`) — authentic sprites + overlay collision only. That is a **harness**, not the game. `play/` stays browse-only.
+**Runnable today:** SDL2 **pattern validator** (`make -C tools/terse/runtime run`) — authentic XC/source sprites only. Not a game; invented motion was removed. `play/` stays browse-only. External notes: `docs/references/professionalmagic-gorf.md`.
 
 See `docs/architecture/terse-toolchain.md`.
