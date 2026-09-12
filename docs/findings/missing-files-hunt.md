@@ -54,6 +54,49 @@ False positives from loaders: `FLOAD BLK`, `FLOAD THIS`, etc. are TERSE words, n
 - Inventing gameplay in the SDL validator.
 - Treating ROTO (Robby Roto) sources as Ms. Gorf logic.
 
+## Is this a dead end without `XC.LOGIC`?
+
+**For a faithful Ms. Gorf game/ROM from the media we have: yes — blocked.**  
+**For the lab (patterns, XC decode, TERSE toolchain, IceBox RE): no.**
+
+### Important distinction
+
+`XC.LOGIC` is the **cross-compile output filename** (what `BINLOAD` / `LLOAD` load), analogous to `game.bin` — not a magic unique format.
+
+You could recover the game either as:
+
+1. A dumped **`XC.LOGIC` binary**, or  
+2. The **application TERSE screens** that an XCLOAD-like block would compile with `OBJECT-FILE XC.LOGIC` (then save via `XCFSYSAVE`).
+
+We have **neither**. On these floppies, `XCLOAD` only builds **`XC.PATTERNS`**:
+
+```text
+OBJECT-FILE XC.PATTERNS
+FLOAD CODE-LOAD   → PATTERN, ANIM-VERBS, INIT-AT
+FLOAD INDEX / PAT-LOAD / ANIM-MAP
+XCFSYSAVE FS.PAT
+```
+
+`CODE-LOAD` is pattern infrastructure only. `FS.XC` is the **cross-compile system** file set (~42 screens); real colon defs there are essentially **`BULLETS` / `ENDBULL` stubs**, not missions. `INSTRUCTIONS` say artists own patterns; **Jay’s program** (application) is separate and not on the Pattern/PATLOAD disks.
+
+### Could other TERSE “generate” the game?
+
+| Candidate | Verdict |
+|-----------|---------|
+| Re-run XCLOAD on what we have | Produces patterns object only — already have `XC.PATTERNS` |
+| Dictionary name `XC.LOGIC` | Filename token in the kernel/dict — **not** the game image |
+| Gorf `GORFOS` / ROTO sources | Different games — Rosetta for verbs/hardware, **not** Ms. Gorf logic |
+| Invent missions in C/SDL | Possible as a **labeled remake**; not faithful compile |
+
+So nothing “built elsewhere” on *these* disks quietly is `XC.LOGIC`. The pipeline *could* emit it from other screens — those screens were never in the public dump.
+
+### What still moves the needle without the file
+
+- Museum/8″ acquisition (see outreach drafts)
+- Deeper TERSE/IceBox/CFA RE (needed even *with* logic disks)
+- Documented behavior from Jamie’s prototype video (constraints only, not source)
+- Explicit reconstruction module outside `play/` if you choose remake — separate from “compiled from disk”
+
 ## Related docs
 
 - `docs/findings/xc-logic.md` — what `XC.LOGIC` is
