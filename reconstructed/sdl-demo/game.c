@@ -82,6 +82,7 @@ static float fire_cd;
 static float player_x, player_y;
 static int player_vis;
 static float clone_x, clone_y, clone_frame;
+static float clone_home_x, clone_home_y;
 static int clone_vis;
 
 static bullet_t bullets[MAX_BULLETS];
@@ -248,14 +249,34 @@ static void rand_vel(float *vx, float *vy) {
 static void spawn_gorf(float x, float y, float vx, float vy, const char *kind, float cool) {
   if (n_foes >= MAX_FOES) return;
   foe_t *f = &foes[n_foes++];
-  f->x = (float)ipart(x);
-  f->y = (float)ipart(y);
+  f->x = x;
+  f->y = y;
   f->vx = vx;
   f->vy = vy;
   f->kind = kind ? kind : "GORF_PAT";
   f->hp = 1;
   f->r = GORF_R;
   f->cool = cool;
+}
+
+/* Keep gorfs moving after wall/pair bounce (elastic swaps can kill speed). */
+static void keep_gorf_speed(foe_t *e) {
+  float sp = hypotf(e->vx, e->vy);
+  float lo = GORF_SPEED * 0.7f;
+  float hi = GORF_SPEED * 1.35f;
+  if (sp < 8.f) {
+    rand_vel(&e->vx, &e->vy);
+    return;
+  }
+  if (sp < lo) {
+    float s = lo / sp;
+    e->vx *= s;
+    e->vy *= s;
+  } else if (sp > hi) {
+    float s = hi / sp;
+    e->vx *= s;
+    e->vy *= s;
+  }
 }
 
 static void spawn_gorf_at_edge(int side) {
@@ -289,11 +310,14 @@ static void spawn_burst(float x, float y) {
 
 static void reveal_player_and_clone(void) {
   player_vis = 1;
-  player_x = (float)ipart(FB_W * 0.5f);
-  player_y = (float)ipart(FB_H * 0.5f);
+  player_x = FB_W * 0.5f;
+  player_y = FB_H * 0.5f;
   clone_vis = 1;
-  clone_x = (float)ipart(FB_W * 0.5f + 28);
-  clone_y = (float)ipart(FB_H * 0.5f - 10);
+  /* GUESS: continuous Lissajous drift around a home near centre (footage). */
+  clone_home_x = FB_W * 0.5f + 20.f;
+  clone_home_y = FB_H * 0.5f - 6.f;
+  clone_x = clone_home_x;
+  clone_y = clone_home_y;
   clone_frame = 0;
 }
 
@@ -379,17 +403,17 @@ static void bounce_walls(foe_t *e) {
   const float top = 22.f;
   if (e->x - e->r < margin) {
     e->x = margin + e->r;
-    e->vx = fabsf(e->vx);
+    if (e->vx < 0) e->vx = -e->vx;
   } else if (e->x + e->r > FB_W - margin) {
     e->x = FB_W - margin - e->r;
-    e->vx = -fabsf(e->vx);
+    if (e->vx > 0) e->vx = -e->vx;
   }
   if (e->y - e->r < top) {
     e->y = top + e->r;
-    e->vy = fabsf(e->vy);
+    if (e->vy < 0) e->vy = -e->vy;
   } else if (e->y + e->r > FB_H - margin) {
     e->y = FB_H - margin - e->r;
-    e->vy = -fabsf(e->vy);
+    if (e->vy > 0) e->vy = -e->vy;
   }
 }
 
@@ -397,10 +421,15 @@ static void bounce_pair(foe_t *a, foe_t *b) {
   float dx = b->x - a->x;
   float dy = b->y - a->y;
   float dist = hypotf(dx, dy);
-  if (dist < 1e-3f) dist = 1.f;
   float min_d = a->r + b->r;
+  if (dist < 1e-3f) {
+    /* stacked — shove apart so they don't lock */
+    dist = 1.f;
+    dx = 1.f;
+    dy = 0.f;
+  }
   if (dist >= min_d) return;
-  float overlap = (min_d - dist) * 0.5f;
+  float overlap = (min_d - dist) * 0.5f + 0.5f;
   float nx = dx / dist, ny = dy / dist;
   a->x -= nx * overlap;
   a->y -= ny * overlap;
@@ -408,6 +437,8 @@ static void bounce_pair(foe_t *a, foe_t *b) {
   b->y += ny * overlap;
   float avn = a->vx * nx + a->vy * ny;
   float bvn = b->vx * nx + b->vy * ny;
+  /* only exchange if approaching — avoids sticky re-collision thrash */
+  if (avn - bvn > 0.f) return;
   a->vx += (bvn - avn) * nx;
   a->vy += (bvn - avn) * ny;
   b->vx += (avn - bvn) * nx;
@@ -455,13 +486,13 @@ static void emit_clones(int exit_right, const char *kind) {
   port_t L, R;
   clone_ports(&L, &R);
   port_t *port = exit_right ? &R : &L;
-  int mid_x = ipart((port->x0 + port->x1) * 0.5f);
-  int mid_y = ipart((port->y0 + port->y1) * 0.5f);
+  float mid_x = (port->x0 + port->x1) * 0.5f;
+  float mid_y = (port->y0 + port->y1) * 0.5f;
   float dir = exit_right ? 1.f : -1.f;
   float dys[2] = {-6.f, 6.f};
   for (int i = 0; i < 2; i++) {
-    spawn_gorf((float)mid_x + dir * 6.f, (float)mid_y + dys[i], dir * CLONE_EXIT_SPEED,
-               dys[i] * 2.f, kind, CLONE_COOL);
+    spawn_gorf(mid_x + dir * 8.f, mid_y + dys[i], dir * CLONE_EXIT_SPEED, dys[i] * 2.f, kind,
+               CLONE_COOL);
   }
 }
 
@@ -470,12 +501,13 @@ static void process_clone_machine(float dt) {
   const int ncycle = (int)(sizeof CLONE_CYCLE / sizeof CLONE_CYCLE[0]);
   clone_frame = fmodf(clone_frame + dt * 2.4f, (float)ncycle);
   if (clone_frame < 0) clone_frame += ncycle;
-  clone_x = (float)ipart(clone_x + sinf(t_accum * 0.55f) * 10.f * dt);
-  clone_y = (float)ipart(clone_y + cosf(t_accum * 0.4f) * 8.f * dt);
-  if (clone_x < 40) clone_x = 40;
-  if (clone_x > FB_W - 40) clone_x = FB_W - 40;
-  if (clone_y < 50) clone_y = 50;
-  if (clone_y > FB_H - 50) clone_y = FB_H - 50;
+  /* Continuous path (not integrated+truncated — that stuttered). */
+  clone_x = clone_home_x + sinf(t_accum * 0.55f) * 28.f + sinf(t_accum * 0.19f) * 6.f;
+  clone_y = clone_home_y + cosf(t_accum * 0.37f) * 20.f + sinf(t_accum * 0.23f + 1.1f) * 5.f;
+  if (clone_x < 48.f) clone_x = 48.f;
+  if (clone_x > FB_W - 48.f) clone_x = FB_W - 48.f;
+  if (clone_y < 48.f) clone_y = 48.f;
+  if (clone_y > FB_H - 40.f) clone_y = FB_H - 40.f;
 
   port_t L, R;
   clone_ports(&L, &R);
@@ -558,10 +590,8 @@ static void update_play(game_t *g, float dt) {
   if (dx || dy) {
     float n = hypotf(dx, dy);
     if (n < 1e-3f) n = 1.f;
-    int step = (int)roundf(speed * dt);
-    if (step < 1) step = 1;
-    player_x = (float)ipart(player_x + (dx / n) * step);
-    player_y = (float)ipart(player_y + (dy / n) * step);
+    player_x += (dx / n) * speed * dt;
+    player_y += (dy / n) * speed * dt;
   }
   if (player_x < 12) player_x = 12;
   if (player_x > FB_W - 12) player_x = FB_W - 12;
@@ -576,8 +606,8 @@ static void update_play(game_t *g, float dt) {
     float sp = 160.f;
     float c = cosf(aim), s = sinf(aim);
     bullet_t *b = &bullets[n_bullets++];
-    b->x = (float)ipart(player_x + c * BULLET_MUZZLE);
-    b->y = (float)ipart(player_y + s * BULLET_MUZZLE);
+    b->x = player_x + c * BULLET_MUZZLE;
+    b->y = player_y + s * BULLET_MUZZLE;
     b->vx = c * sp;
     b->vy = s * sp;
     b->life = 0.9f;
@@ -586,8 +616,8 @@ static void update_play(game_t *g, float dt) {
   int wb = 0;
   for (int i = 0; i < n_bullets; i++) {
     bullet_t *b = &bullets[i];
-    b->x = (float)ipart(b->x + b->vx * dt);
-    b->y = (float)ipart(b->y + b->vy * dt);
+    b->x += b->vx * dt;
+    b->y += b->vy * dt;
     b->life -= dt;
     if (b->life > 0 && b->x > -10 && b->x < FB_W + 10 && b->y > -10 && b->y < FB_H + 10)
       bullets[wb++] = *b;
@@ -599,15 +629,16 @@ static void update_play(game_t *g, float dt) {
   for (int i = 0; i < n_foes; i++) {
     foe_t *f = &foes[i];
     if (f->cool > 0) f->cool -= dt;
-    f->x = (float)ipart(f->x + f->vx * dt);
-    f->y = (float)ipart(f->y + f->vy * dt);
+    f->x += f->vx * dt;
+    f->y += f->vy * dt;
     bounce_walls(f);
-    f->x = (float)ipart(f->x);
-    f->y = (float)ipart(f->y);
   }
   for (int i = 0; i < n_foes; i++)
     for (int j = i + 1; j < n_foes; j++) bounce_pair(&foes[i], &foes[j]);
-
+  for (int i = 0; i < n_foes; i++) {
+    bounce_walls(&foes[i]); /* re-clamp after pair shove */
+    keep_gorf_speed(&foes[i]);
+  }
   for (int bi = 0; bi < n_bullets; bi++) {
     bullet_t *b = &bullets[bi];
     for (int fi = 0; fi < n_foes; fi++) {

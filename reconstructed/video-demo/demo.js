@@ -150,7 +150,7 @@
   let foes = [];
   /** @type {{x:number,y:number,kind:string,hp:number}[]} */
   let fx = [];
-  let clone = { x: W * 0.62, y: H * 0.42, frame: 0, visible: false };
+  let clone = { x: W * 0.62, y: H * 0.42, homeX: 0, homeY: 0, frame: 0, visible: false };
   /** Pending clone exits: enter one yellow port → two exit the other. */
   /** @type {{t:number,exit:string,kind:string}[]} */
   let cloneJobs = [];
@@ -255,8 +255,8 @@
   function spawnGorf(x, y, vel) {
     const v = vel || randVel();
     foes.push({
-      x: ipart(x),
-      y: ipart(y),
+      x,
+      y,
       vx: v.vx,
       vy: v.vy,
       kind: "GORF-PAT",
@@ -287,11 +287,13 @@
 
   function revealPlayerAndClone() {
     player.visible = true;
-    player.x = ipart(W * 0.5);
-    player.y = ipart(H * 0.5);
+    player.x = W * 0.5;
+    player.y = H * 0.5;
     clone.visible = true;
-    clone.x = ipart(W * 0.5 + 28);
-    clone.y = ipart(H * 0.5 - 10);
+    clone.homeX = W * 0.5 + 20;
+    clone.homeY = H * 0.5 - 6;
+    clone.x = clone.homeX;
+    clone.y = clone.homeY;
     clone.frame = 0;
   }
 
@@ -382,41 +384,66 @@
     const top = 22; // below HUD
     if (e.x - e.r < margin) {
       e.x = margin + e.r;
-      e.vx = Math.abs(e.vx);
+      if (e.vx < 0) e.vx = -e.vx;
     } else if (e.x + e.r > W - margin) {
       e.x = W - margin - e.r;
-      e.vx = -Math.abs(e.vx);
+      if (e.vx > 0) e.vx = -e.vx;
     }
     if (e.y - e.r < top) {
       e.y = top + e.r;
-      e.vy = Math.abs(e.vy);
+      if (e.vy < 0) e.vy = -e.vy;
     } else if (e.y + e.r > H - margin) {
       e.y = H - margin - e.r;
-      e.vy = -Math.abs(e.vy);
+      if (e.vy > 0) e.vy = -e.vy;
     }
   }
 
   function bouncePair(a, b) {
-    const dx = b.x - a.x;
-    const dy = b.y - a.y;
-    const dist = Math.hypot(dx, dy) || 1;
+    let dx = b.x - a.x;
+    let dy = b.y - a.y;
+    let dist = Math.hypot(dx, dy);
     const minD = a.r + b.r;
+    if (dist < 1e-3) {
+      dist = 1;
+      dx = 1;
+      dy = 0;
+    }
     if (dist >= minD) return;
-    // separate
-    const overlap = (minD - dist) / 2;
+    const overlap = (minD - dist) / 2 + 0.5;
     const nx = dx / dist;
     const ny = dy / dist;
     a.x -= nx * overlap;
     a.y -= ny * overlap;
     b.x += nx * overlap;
     b.y += ny * overlap;
-    // elastic swap along normal
     const avn = a.vx * nx + a.vy * ny;
     const bvn = b.vx * nx + b.vy * ny;
+    if (avn - bvn > 0) return;
     a.vx += (bvn - avn) * nx;
     a.vy += (bvn - avn) * ny;
     b.vx += (avn - bvn) * nx;
     b.vy += (avn - bvn) * ny;
+  }
+
+  function keepGorfSpeed(e) {
+    const sp = Math.hypot(e.vx, e.vy);
+    const lo = GORF_SPEED * 0.7;
+    const hi = GORF_SPEED * 1.35;
+    if (sp < 8) {
+      const v = randVel();
+      e.vx = v.vx;
+      e.vy = v.vy;
+      return;
+    }
+    if (sp < lo) {
+      const s = lo / sp;
+      e.vx *= s;
+      e.vy *= s;
+    } else if (sp > hi) {
+      const s = hi / sp;
+      e.vx *= s;
+      e.vy *= s;
+    }
   }
 
   function currentCloneFrame() {
@@ -462,12 +489,12 @@
   function emitClones(exitSide, kind) {
     const ports = clonePorts();
     const port = exitSide === "left" ? ports.left : ports.right;
-    const midX = ipart((port.x0 + port.x1) / 2);
-    const midY = ipart((port.y0 + port.y1) / 2);
+    const midX = (port.x0 + port.x1) / 2;
+    const midY = (port.y0 + port.y1) / 2;
     const dir = exitSide === "left" ? -1 : 1;
     const sp = CLONE_EXIT_SPEED;
     for (const dy of [-6, 6]) {
-      spawnGorf(midX + dir * 6, midY + dy, { vx: dir * sp, vy: dy * 2 });
+      spawnGorf(midX + dir * 8, midY + dy, { vx: dir * sp, vy: dy * 2 });
       foes[foes.length - 1].cool = CLONE_COOL;
       foes[foes.length - 1].kind = kind;
     }
@@ -477,10 +504,10 @@
     if (!clone.visible) return;
 
     clone.frame = (clone.frame + dt * 2.4) % CLONE_CYCLE.length;
-    clone.x = ipart(clone.x + Math.sin(t * 0.55) * 10 * dt);
-    clone.y = ipart(clone.y + Math.cos(t * 0.4) * 8 * dt);
-    clone.x = Math.max(40, Math.min(W - 40, clone.x));
-    clone.y = Math.max(50, Math.min(H - 50, clone.y));
+    clone.x = clone.homeX + Math.sin(t * 0.55) * 28 + Math.sin(t * 0.19) * 6;
+    clone.y = clone.homeY + Math.cos(t * 0.37) * 20 + Math.sin(t * 0.23 + 1.1) * 5;
+    clone.x = Math.max(48, Math.min(W - 48, clone.x));
+    clone.y = Math.max(48, Math.min(H - 40, clone.y));
 
     const ports = clonePorts();
     for (const f of foes) {
@@ -513,10 +540,8 @@
     if (keys["s"] || keys["arrowdown"]) dy += 1;
     if (dx || dy) {
       const n = Math.hypot(dx, dy) || 1;
-      // integer pixel steps on the 320×204 grid
-      const step = Math.max(1, Math.round(speed * dt));
-      player.x = ipart(player.x + (dx / n) * step);
-      player.y = ipart(player.y + (dy / n) * step);
+      player.x += (dx / n) * speed * dt;
+      player.y += (dy / n) * speed * dt;
     }
     player.x = Math.max(12, Math.min(W - 12, player.x));
     player.y = Math.max(28, Math.min(H - 12, player.y));
@@ -531,8 +556,8 @@
       const c = Math.cos(aim);
       const s = Math.sin(aim);
       bullets.push({
-        x: ipart(player.x + c * BULLET_MUZZLE),
-        y: ipart(player.y + s * BULLET_MUZZLE),
+        x: player.x + c * BULLET_MUZZLE,
+        y: player.y + s * BULLET_MUZZLE,
         vx: c * sp,
         vy: s * sp,
         life: 0.9,
@@ -540,8 +565,8 @@
     }
 
     bullets = bullets.filter((b) => {
-      b.x = ipart(b.x + b.vx * dt);
-      b.y = ipart(b.y + b.vy * dt);
+      b.x += b.vx * dt;
+      b.y += b.vy * dt;
       b.life -= dt;
       return b.life > 0 && b.x > -10 && b.x < W + 10 && b.y > -10 && b.y < H + 10;
     });
@@ -550,14 +575,16 @@
 
     for (const f of foes) {
       if (f.cool > 0) f.cool -= dt;
-      f.x = ipart(f.x + f.vx * dt);
-      f.y = ipart(f.y + f.vy * dt);
+      f.x += f.vx * dt;
+      f.y += f.vy * dt;
       bounceWalls(f);
-      f.x = ipart(f.x);
-      f.y = ipart(f.y);
     }
     for (let i = 0; i < foes.length; i++) {
       for (let j = i + 1; j < foes.length; j++) bouncePair(foes[i], foes[j]);
+    }
+    for (const f of foes) {
+      bounceWalls(f);
+      keepGorfSpeed(f);
     }
 
     for (const b of bullets) {
