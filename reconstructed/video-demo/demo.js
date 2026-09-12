@@ -215,10 +215,11 @@
     return { vx: Math.cos(a) * s, vy: Math.sin(a) * s };
   }
 
-  function spawnGorfAtEdge() {
+  function spawnGorfAtEdge(side) {
     // Bias toward screen edges (footage: gorfs arrive at perimeter)
     const margin = 18;
-    const side = Math.floor(Math.random() * 4);
+    if (side === undefined) side = Math.floor(Math.random() * 4);
+    side = side % 4;
     let x, y;
     if (side === 0) {
       x = margin + Math.random() * (W - margin * 2);
@@ -259,7 +260,7 @@
     player.visible = false;
     clone.visible = false;
     spawnCd = 2.0;
-    for (let i = 0; i < 5; i++) spawnGorfAtEdge();
+    for (let i = 0; i < 4; i++) spawnGorfAtEdge(i);
     galaxy.phase = "in";
     galaxy.age = 0;
     galaxy.starsDrawn = 0;
@@ -310,16 +311,7 @@
   function updateIntro(dt) {
     t += dt;
     galaxy.age += dt;
-
-    // Gorfs bounce while galaxy plays
-    for (const f of foes) {
-      f.x += f.vx * dt;
-      f.y += f.vy * dt;
-      bounceWalls(f);
-    }
-    for (let i = 0; i < foes.length; i++) {
-      for (let j = i + 1; j < foes.length; j++) bouncePair(foes[i], foes[j]);
-    }
+    // Gorfs stay still until player appears
 
     if (galaxy.phase === "in") {
       galaxy.starsDrawn = Math.min(
