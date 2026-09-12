@@ -83,9 +83,16 @@ Authentic 2bpp patterns from the TERSE sources (and GORF4A). Full set under [`ex
 | ![PLY2-P](extracted/patterns/PLY-P__PLY2-P.png) **PLY2-P** | ![LAZON](extracted/patterns/LAZON-P__LAZON.png) **LAZON** |
 | ![CLN0](extracted/patterns/CLONE-P__CLN0.png) **CLONE** | ![TRION](extracted/patterns/TRION-P__TRION-P.png) **TRION-P** |
 
-Prototype / playfield photo (on-screen **PLAY** is almost certainly a **VCR overlay**, not HUD — see [`docs/findings/display.md`](docs/findings/display.md)):
+Prototype / playfield photos (web gallery + local). On-screen **PLAY** is almost certainly a **VCR/tape overlay**, not game HUD — see [`docs/findings/display.md`](docs/findings/display.md).
 
-![Ms. Gorf screenshot](msgorf_screenshot.jpg)
+**Gameplay stills** mirrored from [Matthew Garrett’s Gorf page](https://www.professionalmagic.com/gorf) → [`docs/references/garrett_ms_gorf_gallery/`](docs/references/garrett_ms_gorf_gallery/):
+
+| | |
+|:--:|:--:|
+| ![ms_gorf_1](docs/references/garrett_ms_gorf_gallery/ms_gorf_1.png) **Still 1** — score / lives / sprites | ![ms_gorf_6](docs/references/garrett_ms_gorf_gallery/ms_gorf_6.png) **Still 6** — spiral / warp field |
+| ![ms_gorf_2](docs/references/garrett_ms_gorf_gallery/ms_gorf_2.png) **Still 2** — many figures + **PLAY** overlay | ![local shot](msgorf_screenshot.jpg) **Local** `msgorf_screenshot.jpg` (same era / similar frame) |
+
+Also in that gallery: phone captures of wiki pages (`ms_gorf_3`–`5`) that embed further stills and 8″-disk notes.
 
 Disk labels in this dump:
 

@@ -28,7 +28,15 @@ Hosted at `https://www.professionalmagic.com/s/…`. Local copies + notes: **`do
 
 Overlapping Bitsavers scans (different filesize/hash): `docs/references/icebox/`.
 
+## Image gallery on the page
+
+Squarespace grid (`ms gorf 1` … `ms gorf 6`). Local mirror: [`garrett_ms_gorf_gallery/`](garrett_ms_gorf_gallery/).
+
+- **Direct gameplay stills:** `ms_gorf_1`, `ms_gorf_6`, `ms_gorf_2` (and related root `msgorf_screenshot.jpg`)
+- **Wiki phone captures** that also show game frames: `ms_gorf_3`, `ms_gorf_4`, `ms_gorf_5`
+
 ## What this does *not* authorize
 
 - Inventing missions, dual-stick play, speech, or a “Gorf II” redesign (the page’s speculative sequel section is opinion, not Ms. Gorf source).
 - Treating the SDL atlas / `--probe` keyboard as cabinet controls.
+- Treating gallery photos as substitutes for disk `PATTERN` art (`extracted/patterns/`).

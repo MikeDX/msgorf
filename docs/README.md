@@ -72,6 +72,7 @@ Dated session notes (newest first by topic):
 
 | Path | Role |
 |------|------|
+| [`references/garrett_ms_gorf_gallery/`](references/garrett_ms_gorf_gallery/) | Garrett gameplay stills |
 | [`../play/`](../play/index.html) | Pattern lab |
 | [`../extracted/patterns/`](../extracted/patterns/) | PNG exports |
 | [`../out/README.md`](../out/README.md) | Build products |
