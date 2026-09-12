@@ -1,0 +1,4 @@
+( Historical Ms. Gorf fragment cut from MSGORPAT FS.XC / screen 0088.
+  Source-only; not invented. P-I / p-i CFA unknown. )
+: BULLETS  p-i @  -2 P-I ;
+: ENDBULL  P-I ;

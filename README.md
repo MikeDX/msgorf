@@ -15,14 +15,14 @@ See `docs/findings/goals.md`, `docs/findings/source-extraction-status.md`, `docs
 | Area | Status |
 |------|--------|
 | Disk normalize / extract | Done |
-| Pattern sources + XC.PATTERNS | Done |
+| Pattern sources + XC.PATTERNS | Done + simple-record decode |
 | Pattern lab (web) | Done — no fake gameplay |
 | Game/`XC.LOGIC` application source | **Missing** from these floppies |
-| TERSE Python compiler | MVP + parse stub |
-| C/SDL/WASM runtime | Stub (`tools/terse/runtime/`) |
+| TERSE Python compiler | Host IR + parse + VM stubs (`compile_host`) |
+| C/SDL runtime | Runnable harness (`make -C tools/terse/runtime run`) |
 | Full ROM | Blocked on logic source / deeper XC |
 
-**Next action:** deepen TERSE parse/dictionary toward compiling real screens; hunt `XC.LOGIC`; keep `play/` source-only.
+**Next action:** deepen dictionary/CFA toward real codegen; hunt `XC.LOGIC`; keep `play/` source-only.
 
 ## Original disks (do not modify)
 
@@ -46,9 +46,17 @@ See `docs/findings/goals.md`, `docs/findings/source-extraction-status.md`, `docs
 ## Quick start
 
 ```bash
-python3 tools/normalize_img.py
+# Desktop pattern harness (needs SDL2: brew install sdl2)
+make -C tools/terse/runtime run
+
+# Pattern lab (browse-only)
 python3 tools/export_play_assets.py
 # open play/index.html
+
+# Host IR + tests
+python3 -m tools.terse.compile_host --bullets
+python3 -m unittest tools.terse.test_compile_host
 python3 tools/terse/parse.py extracted/msgorf_floppy_files/MSGORPAT_Disk/GORF-P
-python3 tools/harness/blit_collision.py
 ```
+
+See `docs/architecture/terse-toolchain.md` and `docs/lab-notebook/2026-09-12-sdl-runtime.md`.

@@ -1,0 +1,149 @@
+{
+  "rom": "out/msgorf_patterns_at_4000.bin",
+  "rom_sha256": "740a5e76662b890b1296265abf1f7299eadfe286bb9d904c2200c7d8bf83a670",
+  "format_note": "7-byte header + MSB 2bpp; width=bpr*4; height=hdr[3]",
+  "decoded": [
+    {
+      "name": "NULPAT",
+      "index": 0,
+      "ptr": "0x804f",
+      "w": 4,
+      "h": 1,
+      "header_hex": "00000101102030",
+      "pix_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119"
+    },
+    {
+      "name": "PLY1-P",
+      "index": 1,
+      "ptr": "0x8057",
+      "w": 16,
+      "h": 15,
+      "header_hex": "0707040f152637",
+      "pix_sha256": "9e4045fabad6979bb8de5eb25d5c4b92a1dafa3416f333ee1b9d7040603af2c5"
+    },
+    {
+      "name": "PLY2-P",
+      "index": 2,
+      "ptr": "0x809a",
+      "w": 16,
+      "h": 15,
+      "header_hex": "0707040f152637",
+      "pix_sha256": "c1dcde4d191844039b3fd0249030ae569a46797761bcf436f1468285595c36ca"
+    },
+    {
+      "name": "SBASE",
+      "index": 3,
+      "ptr": "0x80dd",
+      "w": 8,
+      "h": 8,
+      "header_hex": "03040208152637",
+      "pix_sha256": "44425ef313ed49131c9670c14a03334c0846b147ddd1db9b09880d1e8150c9d3"
+    },
+    {
+      "name": "P1UP",
+      "index": 4,
+      "ptr": "0x80f4",
+      "w": 8,
+      "h": 12,
+      "header_hex": "0306020c152637",
+      "pix_sha256": "6a9922fa95d115157625e0e2cbced58107bab93021c5f41135b9eb1b17827ea1"
+    },
+    {
+      "name": "P2UP",
+      "index": 5,
+      "ptr": "0x8113",
+      "w": 8,
+      "h": 12,
+      "header_hex": "0306020c152637",
+      "pix_sha256": "2e273e77ae1b5db833bfd58a92f3f9f788926c192c1a0723497ec3baffd33204"
+    },
+    {
+      "name": "GORF-PAT",
+      "index": 9,
+      "ptr": "0x86c9",
+      "w": 12,
+      "h": 13,
+      "header_hex": "0506030d192a3c",
+      "pix_sha256": "973b1dfd65d2a0b4f2661ba9f2da5a83c976ba57d9bbb45354b42dcaa4f251d4"
+    },
+    {
+      "name": "LAZON",
+      "index": 10,
+      "ptr": "0x86f7",
+      "w": 16,
+      "h": 13,
+      "header_hex": "0606040d1b2c3d",
+      "pix_sha256": "f75a381c574d23ceb5ba28a8622181498e72b128702a8f9189d638bcbbd8e5dc"
+    },
+    {
+      "name": "SHLD-P",
+      "index": 13,
+      "ptr": "0x882d",
+      "w": 16,
+      "h": 16,
+      "header_hex": "080804101d2c3b",
+      "pix_sha256": "07d2212a728fc5146ff0d461714562f7f8029acec07911a83b6175b6387297ca"
+    },
+    {
+      "name": "MITE-P",
+      "index": 14,
+      "ptr": "0x8874",
+      "w": 12,
+      "h": 11,
+      "header_hex": "0505030b192a3b",
+      "pix_sha256": "0c49dc2ea83cb65a9da0b65950ae7547ee84b47f6f548d986058594360b28741"
+    },
+    {
+      "name": "TRION-P",
+      "index": 15,
+      "ptr": "0x889c",
+      "w": 16,
+      "h": 8,
+      "header_hex": "080404081e2d3c",
+      "pix_sha256": "6918785c1923e2fc6480fa916082b93a7bf72bec66110b3927f9be5a5c4d2066"
+    },
+    {
+      "name": "DEB-P",
+      "index": 16,
+      "ptr": "0x88c3",
+      "w": 16,
+      "h": 7,
+      "header_hex": "08030407192f3b",
+      "pix_sha256": "7132b78822ada08bfc2029fe3a7926df2c099f2b6385931f1b9467282abc8430"
+    },
+    {
+      "name": "HK-P",
+      "index": 17,
+      "ptr": "0x88e6",
+      "w": 12,
+      "h": 10,
+      "header_hex": "0605030a1e293d",
+      "pix_sha256": "84951f70e14fc8379319a342ec82a04fe02395d36361e70c2c9f6b0627c7d5f4"
+    },
+    {
+      "name": "GB-P",
+      "index": 18,
+      "ptr": "0x890b",
+      "w": 12,
+      "h": 10,
+      "header_hex": "0605030a1a2d3f",
+      "pix_sha256": "bf5816a639e27c8e49ff38478bb4fedce989e607b338019c51c1d0a553590104"
+    },
+    {
+      "name": "GRD-P",
+      "index": 19,
+      "ptr": "0x8930",
+      "w": 12,
+      "h": 10,
+      "header_hex": "0605030a1a2b3c",
+      "pix_sha256": "fb02878f95e7cf0c579cc3231b449560e0bf760b927829d8272f568587baa1cf"
+    }
+  ],
+  "skipped_animation_or_complex": [
+    "BANGA",
+    "BANGP",
+    "CLONETBL",
+    "SPINV",
+    "SMINE"
+  ]
+}

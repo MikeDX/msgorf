@@ -1,0 +1,27 @@
+{
+  "label": "test",
+  "ok": true,
+  "errors": [],
+  "xc_bases": {
+    "ROMSTART": 16384,
+    "PT_HERE": 16896,
+    "DP": 32832,
+    "RSTACK": 62464,
+    "PSTACK": 61440,
+    "RAMSTART": 63488
+  },
+  "words": [
+    {
+      "name": "BULLETS",
+      "code_hex": "412030feff40ff"
+    },
+    {
+      "name": "ENDBULL",
+      "code_hex": "40ff"
+    }
+  ],
+  "note": "Host MVP encoding \u2014 not authentic Nutting TERSE bytecode",
+  "output": "out/host_ir.bin",
+  "output_sha256": "e4212dc87cfd5d64308cda636bd04697f5d13ff5a3b94e04b5b8909b93cec8ab",
+  "output_size": 49
+}

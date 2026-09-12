@@ -8,3 +8,5 @@ work/bitsavers_compare/
 work/gorf_index.html
 work/gorf_links.txt
 docs/references/cache/
+
+*.o

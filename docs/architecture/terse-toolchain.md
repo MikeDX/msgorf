@@ -5,40 +5,71 @@ Target pipeline:
 ```text
 ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────────┐
 │ Disk screens /  │     │ Python           │     │ C runtime           │
-│ .lst / objects  │ ──► │ terse_parse      │ ──► │ host IR or Z80 emit │
-│                 │     │ terse_dict       │     │                     │
-└─────────────────┘     │ terse_xc         │     └──────────┬──────────┘
+│ .lst / objects  │ ──► │ parse            │ ──► │ host IR + blit ABI  │
+│ XC.PATTERNS     │     │ compile_host     │     │ XC map @ ROMSTART   │
+└─────────────────┘     │ vm_host / xc_dec │     └──────────┬──────────┘
                         └──────────────────┘                │
                               │                             ├─► out/*.bin ROM
-                              │                             └─► SDL2 / WASM
+                              │                             └─► SDL2 (WASM later)
                               ▼
                         unit tests on known
                         screens (PATTERN, BULLETS)
 ```
 
+## Build / run (desktop harness)
+
+Requires SDL2 (`brew install sdl2` on macOS).
+
+```bash
+make -C tools/terse/runtime run
+# equivalent:
+#   make -C tools/terse/runtime
+#   ./tools/terse/runtime/terse_harness --xc out/msgorf_patterns_at_4000.bin
+```
+
+- Frame default **240×352**, nearest-neighbor scale ×2 (configurable via `FRAME_W` / `FRAME_H`)
+- Pixels: XC decode when `--xc` works; else `pack_assets.py` from `play/assets.json`
+- Overlay collision counted on write of non-zero over another owner
+
+## Python compile path
+
+```bash
+python3 -m tools.terse.compile_host --bullets   # → out/host_ir.bin + host_ir_map.json
+python3 -m tools.terse.compile_host --demo
+python3 tools/terse/parse.py extracted/msgorf_floppy_files/MSGORPAT_Disk/GORF-P
+python3 -m unittest tools.terse.test_compile_host
+python3 tools/terse/xc_decode.py               # → out/xc_decode_report.json
+```
+
+Host opcodes are **not** claimed authentic ARC-TERSE Z80. `P-I` / `p-i` remain stubs pending CFA recovery.
+
 ## Stages
 
-1. **Parse** — 16×64 Forth screens, `:` definitions, `PATTERN` / `~` `^` art, `FLOAD` graphs (`tools/terse/fload_chain.py` exists).
-2. **Dictionary** — name fields from corrected images (`extracted/dictionary/`); map CFA / parameter fields via `Z80_Asm.pdf` + kernel.
-3. **Eval/compile** — start with host IR (stack machine) for words we understand; XC path emits image at `ROMSTART`.
-4. **C wrapper** — stable ABI for blit, overlay-collision hook, memory image; SDL2 window for desktop; Emscripten optional later.
-5. **ROM** — link `XC.PATTERNS` + compiled logic (when available) into the dual-Z80 map.
+1. **Parse** — 16×64 Forth screens, `:` definitions, `PATTERN` / `~` `^` art, `FLOAD` graphs (`fload_chain.py`).
+2. **Dictionary** — name fields from corrected images; map CFA via `Z80_Asm.pdf` + kernel (open).
+3. **Eval/compile** — host IR (`compile_host.py` / `vm_host.py`); XC path places `XC.PATTERNS` at `ROMSTART`.
+4. **C wrapper** — blit + overlay collision; SDL2 desktop; Emscripten optional later (same `terse_rt`).
+5. **ROM** — link patterns + compiled logic (when `XC.LOGIC` / application source exists).
 
-## Repo layout (intended)
+## Repo layout
 
 ```text
 tools/terse/
-  parse.py          # screen/token parser
-  dict_walk.py      # binary dictionary walker
-  compile_host.py   # host IR (evolves from mvp_compile.py)
-  compile_xc.py     # ROM image emit
-  runtime/          # C sources
-    terse_rt.h
-    terse_rt.c
-    sdl_main.c      # optional
+  parse.py
+  compile_host.py   # host IR (mvp_compile.py re-exports)
+  vm_host.py
+  xc_decode.py
+  package_patterns_rom.py
+  runtime/
+    terse_rt.c/.h
+    pack_assets.py
+    xc_map.c/.h
+    sdl_main.c
+    Makefile
 ```
 
 ## Non-goals until source exists
 
 - Shipping a WASM “game” with invented missions
 - Claiming Gorf mission code is Ms. Gorf
+- Invented HUD / waves inside `play/`

@@ -12,9 +12,17 @@ typedef struct {
 
 void terse_frame_init(terse_frame_t *f, uint16_t w, uint16_t h);
 void terse_frame_clear(terse_frame_t *f);
+void terse_frame_free(terse_frame_t *f);
+
 /* returns number of overlay collisions while blitting non-zero pixels */
 int terse_blit_pattern(terse_frame_t *f, const char **rows, int rh, int rw,
                        int x, int y, uint16_t owner);
-void terse_frame_free(terse_frame_t *f);
+
+int terse_blit_u8(terse_frame_t *f, const uint8_t *pix, int rw, int rh,
+                  int x, int y, uint16_t owner);
+
+/* palette[4] as 0x00RRGGBB; out length w*h */
+void terse_frame_to_rgb24(const terse_frame_t *f, uint8_t *out_rgb,
+                          const uint8_t palette[4][3]);
 
 #endif
