@@ -1,16 +1,17 @@
 # C runtime — pattern animator
 
-Authentic patterns with shared black/yellow/blue/red 2bpp palette; cycles disk frame groups.
+One sequence at a time, centred in a **fixed cell** (max frame size) so CLONE/SMINE don’t jump.
 
 ```bash
-python3 tools/export_play_assets.py   # refresh play/assets.json + pack input
+python3 tools/export_play_assets.py
 make -C tools/terse/runtime run
 ```
 
-| Faithful | Lab guess |
-|----------|-----------|
-| Pixel art + frame lists from PATTERN files | Frame size 240×352 |
-| Shared 2bpp colour hypothesis (BYBR) | Exact CRT / hardware LUT |
-| CLONE / KAMI / SMINE / BANG frame order | Atlas layout / timing |
+| Key | Action |
+|-----|--------|
+| ← → / A D | Previous / next sequence |
+| Space | Pause |
+| `[` `]` | Slower / faster |
+| Esc | Quit |
 
-Not a game — no `XC.LOGIC`.
+Palette: 0=black 1=yellow 2=blue 3=red. Not a game.

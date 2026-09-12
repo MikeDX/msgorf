@@ -28,6 +28,9 @@
   .ref label { margin-right:1rem; }
   .swatches { display:flex; gap:6px; align-items:center; margin:.5rem 0 0; }
   .swatches i { width:18px; height:18px; display:inline-block; border:1px solid #444; }
+  #strip { display:flex; flex-wrap:wrap; gap:8px; margin-top:.75rem; }
+  #strip canvas { border:1px solid var(--line); cursor:pointer; image-rendering:pixelated; }
+  #strip canvas.strip-on { border-color:var(--acc); }
   pre { background:#141820; border:1px solid var(--line); padding:.75rem; overflow:auto;
     font-size:.72rem; max-height:220px; }
 </style>
@@ -49,6 +52,7 @@
     <div class="meta" id="meta">Select an INDEX entry</div>
     <div class="swatches" id="swatches"></div>
     <div class="stage"><canvas id="c" width="64" height="64"></canvas></div>
+    <div id="strip"></div>
     <div class="ref">
       <label><input type="checkbox" id="anim" checked> Animate</label>
       · ms/frame <input id="fps" type="range" min="50" max="400" value="120"/>
@@ -108,6 +112,21 @@ function activePatternName() {
   return frames[frameIdx % frames.length];
 }
 
+/** Fixed cell = max w×h across this entry's frames (stops CLONE/SMINE jumping). */
+function cellSize() {
+  const names = current && current.frames && current.frames.length
+    ? current.frames
+    : (current && current.pattern ? [current.pattern] : []);
+  let mw = 1, mh = 1;
+  for (const n of names) {
+    const p = PATTERNS[n];
+    if (!p) continue;
+    if (p.w > mw) mw = p.w;
+    if (p.h > mh) mh = p.h;
+  }
+  return { w: mw, h: mh };
+}
+
 function draw() {
   const pname = activePatternName();
   if (!pname || !PATTERNS[pname]) {
@@ -118,36 +137,83 @@ function draw() {
   const spr = PATTERNS[pname];
   const pal = paletteFor(pname);
   const scale = +document.getElementById('scale').value;
-  const frame = frameSize();
-  const fw = frame ? frame.w : spr.w;
-  const fh = frame ? frame.h : spr.h;
+  const ref = frameSize();
+  const cell = cellSize();
+  const fw = ref ? ref.w : cell.w;
+  const fh = ref ? ref.h : cell.h;
   canvas.width = fw * scale;
   canvas.height = fh * scale;
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+  /* cell outline in native mode */
+  if (!ref) {
+    ctx.strokeStyle = '#2a3140';
+    ctx.strokeRect(0.5, 0.5, canvas.width - 1, canvas.height - 1);
+  }
   const img = bake(spr.rows, spr.w, spr.h, pal);
   const off = document.createElement('canvas');
   off.width = spr.w; off.height = spr.h;
   off.getContext('2d').putImageData(img, 0, 0);
-  let dx = 0, dy = 0;
-  if (frame) {
+  let dx, dy;
+  if (ref) {
     dx = Math.floor((fw - spr.w) / 2);
     dy = Math.floor(fh - spr.h - Math.max(4, Math.floor(fh * 0.08)));
+  } else {
+    dx = Math.floor((cell.w - spr.w) / 2);
+    dy = Math.floor((cell.h - spr.h) / 2);
   }
   ctx.imageSmoothingEnabled = false;
   ctx.drawImage(off, dx * scale, dy * scale, spr.w * scale, spr.h * scale);
-  if (frame) {
+  if (ref) {
     ctx.strokeStyle = '#333';
     ctx.strokeRect(0.5, 0.5, canvas.width - 1, canvas.height - 1);
   }
+  /* filmstrip of frames */
+  const strip = document.getElementById('strip');
+  if (strip) {
+    strip.innerHTML = '';
+    const names = current.frames && current.frames.length > 1 ? current.frames : [];
+    names.forEach((n, i) => {
+      const p = PATTERNS[n];
+      if (!p) return;
+      const c = document.createElement('canvas');
+      const sc = 2;
+      c.width = cell.w * sc;
+      c.height = cell.h * sc;
+      c.className = i === (frameIdx % names.length) ? 'strip-on' : 'strip-off';
+      c.title = `${n} ${p.w}×${p.h}`;
+      const cctx = c.getContext('2d');
+      cctx.imageSmoothingEnabled = false;
+      cctx.fillStyle = '#000';
+      cctx.fillRect(0, 0, c.width, c.height);
+      const im = bake(p.rows, p.w, p.h, paletteFor(n));
+      const o2 = document.createElement('canvas');
+      o2.width = p.w; o2.height = p.h;
+      o2.getContext('2d').putImageData(im, 0, 0);
+      const sx = Math.floor((cell.w - p.w) / 2) * sc;
+      const sy = Math.floor((cell.h - p.h) / 2) * sc;
+      cctx.drawImage(o2, sx, sy, p.w * sc, p.h * sc);
+      c.onclick = () => { frameIdx = i; draw(); document.getElementById('meta').textContent = metaText(); };
+      strip.appendChild(c);
+    });
+  }
   const sw = document.getElementById('swatches');
-  sw.innerHTML = 'palette ' + pname + ':';
+  sw.innerHTML = 'palette:';
   pal.forEach((c, i) => {
     const el = document.createElement('i');
-    el.title = `color ${i} rgb(${c})`;
+    el.title = `color ${i}`;
     el.style.background = `rgb(${c[0]},${c[1]},${c[2]})`;
     sw.appendChild(el);
   });
+}
+
+function metaText() {
+  const r = current;
+  const pname = activePatternName();
+  const spr = pname && PATTERNS[pname];
+  const cell = cellSize();
+  const n = (r.frames && r.frames.length) || 1;
+  return `${r.id} · ${pname || '—'} (${frameIdx + 1}/${n}) · sprite ${spr ? spr.w + '×' + spr.h : '?'} · cell ${cell.w}×${cell.h}`;
 }
 
 function tick(ts) {
@@ -162,14 +228,6 @@ function tick(ts) {
     document.getElementById('meta').textContent = metaText();
     draw();
   }
-}
-
-function metaText() {
-  const r = current;
-  const pname = activePatternName();
-  const spr = pname && PATTERNS[pname];
-  const n = (r.frames && r.frames.length) || 1;
-  return `${r.id} · anim_map=${r.anim_map || '—'} · frame ${pname || '—'} (${frameIdx + 1}/${n}) · ${spr ? spr.w + '×' + spr.h : '?'}`;
 }
 
 function select(r, btn) {

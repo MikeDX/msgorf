@@ -10,11 +10,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 WORK = ROOT / "work"
 OUT = ROOT / "extracted" / "patterns"
+# Shared 2bpp lab palette (same as export_play_assets / play lab):
+# digit 0..3 → black, yellow, blue, red.
 PALETTE = {
     0: (0, 0, 0),
-    1: (40, 90, 220),
-    2: (230, 50, 40),
-    3: (245, 245, 245),
+    1: (240, 200, 32),
+    2: (48, 96, 220),
+    3: (220, 40, 48),
 }
 
 

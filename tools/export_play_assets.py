@@ -3,16 +3,22 @@
 
 Adds per-pattern palette bytes (from PATTERN headers) and animation frame lists
 grouped from the same source files (CLONE, KAMI, SMINE, BANG explosions).
+
+Also rewrites extracted/patterns/{file}__{name}.png with the shared BYBR palette.
 """
 from __future__ import annotations
 
 import json
 import re
+import struct
+import zlib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DISK = ROOT / "extracted" / "msgorf_floppy_files" / "MSGORPAT_Disk"
 OUT = ROOT / "play" / "assets.json"
+PAT_OUT = ROOT / "extracted" / "patterns"
+PNG_SCALE = 4
 
 # Frame sequences from disk pattern files (names as PATTERN … on disk)
 ANIMATIONS = {
@@ -34,6 +40,43 @@ FIXED_PALETTE_RGB = [
     [48, 96, 220],  # 2 blue
     [220, 40, 48],  # 3 red
 ]
+
+
+def write_png(
+    path: Path, width: int, height: int, pixels: list[tuple[int, int, int]], scale: int = PNG_SCALE
+) -> None:
+    w, h = width * scale, height * scale
+    rows = []
+    for y in range(h):
+        row = [0]  # filter none
+        src_y = y // scale
+        for x in range(w):
+            r, g, b = pixels[src_y * width + (x // scale)]
+            row.extend((r, g, b))
+        rows.append(bytes(row))
+    raw = b"".join(rows)
+    compressed = zlib.compress(raw, 9)
+
+    def chunk(tag: bytes, data: bytes) -> bytes:
+        return (
+            struct.pack(">I", len(data))
+            + tag
+            + data
+            + struct.pack(">I", zlib.crc32(tag + data) & 0xFFFFFFFF)
+        )
+
+    ihdr = struct.pack(">IIBBBBB", w, h, 8, 2, 0, 0, 0)
+    png = b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", ihdr) + chunk(b"IDAT", compressed) + chunk(b"IEND", b"")
+    path.write_bytes(png)
+
+
+def rows_to_pixels(rows: list[str]) -> list[tuple[int, int, int]]:
+    pal = {i: tuple(c) for i, c in enumerate(FIXED_PALETTE_RGB)}
+    pixels: list[tuple[int, int, int]] = []
+    for row in rows:
+        for ch in row:
+            pixels.append(pal[int(ch)])
+    return pixels
 
 
 def parse_file_patterns(text: str) -> dict:
@@ -89,8 +132,10 @@ def main() -> None:
     )
     amap = {m.group(2): m.group(1) for m in re.finditer(r"(\S+)\s+(\S+)\s+AT!", am)}
 
+    PAT_OUT.mkdir(parents=True, exist_ok=True)
     patterns: dict = {}
-    for p in DISK.iterdir():
+    floppy_meta: list[dict] = []
+    for p in sorted(DISK.iterdir()):
         if not p.is_file():
             continue
         if not (
@@ -99,7 +144,20 @@ def main() -> None:
         ):
             continue
         text = "".join(chr(b) if 32 <= b < 127 else "\n" for b in p.read_bytes())
-        patterns.update(parse_file_patterns(text))
+        file_pats = parse_file_patterns(text)
+        for name, pix in file_pats.items():
+            patterns[name] = pix
+            png_rel = f"extracted/patterns/{p.name}__{name}.png"
+            write_png(ROOT / png_rel, pix["w"], pix["h"], rows_to_pixels(pix["rows"]))
+            floppy_meta.append(
+                {
+                    "file": p.name,
+                    "pattern": name,
+                    "w": pix["w"],
+                    "h": pix["h"],
+                    "png": png_rel,
+                }
+            )
 
     if "NULPAT" not in patterns:
         patterns["NULPAT"] = {
@@ -174,9 +232,12 @@ def main() -> None:
         + json.dumps(assets, separators=(",", ":"))
         + ";\n"
     )
+    meta_path = PAT_OUT / "from_floppy_files.json"
+    meta_path.write_text(json.dumps(floppy_meta, indent=2) + "\n")
     print(
         f"wrote {OUT} ({OUT.stat().st_size} bytes) + {js.name}, "
-        f"{len(patterns)} patterns, {len(animations)} anims, {len(roster)} roster"
+        f"{len(patterns)} patterns, {len(animations)} anims, {len(roster)} roster; "
+        f"{len(floppy_meta)} PNGs → {PAT_OUT.relative_to(ROOT)}"
     )
 
 

@@ -1,16 +1,37 @@
 [
   {
     "file": "BANG",
+    "pattern": "FBEXP1",
+    "w": 144,
+    "h": 1,
+    "png": "extracted/patterns/BANG__FBEXP1.png"
+  },
+  {
+    "file": "BANG",
+    "pattern": "FBEXP2",
+    "w": 272,
+    "h": 1,
+    "png": "extracted/patterns/BANG__FBEXP2.png"
+  },
+  {
+    "file": "BANG",
+    "pattern": "FBEXP3",
+    "w": 552,
+    "h": 1,
+    "png": "extracted/patterns/BANG__FBEXP3.png"
+  },
+  {
+    "file": "BANG",
     "pattern": "FBEXP4",
-    "w": 20,
-    "h": 23,
+    "w": 440,
+    "h": 1,
     "png": "extracted/patterns/BANG__FBEXP4.png"
   },
   {
     "file": "BANG",
     "pattern": "FBEXP5",
     "w": 20,
-    "h": 46,
+    "h": 23,
     "png": "extracted/patterns/BANG__FBEXP5.png"
   },
   {
@@ -23,15 +44,15 @@
   {
     "file": "CLONE-P",
     "pattern": "CLN0",
-    "w": 36,
-    "h": 57,
+    "w": 32,
+    "h": 28,
     "png": "extracted/patterns/CLONE-P__CLN0.png"
   },
   {
     "file": "CLONE-P",
     "pattern": "CLN32",
     "w": 36,
-    "h": 47,
+    "h": 34,
     "png": "extracted/patterns/CLONE-P__CLN32.png"
   },
   {
@@ -80,21 +101,21 @@
     "file": "KAMI-P",
     "pattern": "COMC5B",
     "w": 16,
-    "h": 36,
+    "h": 9,
     "png": "extracted/patterns/KAMI-P__COMC5B.png"
   },
   {
     "file": "KAMI-P",
     "pattern": "COMC5A",
     "w": 16,
-    "h": 27,
+    "h": 9,
     "png": "extracted/patterns/KAMI-P__COMC5A.png"
   },
   {
     "file": "KAMI-P",
     "pattern": "COMC5",
     "w": 16,
-    "h": 18,
+    "h": 9,
     "png": "extracted/patterns/KAMI-P__COMC5.png"
   },
   {
@@ -119,25 +140,32 @@
     "png": "extracted/patterns/MITE-P__MITE-P.png"
   },
   {
+    "file": "PLUP",
+    "pattern": "P1UP",
+    "w": 8,
+    "h": 12,
+    "png": "extracted/patterns/PLUP__P1UP.png"
+  },
+  {
+    "file": "PLUP",
+    "pattern": "P2UP",
+    "w": 8,
+    "h": 12,
+    "png": "extracted/patterns/PLUP__P2UP.png"
+  },
+  {
     "file": "PLY-P",
     "pattern": "PLY1-P",
     "w": 16,
-    "h": 30,
+    "h": 15,
     "png": "extracted/patterns/PLY-P__PLY1-P.png"
   },
   {
     "file": "PLY-P",
     "pattern": "PLY2-P",
     "w": 16,
-    "h": 23,
+    "h": 15,
     "png": "extracted/patterns/PLY-P__PLY2-P.png"
-  },
-  {
-    "file": "PLY-P",
-    "pattern": "INDICATING",
-    "w": 8,
-    "h": 8,
-    "png": "extracted/patterns/PLY-P__INDICATING.png"
   },
   {
     "file": "PLY-P",
@@ -157,7 +185,7 @@
     "file": "SMINE-P",
     "pattern": "SMINE0",
     "w": 16,
-    "h": 26,
+    "h": 13,
     "png": "extracted/patterns/SMINE-P__SMINE0.png"
   },
   {

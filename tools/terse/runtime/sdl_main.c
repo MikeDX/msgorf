@@ -1,8 +1,9 @@
 /*
- * Pattern decode/blit validator — NOT Ms. Gorf gameplay.
+ * Pattern animator — NOT Ms. Gorf gameplay.
  *
- * Shows authentic patterns with header-derived colours and cycles
- * multi-frame sequences from disk (CLONE / KAMI / SMINE / BANG).
+ * One sequence at a time, centred in a fixed cell (max frame w×h) so
+ * CLONE / SMINE size changes do not jump the layout.
+ * Left/Right = prev/next sequence · Space = pause · Esc = quit
  */
 #include "terse_rt.h"
 #include "assets_gen.h"
@@ -19,89 +20,123 @@
 #ifndef FRAME_H
 #define FRAME_H 352
 #endif
-#define SCALE 2
+#define SCALE 3
 
-static void blit_with_pal(terse_frame_t *fr, const terse_asset_t *a, int x, int y,
-                          uint16_t owner) {
-  terse_blit_u8(fr, a->pix, a->w, a->h, x, y, owner);
+typedef struct {
+  const char *label;
+  int count;
+  const terse_asset_t *const *frames; /* NULL => single */
+  const terse_asset_t *single;
+  int cell_w, cell_h;
+} seq_t;
+
+#define MAX_SEQ 48
+
+static void seq_bounds(seq_t *s) {
+  int mw = 1, mh = 1;
+  if (s->frames) {
+    for (int i = 0; i < s->count; i++) {
+      if (s->frames[i]->w > mw) mw = s->frames[i]->w;
+      if (s->frames[i]->h > mh) mh = s->frames[i]->h;
+    }
+  } else if (s->single) {
+    mw = s->single->w;
+    mh = s->single->h;
+  }
+  s->cell_w = mw;
+  s->cell_h = mh;
 }
 
-/* Composite atlas using each sprite's own palette into RGB (per-sprite bake). */
-static void atlas_to_rgb(uint8_t *rgb, int fw, int fh,
-                         const terse_asset_t *const *sprites, int n,
-                         int anim_phase) {
-  memset(rgb, 0, (size_t)fw * fh * 3);
-  int x = 4, y = 4, row_h = 0;
-  for (int i = 0; i < n; i++) {
-    const terse_asset_t *a = sprites[i];
-    /* If this asset is part of an anim group sharing a prefix slot, skip —
-       we pass already-selected frames. */
-    if (x + a->w + 4 > fw) {
-      x = 4;
-      y += row_h + 4;
-      row_h = 0;
+static const terse_asset_t *seq_frame(const seq_t *s, int fi) {
+  if (s->frames) return s->frames[fi % s->count];
+  return s->single;
+}
+
+static void blit_centered(uint8_t *rgb, int fw, int fh, const terse_asset_t *a,
+                          int cell_w, int cell_h, int ox, int oy) {
+  int x0 = ox + (cell_w - a->w) / 2;
+  int y0 = oy + (cell_h - a->h) / 2;
+  for (int j = 0; j < a->h; j++) {
+    for (int i = 0; i < a->w; i++) {
+      uint8_t v = a->pix[j * a->w + i] & 3;
+      if (!v) continue;
+      int xx = x0 + i, yy = y0 + j;
+      if (xx < 0 || yy < 0 || xx >= fw || yy >= fh) continue;
+      size_t idx = ((size_t)yy * (size_t)fw + (size_t)xx) * 3;
+      rgb[idx + 0] = a->pal[v][0];
+      rgb[idx + 1] = a->pal[v][1];
+      rgb[idx + 2] = a->pal[v][2];
     }
-    if (y + a->h > fh) break;
-    for (int j = 0; j < a->h; j++) {
-      for (int i2 = 0; i2 < a->w; i2++) {
-        uint8_t v = a->pix[j * a->w + i2] & 3;
-        if (!v) continue;
-        int xx = x + i2, yy = y + j;
-        if (xx < 0 || yy < 0 || xx >= fw || yy >= fh) continue;
-        size_t idx = ((size_t)yy * (size_t)fw + (size_t)xx) * 3;
-        rgb[idx + 0] = a->pal[v][0];
-        rgb[idx + 1] = a->pal[v][1];
-        rgb[idx + 2] = a->pal[v][2];
-      }
-    }
-    x += a->w + 4;
-    if (a->h > row_h) row_h = a->h;
   }
-  (void)anim_phase;
+}
+
+static void draw_cell_border(uint8_t *rgb, int fw, int fh, int ox, int oy,
+                             int cw, int ch) {
+  uint8_t c = 40;
+  for (int x = ox; x < ox + cw && x < fw; x++) {
+    if (oy >= 0 && oy < fh) {
+      size_t i = ((size_t)oy * fw + x) * 3;
+      rgb[i] = rgb[i + 1] = rgb[i + 2] = c;
+    }
+    int yb = oy + ch - 1;
+    if (yb >= 0 && yb < fh) {
+      size_t i = ((size_t)yb * fw + x) * 3;
+      rgb[i] = rgb[i + 1] = rgb[i + 2] = c;
+    }
+  }
+  for (int y = oy; y < oy + ch && y < fh; y++) {
+    if (ox >= 0 && ox < fw) {
+      size_t i = ((size_t)y * fw + ox) * 3;
+      rgb[i] = rgb[i + 1] = rgb[i + 2] = c;
+    }
+    int xr = ox + cw - 1;
+    if (xr >= 0 && xr < fw) {
+      size_t i = ((size_t)y * fw + xr) * 3;
+      rgb[i] = rgb[i + 1] = rgb[i + 2] = c;
+    }
+  }
 }
 
 int main(int argc, char **argv) {
   int use_xc = 0;
-  int probe = 0;
   const char *rom_path = NULL;
   for (int i = 1; i < argc; i++) {
     if (!strcmp(argv[i], "--xc") && i + 1 < argc) {
       use_xc = 1;
       rom_path = argv[++i];
-    } else if (!strcmp(argv[i], "--probe")) {
-      probe = 1;
     }
   }
 
-  /* Build display list: one frame from each anim + leftover singles */
-  const terse_asset_t *show[64];
-  int nshow = 0;
-  int anim_frame[16];
-  memset(anim_frame, 0, sizeof anim_frame);
-
-  for (int i = 0; i < TERSE_ANIM_COUNT && nshow < 64; i++) {
-    show[nshow++] = terse_anims[i]->frames[0];
+  seq_t seqs[MAX_SEQ];
+  int nseq = 0;
+  for (int i = 0; i < TERSE_ANIM_COUNT && nseq < MAX_SEQ; i++) {
+    seqs[nseq].label = terse_anims[i]->name;
+    seqs[nseq].count = terse_anims[i]->count;
+    seqs[nseq].frames = terse_anims[i]->frames;
+    seqs[nseq].single = NULL;
+    seq_bounds(&seqs[nseq]);
+    nseq++;
   }
-  /* Add a few static notables not in anims */
-  const char *statics[] = {"GORF-PAT", "PLY1-P", "LAZON", "SHLD-P", "TRION-P",
-                           "DEB-P", "HK-P", "GB-P", "GRD-P", NULL};
-  for (int s = 0; statics[s]; s++) {
+  const char *statics[] = {"GORF-PAT", "PLY1-P", "PLY2-P", "LAZON", "SHLD-P",
+                           "TRION-P",  "DEB-P",  "HK-P",   "GB-P",  "GRD-P",
+                           "SBASE",    "P1UP",   "P2UP",   NULL};
+  for (int s = 0; statics[s] && nseq < MAX_SEQ; s++) {
     for (int i = 0; i < TERSE_ASSET_COUNT; i++) {
-      if (!strcmp(terse_assets[i]->name, statics[s])) {
-        int dup = 0;
-        for (int j = 0; j < nshow; j++)
-          if (show[j] == terse_assets[i]) dup = 1;
-        if (!dup && nshow < 64) show[nshow++] = terse_assets[i];
-        break;
-      }
+      if (strcmp(terse_assets[i]->name, statics[s])) continue;
+      seqs[nseq].label = terse_assets[i]->name;
+      seqs[nseq].count = 1;
+      seqs[nseq].frames = NULL;
+      seqs[nseq].single = terse_assets[i];
+      seq_bounds(&seqs[nseq]);
+      nseq++;
+      break;
     }
   }
 
   uint8_t *xc_mem = NULL;
   if (use_xc && rom_path) {
     xc_mem = xc_load_64k(rom_path);
-    if (xc_mem)
-      printf("XC image loaded (atlas still uses source-pack frames+palettes)\n");
+    if (xc_mem) printf("XC image loaded (display uses source pack)\n");
   }
 
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -109,59 +144,122 @@ int main(int argc, char **argv) {
     return 1;
   }
   SDL_Window *win = SDL_CreateWindow(
-      "Ms. Gorf pattern animator (not a game)", SDL_WINDOWPOS_CENTERED,
-      SDL_WINDOWPOS_CENTERED, FRAME_W * SCALE, FRAME_H * SCALE, 0);
+      "Ms. Gorf patterns", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+      FRAME_W * SCALE, FRAME_H * SCALE, 0);
   SDL_Renderer *ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
   SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
   SDL_Texture *tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGB24,
                                        SDL_TEXTUREACCESS_STREAMING, FRAME_W,
                                        FRAME_H);
   uint8_t *rgb = malloc((size_t)FRAME_W * FRAME_H * 3);
-  terse_frame_t fr;
-  terse_frame_init(&fr, FRAME_W, FRAME_H);
 
   printf("=== pattern animator (not Ms. Gorf) ===\n");
-  printf("Colours: shared 0=black 1=yellow 2=blue 3=red (lab hypothesis)\n");
-  printf("Anims: %d sequences · Esc quit", TERSE_ANIM_COUNT);
-  if (probe) printf(" · --probe unused in atlas mode");
-  printf("\n");
+  printf("Left/Right  previous / next sequence\n");
+  printf("Space       pause/resume animation\n");
+  printf("[ / ]       slower / faster\n");
+  printf("Esc         quit\n");
+  printf("Palette: 0=black 1=yellow 2=blue 3=red\n");
 
+  int sel = 0;
+  int fi = 0;
+  int paused = 0;
+  int period_ms = 140;
   int running = 1;
   Uint32 last = SDL_GetTicks();
-  int phase = 0;
 
   while (running) {
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
       if (e.type == SDL_QUIT) running = 0;
-      if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE) running = 0;
+      if (e.type != SDL_KEYDOWN) continue;
+      switch (e.key.keysym.sym) {
+        case SDLK_ESCAPE:
+          running = 0;
+          break;
+        case SDLK_LEFT:
+        case SDLK_a:
+          sel = (sel + nseq - 1) % nseq;
+          fi = 0;
+          break;
+        case SDLK_RIGHT:
+        case SDLK_d:
+          sel = (sel + 1) % nseq;
+          fi = 0;
+          break;
+        case SDLK_SPACE:
+          paused = !paused;
+          break;
+        case SDLK_LEFTBRACKET:
+          if (period_ms < 400) period_ms += 20;
+          break;
+        case SDLK_RIGHTBRACKET:
+          if (period_ms > 40) period_ms -= 20;
+          break;
+        default:
+          break;
+      }
     }
 
     Uint32 now = SDL_GetTicks();
-    if (now - last > 120) {
-      phase++;
+    if (!paused && seqs[sel].count > 1 && now - last >= (Uint32)period_ms) {
+      fi = (fi + 1) % seqs[sel].count;
       last = now;
-      /* advance each animation slot */
-      nshow = 0;
-      for (int i = 0; i < TERSE_ANIM_COUNT && nshow < 64; i++) {
-        const terse_anim_t *an = terse_anims[i];
-        anim_frame[i] = (anim_frame[i] + 1) % an->count;
-        show[nshow++] = an->frames[anim_frame[i]];
-      }
-      for (int s = 0; statics[s]; s++) {
-        for (int i = 0; i < TERSE_ASSET_COUNT; i++) {
-          if (!strcmp(terse_assets[i]->name, statics[s])) {
-            int dup = 0;
-            for (int j = 0; j < nshow; j++)
-              if (show[j] == terse_assets[i]) dup = 1;
-            if (!dup && nshow < 64) show[nshow++] = terse_assets[i];
-            break;
+    }
+
+    memset(rgb, 0, (size_t)FRAME_W * FRAME_H * 3);
+    seq_t *s = &seqs[sel];
+    const terse_asset_t *fr = seq_frame(s, fi);
+    /* Centre the fixed cell in the framebuffer */
+    int ox = (FRAME_W - s->cell_w) / 2;
+    int oy = (FRAME_H - s->cell_h) / 2 - 8;
+    if (ox < 4) ox = 4;
+    if (oy < 4) oy = 4;
+    draw_cell_border(rgb, FRAME_W, FRAME_H, ox - 1, oy - 1, s->cell_w + 2,
+                     s->cell_h + 2);
+    blit_centered(rgb, FRAME_W, FRAME_H, fr, s->cell_w, s->cell_h, ox, oy);
+
+    /* Tiny filmstrip of all frames in this sequence along the bottom */
+    int strip_y = FRAME_H - 40;
+    int sx = 4;
+    if (s->frames) {
+      for (int i = 0; i < s->count; i++) {
+        const terse_asset_t *f = s->frames[i];
+        int cw = s->cell_w;
+        /* scale strip cells down if needed */
+        int max_strip = 36;
+        int cell = cw > max_strip ? max_strip : cw;
+        int ch = s->cell_h > 28 ? 28 : s->cell_h;
+        if (sx + cell + 2 > FRAME_W) break;
+        /* draw mini: nearest subsample via centred blit into small cell */
+        int mx = sx, my = strip_y;
+        if (i == fi) draw_cell_border(rgb, FRAME_W, FRAME_H, mx - 1, my - 1,
+                                      cell + 2, ch + 2);
+        /* simple 1:1 if fits, else skip pixels */
+        int x0 = mx + (cell - f->w) / 2;
+        int y0 = my + (ch - f->h) / 2;
+        for (int j = 0; j < f->h; j++) {
+          for (int ii = 0; ii < f->w; ii++) {
+            uint8_t v = f->pix[j * f->w + ii] & 3;
+            if (!v) continue;
+            int xx = x0 + ii, yy = y0 + j;
+            if (xx < mx || yy < my || xx >= mx + cell || yy >= my + ch) continue;
+            if (xx >= FRAME_W || yy >= FRAME_H) continue;
+            size_t idx = ((size_t)yy * FRAME_W + xx) * 3;
+            rgb[idx] = f->pal[v][0];
+            rgb[idx + 1] = f->pal[v][1];
+            rgb[idx + 2] = f->pal[v][2];
           }
         }
+        sx += cell + 4;
       }
     }
 
-    atlas_to_rgb(rgb, FRAME_W, FRAME_H, show, nshow, phase);
+    char title[160];
+    snprintf(title, sizeof title,
+             "%s  frame %d/%d  cell %dx%d  %dms %s", s->label, fi + 1, s->count,
+             s->cell_w, s->cell_h, period_ms, paused ? "[paused]" : "");
+    SDL_SetWindowTitle(win, title);
+
     SDL_UpdateTexture(tex, NULL, rgb, FRAME_W * 3);
     SDL_RenderClear(ren);
     SDL_RenderCopy(ren, tex, NULL, NULL);
@@ -171,12 +269,9 @@ int main(int argc, char **argv) {
 
   free(xc_mem);
   free(rgb);
-  terse_frame_free(&fr);
   SDL_DestroyTexture(tex);
   SDL_DestroyRenderer(ren);
   SDL_DestroyWindow(win);
   SDL_Quit();
-  (void)blit_with_pal;
-  (void)probe;
   return 0;
 }
