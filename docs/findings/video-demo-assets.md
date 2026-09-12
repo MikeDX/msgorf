@@ -23,8 +23,9 @@ Source clip: `work/video_refs/gameplay.mp4` (~163 s chopped Media Burn fullscr
 |---------|----------|-------------------|
 | `$` + digits + `SELECT 1 OR 2 PLAYER GAME` | Clear yellow HUD on clip open | Character generator / font in **application** TERSE or Ice video ROM — dictionary noise mentions `GFONTPAT` but **no glyph file** here |
 | Thin shot streaks | Always 1-px-ish lines, any angle | Hardware line / `BULLETS` verb path — `FS.XC` only has stub `: BULLETS  p-i @ -2 P-I ;` |
-| Purple life diamonds | HUD next to score | Small draw or missing micro-pattern; **not** `SMINE1` (that's a blue/yellow bar) |
-| Green spiral / warp field | Dotted radial field in several shots | Procedural paint (Jamie’s “paint pixels” note) or table not shipped as PATTERN |
+| Purple life diamonds | HUD next to score | **Wrong earlier:** those are INDEX `SBi` → pattern `SBASE` (ships remaining), not a separate diamond glyph |
+| Flashing mark by score | Near `$` | INDEX `P1Ui` → `P1UP` (alternates with `NULPAT`) |
+| Green spiral / warp field | Dotted radial field in several shots | Procedural paint; arms from small centre, out then in |
 
 ## Demo policy
 

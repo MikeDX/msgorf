@@ -14,8 +14,11 @@ Sprites / animations via `play/assets.json`: PLY*, GORF-PAT, CLONE frames, LAZON
 |-----------|---------------|---------------|
 | `$` score digits + `SELECT…` letters | No `GFONTPAT` / digit atlas on pattern disks | `font_guess.json` — video-traced GUESS |
 | Thin shot streaks | `BULLETS` stub only (`p-i` CFA unknown); not pattern art | Short line segments along velocity |
-| Purple “life” diamonds | Not identified as a named PATTERN | Tiny drawn diamonds (GUESS) |
-| Spiral / warp field dots | Likely procedural / paint, not a static pattern | Optional dotted spiral (GUESS) |
-| Dual-stick feel | Observed on wooden prototype panel in video | WASD + mouse aim / arrows (GUESS mapping) |
+| Ships remaining | INDEX `SBi` → `SBASE` | Blit `SBASE` icons after P1Ui |
+| P1 up flash | INDEX `P1Ui` → `P1UP` / `NULPAT` | Flash `P1UP` near `$` score |
+| Spiral / warp field | Procedural paint | Arms from small centre, sparse rings, breathe out/in |
+| Playfield size | Gorf MAME 352×240 @ 270° | **240×352** portrait (lab guess for Ms. Gorf) |
+| Dual-stick feel | Wooden prototype in video | WASD move + mouse aim; **ship art stays upright** |
+| Clone anim | `CLN0/32/64` | Cycle `1 → 2 → 1(hflip) → 3 → 1` (footage GUESS) |
 
 See also: [`../findings/reconstruction-stubs.md`](../../docs/findings/reconstruction-stubs.md), [`../../docs/references/jamie-fenton-1982-video.md`](../../docs/references/jamie-fenton-1982-video.md).

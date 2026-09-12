@@ -1,11 +1,15 @@
 /*!
  * GUESS: video-derived Ms. Gorf sketch — not XC.LOGIC / not compiled game.
  * Disk patterns from play/assets.js; font + bullets + motion estimated from footage.
+ *
+ * Playfield: 240×352 — Gorf/Astrocade family player view (MAME 352×240 @ 270°).
+ * See docs/findings/display.md (still a lab guess for Ms. Gorf’s late board).
  */
 (function () {
-  const W = 320;
-  const H = 240; // lab playfield (portrait cabinet was taller; landscape for remake readability)
-  const SCALE = 3;
+  // Portrait Astrocade/Gorf view (cabinet after 270° rotate of 352×240 raster)
+  const W = 240;
+  const H = 352;
+  const SCALE = 2;
 
   const canvas = document.getElementById("c");
   const ctx = canvas.getContext("2d");
@@ -55,6 +59,15 @@
     if (p.rows) sprites[name] = patternToCanvas(p);
   }
 
+  // CLONE cycle from footage: CLN0 → CLN32 → CLN0(hflip) → CLN64 → CLN0 …
+  const CLONE_CYCLE = [
+    { name: "CLN0", flip: false },
+    { name: "CLN32", flip: false },
+    { name: "CLN0", flip: true },
+    { name: "CLN64", flip: false },
+    { name: "CLN0", flip: false },
+  ];
+
   const keys = Object.create(null);
   addEventListener("keydown", (e) => {
     keys[e.key.toLowerCase()] = true;
@@ -94,43 +107,24 @@
     }
   }
 
-  function drawText(str, x, y, px = 2) {
+  function drawText(str, x, y, px = 1) {
     const [cw] = FONT.cell;
     let cx = x;
     for (const ch of str) {
       drawGlyph(ch, cx, y, px);
       cx += (cw + 1) * px;
     }
+    return cx;
   }
 
-  function drawBoxedDigit(d, x, y, px = 2) {
-    const [r, gv, b] = YELLOW;
-    ctx.strokeStyle = `rgb(${r},${gv},${b})`;
-    ctx.lineWidth = px;
-    const [cw, chh] = FONT.cell;
-    const bw = (cw + 2) * px;
-    const bh = (chh + 2) * px;
-    ctx.strokeRect(x + 0.5, y + 0.5, bw, bh);
-    drawGlyph(String(d), x + px, y + px, px);
-  }
-
-  function drawLifeDiamond(x, y, s = 3) {
-    ctx.fillStyle = "rgb(180,60,160)";
-    ctx.beginPath();
-    ctx.moveTo(x, y - s);
-    ctx.lineTo(x + s, y);
-    ctx.lineTo(x, y + s);
-    ctx.lineTo(x - s, y);
-    ctx.closePath();
-    ctx.fill();
-  }
-
-  function blit(name, x, y, ang) {
+  function blit(name, x, y, opts) {
     const s = sprites[name];
     if (!s) return;
+    const flip = opts && opts.flip;
     ctx.save();
     ctx.translate(x, y);
-    if (ang) ctx.rotate(ang);
+    if (flip) ctx.scale(-1, 1);
+    // Ship / most sprites: never rotate — always “up” as stored on disk
     ctx.drawImage(s, -s.width / 2, -s.height / 2);
     ctx.restore();
   }
@@ -138,40 +132,57 @@
   // --- game state (GUESS rules) ---
   let mode = "select"; // select | play | dead
   let score = 0;
-  let lives = 3;
+  let shipsLeft = 3; // SBi / SBASE count
   let t = 0;
   let fireCd = 0;
-  const player = { x: W * 0.35, y: H * 0.55, vx: 0, vy: 0 };
+  let spawnCd = 0;
+  const player = { x: W * 0.35, y: H * 0.55 };
   /** @type {{x:number,y:number,vx:number,vy:number,life:number}[]} */
   let bullets = [];
-  /** @type {{x:number,y:number,kind:string,phase:number,hp:number}[]} */
+  /** @type {{x:number,y:number,vx:number,vy:number,kind:string,hp:number,r:number}[]} */
   let foes = [];
-  let clone = { x: W * 0.65, y: H * 0.4, frame: 0, alive: true };
-  let spiral = true;
+  /** @type {{x:number,y:number,kind:string,hp:number}[]} */
+  let fx = [];
+  let clone = { x: W * 0.62, y: H * 0.42, frame: 0 };
+
+  const GORF_R = 7;
+  const GORF_SPEED = 38;
+
+  function randVel() {
+    const a = Math.random() * Math.PI * 2;
+    const s = GORF_SPEED * (0.75 + Math.random() * 0.5);
+    return { vx: Math.cos(a) * s, vy: Math.sin(a) * s };
+  }
+
+  function spawnGorf(x, y) {
+    const v = randVel();
+    foes.push({
+      x: x ?? W * 0.5 + (Math.random() - 0.5) * 80,
+      y: y ?? H * 0.35 + (Math.random() - 0.5) * 60,
+      vx: v.vx,
+      vy: v.vy,
+      kind: "GORF-PAT",
+      hp: 1,
+      r: GORF_R,
+    });
+  }
 
   function resetPlay() {
     score = 0;
-    lives = 3;
+    shipsLeft = 3;
     player.x = W * 0.35;
     player.y = H * 0.55;
     bullets = [];
     foes = [];
-    clone = { x: W * 0.62, y: H * 0.42, frame: 0, alive: true };
-    for (let i = 0; i < 6; i++) {
-      foes.push({
-        x: W * 0.55 + Math.random() * W * 0.35,
-        y: 30 + Math.random() * (H - 60),
-        kind: "GORF-PAT",
-        phase: Math.random() * Math.PI * 2,
-        hp: 1,
-      });
-    }
+    fx = [];
+    clone = { x: W * 0.58, y: H * 0.4, frame: 0 };
+    spawnCd = 1.2;
+    for (let i = 0; i < 5; i++) spawnGorf();
     mode = "play";
   }
 
   function spawnBurst(x, y) {
-    // visual only — FBEXP flash
-    foes.push({ x, y, kind: "_BANG", phase: 0, hp: 8 });
+    fx.push({ x, y, kind: "_BANG", hp: 0.45 });
   }
 
   addEventListener("keydown", (e) => {
@@ -182,35 +193,92 @@
     }
   });
 
+  /** Spiral arms from a small centre; larger ring spacing; breathe out then in. */
   function drawSpiral(cx, cy) {
     ctx.fillStyle = "rgb(48,200,80)";
-    for (let i = 0; i < 90; i++) {
-      const a = i * 0.35 + t * 0.02;
-      const r = 8 + i * 0.9;
-      const x = cx + Math.cos(a) * r;
-      const y = cy + Math.sin(a) * r * 0.85;
-      ctx.fillRect(x, y, 1, 1);
+    // 0→1→0 over ~ few seconds
+    const breath = (Math.sin(t * 0.55) + 1) * 0.5;
+    const maxR = 14 + breath * 55;
+    const arms = 3;
+    const steps = 28; // fewer dots / larger spacing between windings
+    const twist = Math.PI * 2.2;
+    for (let arm = 0; arm < arms; arm++) {
+      const base = (arm / arms) * Math.PI * 2 + t * 0.35;
+      for (let i = 0; i < steps; i++) {
+        const u = i / (steps - 1);
+        const r = 5 + u * maxR; // small-ish core radius ~5
+        const a = base + u * twist;
+        const x = cx + Math.cos(a) * r;
+        const y = cy + Math.sin(a) * r;
+        ctx.fillRect(x | 0, y | 0, 1, 1);
+      }
     }
   }
 
   function drawSelect() {
     ctx.fillStyle = "#000";
     ctx.fillRect(0, 0, W, H);
-    drawText("$8000", 12, 10, 2);
-    drawBoxedDigit(1, 68, 8, 2);
-    drawBoxedDigit(2, W - 100, 8, 2);
-    drawText("$4500", W - 72, 10, 2);
+    drawText("$8000", 8, 8, 1);
+    // boxed 1 / 2 stand-ins on select (video); in-play uses P1Ui pattern
+    const [cw, chh] = FONT.cell;
+    ctx.strokeStyle = `rgb(${YELLOW[0]},${YELLOW[1]},${YELLOW[2]})`;
+    ctx.strokeRect(8 + 6 * 6, 6, cw + 4, chh + 4);
+    drawGlyph("1", 8 + 6 * 6 + 2, 8, 1);
+    ctx.strokeRect(W - 8 - 6 * 6 - cw - 4, 6, cw + 4, chh + 4);
+    drawGlyph("2", W - 8 - 6 * 6 - cw - 2, 8, 1);
+    drawText("$4500", W - 8 - 5 * 6, 8, 1);
     const msg1 = "SELECT 1 OR 2";
     const msg2 = "PLAYER GAME";
-    const [cw] = FONT.cell;
-    const px = 3;
+    const px = 2;
     const w1 = msg1.length * (cw + 1) * px;
     const w2 = msg2.length * (cw + 1) * px;
-    drawText(msg1, (W - w1) / 2, H * 0.38, px);
-    drawText(msg2, (W - w2) / 2, H * 0.38 + 28, px);
+    drawText(msg1, (W - w1) / 2, H * 0.4, px);
+    drawText(msg2, (W - w2) / 2, H * 0.4 + 22, px);
     ctx.fillStyle = "#666";
     ctx.font = "10px monospace";
-    ctx.fillText("GUESS remake — press 1 or 2", 8, H - 10);
+    ctx.fillText("GUESS — 1 / 2 to start", 8, H - 8);
+  }
+
+  function bounceWalls(e) {
+    const margin = 4;
+    const top = 22; // below HUD
+    if (e.x - e.r < margin) {
+      e.x = margin + e.r;
+      e.vx = Math.abs(e.vx);
+    } else if (e.x + e.r > W - margin) {
+      e.x = W - margin - e.r;
+      e.vx = -Math.abs(e.vx);
+    }
+    if (e.y - e.r < top) {
+      e.y = top + e.r;
+      e.vy = Math.abs(e.vy);
+    } else if (e.y + e.r > H - margin) {
+      e.y = H - margin - e.r;
+      e.vy = -Math.abs(e.vy);
+    }
+  }
+
+  function bouncePair(a, b) {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const dist = Math.hypot(dx, dy) || 1;
+    const minD = a.r + b.r;
+    if (dist >= minD) return;
+    // separate
+    const overlap = (minD - dist) / 2;
+    const nx = dx / dist;
+    const ny = dy / dist;
+    a.x -= nx * overlap;
+    a.y -= ny * overlap;
+    b.x += nx * overlap;
+    b.y += ny * overlap;
+    // elastic swap along normal
+    const avn = a.vx * nx + a.vy * ny;
+    const bvn = b.vx * nx + b.vy * ny;
+    a.vx += (bvn - avn) * nx;
+    a.vy += (bvn - avn) * ny;
+    b.vx += (avn - bvn) * nx;
+    b.vy += (avn - bvn) * ny;
   }
 
   function updatePlay(dt) {
@@ -228,11 +296,10 @@
       player.y += (dy / n) * speed * dt;
     }
     player.x = Math.max(12, Math.min(W - 12, player.x));
-    player.y = Math.max(20, Math.min(H - 12, player.y));
+    player.y = Math.max(28, Math.min(H - 12, player.y));
 
-    const aimX = mouse.x - player.x;
-    const aimY = mouse.y - player.y;
-    const aim = Math.atan2(aimY, aimX);
+    // Aim stick (mouse) — ship art stays upright
+    const aim = Math.atan2(mouse.y - player.y, mouse.x - player.x);
 
     fireCd -= dt;
     if ((mouse.down || keys[" "] || keys["k"]) && fireCd <= 0) {
@@ -254,90 +321,86 @@
       return b.life > 0 && b.x > -10 && b.x < W + 10 && b.y > -10 && b.y < H + 10;
     });
 
-    if (clone.alive) {
-      clone.frame = (clone.frame + dt * 2.2) % 3;
-      clone.x += Math.sin(t * 0.7) * 12 * dt;
-      clone.y += Math.cos(t * 0.5) * 10 * dt;
+    // Clone machine: animate + drift slightly; not destroyable; spawns gorfs
+    clone.frame = (clone.frame + dt * 2.4) % CLONE_CYCLE.length;
+    clone.x += Math.sin(t * 0.55) * 10 * dt;
+    clone.y += Math.cos(t * 0.4) * 8 * dt;
+    clone.x = Math.max(40, Math.min(W - 40, clone.x));
+    clone.y = Math.max(50, Math.min(H - 50, clone.y));
+
+    spawnCd -= dt;
+    if (spawnCd <= 0) {
+      spawnCd = 2.2 + Math.random() * 1.5;
+      spawnGorf(clone.x + (Math.random() - 0.5) * 20, clone.y + (Math.random() - 0.5) * 20);
     }
 
     for (const f of foes) {
-      if (f.kind === "_BANG") {
-        f.hp -= dt * 8;
-        continue;
-      }
-      f.phase += dt;
-      f.x += Math.sin(f.phase) * 18 * dt;
-      f.y += Math.cos(f.phase * 0.8) * 14 * dt;
-      f.x = Math.max(10, Math.min(W - 10, f.x));
-      f.y = Math.max(24, Math.min(H - 10, f.y));
+      f.x += f.vx * dt;
+      f.y += f.vy * dt;
+      bounceWalls(f);
+    }
+    for (let i = 0; i < foes.length; i++) {
+      for (let j = i + 1; j < foes.length; j++) bouncePair(foes[i], foes[j]);
     }
 
-    // collisions (AABB GUESS)
     for (const b of bullets) {
       for (const f of foes) {
-        if (f.kind === "_BANG" || f.hp <= 0) continue;
-        if (Math.hypot(b.x - f.x, b.y - f.y) < 10) {
+        if (f.hp <= 0) continue;
+        if (Math.hypot(b.x - f.x, b.y - f.y) < f.r + 3) {
           f.hp = 0;
           b.life = 0;
-          score += 500;
+          score += 1000;
           spawnBurst(f.x, f.y);
         }
       }
-      if (clone.alive && Math.hypot(b.x - clone.x, b.y - clone.y) < 18) {
-        b.life = 0;
-        clone.alive = false;
-        score += 2000;
-        spawnBurst(clone.x, clone.y);
-      }
+      // bullets pass through clone machine (no destroy)
     }
     foes = foes.filter((f) => f.hp > 0);
-    if (foes.filter((f) => f.kind === "GORF-PAT").length < 4) {
-      foes.push({
-        x: W * 0.7 + Math.random() * 40,
-        y: 40 + Math.random() * (H - 80),
-        kind: "GORF-PAT",
-        phase: Math.random() * 6,
-        hp: 1,
-      });
-    }
 
-    // touch damage
+    for (const e of fx) e.hp -= dt;
+    fx = fx.filter((e) => e.hp > 0);
+
     for (const f of foes) {
-      if (f.kind === "_BANG") continue;
-      if (Math.hypot(f.x - player.x, f.y - player.y) < 12) {
-        lives -= 1;
+      if (Math.hypot(f.x - player.x, f.y - player.y) < f.r + 8) {
+        shipsLeft -= 1;
+        spawnBurst(player.x, player.y);
         player.x = W * 0.3;
         player.y = H * 0.55;
-        if (lives <= 0) mode = "dead";
+        if (shipsLeft <= 0) mode = "dead";
         break;
       }
+    }
+  }
+
+  function drawHud() {
+    // $score  then flashing P1Ui  then SBi (SBASE) ships remaining
+    let x = 4;
+    x = drawText("$" + String(score), x, 4, 1);
+    x += 4;
+    // flash ~2 Hz like INDEX comment
+    if (Math.floor(t * 4) % 2 === 0) {
+      blit("P1UP", x + 4, 10);
+    }
+    x += 12;
+    for (let i = 0; i < shipsLeft; i++) {
+      blit("SBASE", x + 6 + i * 10, 10);
     }
   }
 
   function drawPlay() {
     ctx.fillStyle = "#000";
     ctx.fillRect(0, 0, W, H);
-    if (spiral) drawSpiral(W * 0.55, H * 0.45);
+    drawSpiral(W * 0.52, H * 0.42);
 
-    drawText("$" + String(score), 6, 4, 2);
-    drawBoxedDigit(1, 6 + (String(score).length + 2) * 12, 2, 2);
-    for (let i = 0; i < lives; i++) drawLifeDiamond(W - 14 - i * 12, 12, 4);
+    const ci = Math.floor(clone.frame) % CLONE_CYCLE.length;
+    const cf = CLONE_CYCLE[ci];
+    blit(cf.name, clone.x, clone.y, { flip: cf.flip });
 
-    const cloneNames = ["CLN0", "CLN32", "CLN64"];
-    if (clone.alive) blit(cloneNames[Math.floor(clone.frame) % 3], clone.x, clone.y);
+    for (const f of foes) blit(f.kind, f.x, f.y);
+    for (const e of fx) blit(e.hp > 0.22 ? "FBEXP5" : "FBEXP6", e.x, e.y);
 
-    for (const f of foes) {
-      if (f.kind === "_BANG") {
-        blit(f.hp > 4 ? "FBEXP5" : "FBEXP6", f.x, f.y);
-      } else {
-        blit(f.kind, f.x, f.y);
-      }
-    }
+    blit("PLY1-P", player.x, player.y); // always upright
 
-    const aim = Math.atan2(mouse.y - player.y, mouse.x - player.x);
-    blit("PLY1-P", player.x, player.y, aim);
-
-    // GUESS line bullets
     ctx.strokeStyle = "rgb(240,220,180)";
     ctx.lineWidth = 1;
     for (const b of bullets) {
@@ -348,16 +411,18 @@
       ctx.lineTo(b.x + Math.cos(ang) * len, b.y + Math.sin(ang) * len);
       ctx.stroke();
     }
+
+    drawHud();
   }
 
   function drawDead() {
     drawPlay();
     ctx.fillStyle = "rgba(0,0,0,0.55)";
     ctx.fillRect(0, 0, W, H);
-    drawText("GAME OVER", W / 2 - 54, H / 2 - 10, 3);
+    drawText("GAME OVER", W / 2 - 40, H / 2 - 8, 2);
     ctx.fillStyle = "#aaa";
     ctx.font = "10px monospace";
-    ctx.fillText("Enter / 1 — select", W / 2 - 50, H / 2 + 24);
+    ctx.fillText("Enter / 1 — select", W / 2 - 48, H / 2 + 20);
   }
 
   let last = performance.now();
