@@ -59,13 +59,12 @@
     if (p.rows) sprites[name] = patternToCanvas(p);
   }
 
-  // CLONE cycle from footage: CLN0 → CLN32 → CLN0(hflip) → CLN64 → CLN0 …
+  // CLONE cycle from footage: 1 → 2 → 3 → 2(hflip)
   const CLONE_CYCLE = [
     { name: "CLN0", flip: false },
     { name: "CLN32", flip: false },
-    { name: "CLN0", flip: true },
     { name: "CLN64", flip: false },
-    { name: "CLN0", flip: false },
+    { name: "CLN32", flip: true },
   ];
 
   const keys = Object.create(null);
@@ -130,20 +129,36 @@
   }
 
   // --- game state (GUESS rules) ---
-  let mode = "select"; // select | play | dead
+  let mode = "select"; // select | intro | play | dead
   let score = 0;
   let shipsLeft = 3; // SBi / SBASE count
   let t = 0;
   let fireCd = 0;
   let spawnCd = 0;
-  const player = { x: W * 0.35, y: H * 0.55 };
+  const player = { x: W * 0.35, y: H * 0.55, visible: false };
   /** @type {{x:number,y:number,vx:number,vy:number,life:number}[]} */
   let bullets = [];
   /** @type {{x:number,y:number,vx:number,vy:number,kind:string,hp:number,r:number}[]} */
   let foes = [];
   /** @type {{x:number,y:number,kind:string,hp:number}[]} */
   let fx = [];
-  let clone = { x: W * 0.62, y: H * 0.42, frame: 0 };
+  let clone = { x: W * 0.62, y: H * 0.42, frame: 0, visible: false };
+
+  /** Level-start galaxy (yellow, 16 arms) — not present during play. */
+  const galaxy = {
+    phase: "in", // in | bang | out | done
+    age: 0,
+    rot: 0,
+    bangT: 0,
+  };
+  const GALAXY_CX = W * 0.5;
+  const GALAXY_CY = H * 0.52;
+  const GALAXY_ARMS = 16;
+  const GALAXY_R0 = 95;
+  const GALAXY_R1 = 5;
+  const GALAXY_IN_DUR = 2.8;
+  const GALAXY_BANG_DUR = 0.55;
+  const GALAXY_OUT_DUR = 1.1;
 
   const GORF_R = 7;
   const GORF_SPEED = 38;
@@ -167,18 +182,33 @@
     });
   }
 
+  function beginPlayfield() {
+    player.visible = true;
+    player.x = W * 0.28;
+    player.y = H * 0.55;
+    clone.visible = true;
+    clone.x = W * 0.62;
+    clone.y = H * 0.45;
+    clone.frame = 0;
+    spawnCd = 1.5;
+    foes = [];
+    for (let i = 0; i < 4; i++) spawnGorf();
+    mode = "play";
+  }
+
   function resetPlay() {
     score = 0;
     shipsLeft = 3;
-    player.x = W * 0.35;
-    player.y = H * 0.55;
     bullets = [];
     foes = [];
     fx = [];
-    clone = { x: W * 0.58, y: H * 0.4, frame: 0 };
-    spawnCd = 1.2;
-    for (let i = 0; i < 5; i++) spawnGorf();
-    mode = "play";
+    player.visible = false;
+    clone.visible = false;
+    galaxy.phase = "in";
+    galaxy.age = 0;
+    galaxy.rot = 0;
+    galaxy.bangT = 0;
+    mode = "intro";
   }
 
   function spawnBurst(x, y) {
@@ -193,24 +223,76 @@
     }
   });
 
-  /** Spiral arms from a small centre; larger ring spacing; breathe out then in. */
-  function drawSpiral(cx, cy) {
-    ctx.fillStyle = "rgb(48,200,80)";
-    // 0→1→0 over ~ few seconds
-    const breath = (Math.sin(t * 0.55) + 1) * 0.5;
-    const maxR = 14 + breath * 55;
-    const arms = 3;
-    const steps = 28; // fewer dots / larger spacing between windings
-    const twist = Math.PI * 2.2;
-    for (let arm = 0; arm < arms; arm++) {
-      const base = (arm / arms) * Math.PI * 2 + t * 0.35;
+  /**
+   * Intro galaxy: 16 yellow spiral arms → small centre (CCW), bang, then peel
+   * outer→inner and vanish. GUESS from footage.
+   */
+  function drawGalaxy() {
+    const [yr, yg, yb] = YELLOW;
+    ctx.fillStyle = `rgb(${yr},${yg},${yb})`;
+
+    let rMax = GALAXY_R0;
+    let rMin = GALAXY_R1;
+    if (galaxy.phase === "in") {
+      // collapse toward centre: outer radius shrinks
+      const u = Math.min(1, galaxy.age / GALAXY_IN_DUR);
+      rMax = GALAXY_R0 + (GALAXY_R1 + 2 - GALAXY_R0) * u;
+    } else if (galaxy.phase === "bang") {
+      rMax = GALAXY_R1 + 4;
+    } else if (galaxy.phase === "out") {
+      // disappear biggest → smallest: raise the minimum drawn radius
+      const u = Math.min(1, galaxy.age / GALAXY_OUT_DUR);
+      rMin = GALAXY_R1 + (GALAXY_R0 - GALAXY_R1) * u;
+      rMax = GALAXY_R0;
+      if (rMin >= rMax) return;
+    } else {
+      return;
+    }
+
+    const steps = 36;
+    const twist = Math.PI * 1.35; // arm curvature toward centre
+    for (let arm = 0; arm < GALAXY_ARMS; arm++) {
+      const base = (arm / GALAXY_ARMS) * Math.PI * 2 + galaxy.rot;
       for (let i = 0; i < steps; i++) {
-        const u = i / (steps - 1);
-        const r = 5 + u * maxR; // small-ish core radius ~5
-        const a = base + u * twist;
-        const x = cx + Math.cos(a) * r;
-        const y = cy + Math.sin(a) * r;
+        const v = i / (steps - 1); // 0 = outer, 1 = inner
+        const r = rMax + (rMin - rMax) * v;
+        if (r < rMin - 0.01 || r > rMax + 0.01) continue;
+        // anti-clockwise spiral (positive angle with decreasing r)
+        const a = base + (1 - v) * twist;
+        const x = GALAXY_CX + Math.cos(a) * r;
+        const y = GALAXY_CY + Math.sin(a) * r;
         ctx.fillRect(x | 0, y | 0, 1, 1);
+      }
+    }
+
+    if (galaxy.phase === "bang") {
+      const bangName = galaxy.bangT < GALAXY_BANG_DUR * 0.5 ? "FBEXP5" : "FBEXP6";
+      blit(bangName, GALAXY_CX, GALAXY_CY);
+    }
+  }
+
+  function updateIntro(dt) {
+    t += dt;
+    galaxy.age += dt;
+    // anti-clockwise: increasing angle
+    galaxy.rot += dt * 1.1;
+
+    if (galaxy.phase === "in") {
+      if (galaxy.age >= GALAXY_IN_DUR) {
+        galaxy.phase = "bang";
+        galaxy.age = 0;
+        galaxy.bangT = 0;
+      }
+    } else if (galaxy.phase === "bang") {
+      galaxy.bangT += dt;
+      if (galaxy.age >= GALAXY_BANG_DUR) {
+        galaxy.phase = "out";
+        galaxy.age = 0;
+      }
+    } else if (galaxy.phase === "out") {
+      if (galaxy.age >= GALAXY_OUT_DUR) {
+        galaxy.phase = "done";
+        beginPlayfield();
       }
     }
   }
@@ -283,6 +365,8 @@
 
   function updatePlay(dt) {
     t += dt;
+    if (!player.visible) return;
+
     const speed = 70;
     let dx = 0,
       dy = 0;
@@ -321,17 +405,19 @@
       return b.life > 0 && b.x > -10 && b.x < W + 10 && b.y > -10 && b.y < H + 10;
     });
 
-    // Clone machine: animate + drift slightly; not destroyable; spawns gorfs
-    clone.frame = (clone.frame + dt * 2.4) % CLONE_CYCLE.length;
-    clone.x += Math.sin(t * 0.55) * 10 * dt;
-    clone.y += Math.cos(t * 0.4) * 8 * dt;
-    clone.x = Math.max(40, Math.min(W - 40, clone.x));
-    clone.y = Math.max(50, Math.min(H - 50, clone.y));
+    // Clone machine: animate + drift; not destroyable; spawns gorfs
+    if (clone.visible) {
+      clone.frame = (clone.frame + dt * 2.4) % CLONE_CYCLE.length;
+      clone.x += Math.sin(t * 0.55) * 10 * dt;
+      clone.y += Math.cos(t * 0.4) * 8 * dt;
+      clone.x = Math.max(40, Math.min(W - 40, clone.x));
+      clone.y = Math.max(50, Math.min(H - 50, clone.y));
 
-    spawnCd -= dt;
-    if (spawnCd <= 0) {
-      spawnCd = 2.2 + Math.random() * 1.5;
-      spawnGorf(clone.x + (Math.random() - 0.5) * 20, clone.y + (Math.random() - 0.5) * 20);
+      spawnCd -= dt;
+      if (spawnCd <= 0) {
+        spawnCd = 2.2 + Math.random() * 1.5;
+        spawnGorf(clone.x + (Math.random() - 0.5) * 20, clone.y + (Math.random() - 0.5) * 20);
+      }
     }
 
     for (const f of foes) {
@@ -353,7 +439,6 @@
           spawnBurst(f.x, f.y);
         }
       }
-      // bullets pass through clone machine (no destroy)
     }
     foes = foes.filter((f) => f.hp > 0);
 
@@ -373,11 +458,9 @@
   }
 
   function drawHud() {
-    // $score  then flashing P1Ui  then SBi (SBASE) ships remaining
     let x = 4;
     x = drawText("$" + String(score), x, 4, 1);
     x += 4;
-    // flash ~2 Hz like INDEX comment
     if (Math.floor(t * 4) % 2 === 0) {
       blit("P1UP", x + 4, 10);
     }
@@ -387,19 +470,28 @@
     }
   }
 
+  function drawIntro() {
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, W, H);
+    drawGalaxy();
+    drawHud();
+  }
+
   function drawPlay() {
     ctx.fillStyle = "#000";
     ctx.fillRect(0, 0, W, H);
-    drawSpiral(W * 0.52, H * 0.42);
+    // no galaxy during play — intro-only
 
-    const ci = Math.floor(clone.frame) % CLONE_CYCLE.length;
-    const cf = CLONE_CYCLE[ci];
-    blit(cf.name, clone.x, clone.y, { flip: cf.flip });
+    if (clone.visible) {
+      const ci = Math.floor(clone.frame) % CLONE_CYCLE.length;
+      const cf = CLONE_CYCLE[ci];
+      blit(cf.name, clone.x, clone.y, { flip: cf.flip });
+    }
 
     for (const f of foes) blit(f.kind, f.x, f.y);
     for (const e of fx) blit(e.hp > 0.22 ? "FBEXP5" : "FBEXP6", e.x, e.y);
 
-    blit("PLY1-P", player.x, player.y); // always upright
+    if (player.visible) blit("PLY1-P", player.x, player.y);
 
     ctx.strokeStyle = "rgb(240,220,180)";
     ctx.lineWidth = 1;
@@ -431,7 +523,10 @@
     last = now;
     ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
     if (mode === "select") drawSelect();
-    else if (mode === "play") {
+    else if (mode === "intro") {
+      updateIntro(dt);
+      drawIntro();
+    } else if (mode === "play") {
       updatePlay(dt);
       drawPlay();
     } else drawDead();

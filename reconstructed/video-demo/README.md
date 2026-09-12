@@ -16,9 +16,9 @@ Sprites / animations via `play/assets.json`: PLY*, GORF-PAT, CLONE frames, LAZON
 | Thin shot streaks | `BULLETS` stub only (`p-i` CFA unknown); not pattern art | Short line segments along velocity |
 | Ships remaining | INDEX `SBi` → `SBASE` | Blit `SBASE` icons after P1Ui |
 | P1 up flash | INDEX `P1Ui` → `P1UP` / `NULPAT` | Flash `P1UP` near `$` score |
-| Spiral / warp field | Procedural paint | Arms from small centre, sparse rings, breathe out/in |
+| Spiral / warp field | Procedural paint | **Intro only:** 16 yellow arms → centre (CCW), bang, peel outer→inner |
 | Playfield size | Footage is **horizontal** | **320×204** Astrocade hi-res landscape (GUESS) |
 | Dual-stick feel | Wooden prototype in video | WASD move + mouse aim; **ship art stays upright** |
-| Clone anim | `CLN0/32/64` | Cycle `1 → 2 → 1(hflip) → 3 → 1` (footage GUESS) |
+| Clone anim | `CLN0/32/64` | Cycle `1 → 2 → 3 → 2(hflip)` |
 
 See also: [`../findings/reconstruction-stubs.md`](../../docs/findings/reconstruction-stubs.md), [`../../docs/references/jamie-fenton-1982-video.md`](../../docs/references/jamie-fenton-1982-video.md).
