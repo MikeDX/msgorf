@@ -17,7 +17,7 @@ Sprites / animations via `play/assets.json`: PLY*, GORF-PAT, CLONE frames, LAZON
 | Ships remaining | INDEX `SBi` → `SBASE` | Blit `SBASE` icons after P1Ui |
 | P1 up flash | INDEX `P1Ui` → `P1UP` / `NULPAT` | Flash `P1UP` near `$` score |
 | Spiral / warp field | Procedural paint | Arms from small centre, sparse rings, breathe out/in |
-| Playfield size | Gorf MAME 352×240 @ 270° | **240×352** portrait (lab guess for Ms. Gorf) |
+| Playfield size | Footage is **horizontal** | **320×204** Astrocade hi-res landscape (GUESS) |
 | Dual-stick feel | Wooden prototype in video | WASD move + mouse aim; **ship art stays upright** |
 | Clone anim | `CLN0/32/64` | Cycle `1 → 2 → 1(hflip) → 3 → 1` (footage GUESS) |
 

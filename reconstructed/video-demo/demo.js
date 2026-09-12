@@ -2,14 +2,14 @@
  * GUESS: video-derived Ms. Gorf sketch — not XC.LOGIC / not compiled game.
  * Disk patterns from play/assets.js; font + bullets + motion estimated from footage.
  *
- * Playfield: 240×352 — Gorf/Astrocade family player view (MAME 352×240 @ 270°).
- * See docs/findings/display.md (still a lab guess for Ms. Gorf’s late board).
+ * Playfield: 320×204 — Astrocade commercial hi-res (landscape). Footage is horizontal.
+ * See docs/findings/display.md (Ms. Gorf late board still unproven; Gorf cabinet was portrait).
  */
 (function () {
-  // Portrait Astrocade/Gorf view (cabinet after 270° rotate of 352×240 raster)
-  const W = 240;
-  const H = 352;
-  const SCALE = 2;
+  // Landscape Astrocade hi-res (gameplay video is horizontal)
+  const W = 320;
+  const H = 204;
+  const SCALE = 3;
 
   const canvas = document.getElementById("c");
   const ctx = canvas.getContext("2d");
