@@ -76,32 +76,66 @@ Toolchain notes: [`docs/architecture/terse-toolchain.md`](docs/architecture/ters
 
 ## Gallery — extracted graphics
 
-Authentic 2bpp patterns from the TERSE sources (and GORF4A). Full set under [`extracted/patterns/`](extracted/patterns/).
+Authentic 2bpp patterns from the TERSE sources. Lab palette hypothesis: **0** black · **1** yellow · **2** blue · **3** red (same for all). Full set under [`extracted/patterns/`](extracted/patterns/); animate in [`play/index.html`](play/index.html).
 
-| | |
-|:--:|:--:|
-| ![GORF-PAT](extracted/patterns/GORF-P__GORF-PAT.png) **GORF-PAT** | ![PLY1-P](extracted/patterns/PLY-P__PLY1-P.png) **PLY1-P** |
-| ![PLY2-P](extracted/patterns/PLY-P__PLY2-P.png) **PLY2-P** | ![LAZON](extracted/patterns/LAZON-P__LAZON.png) **LAZON** |
-| ![CLN0](extracted/patterns/CLONE-P__CLN0.png) **CLONE** | ![TRION](extracted/patterns/TRION-P__TRION-P.png) **TRION-P** |
+### Ships & figures
+
+| GORF-PAT | PLY1-P | PLY2-P | LAZON | P1UP / P2UP |
+|:--:|:--:|:--:|:--:|:--:|
+| <img src="extracted/patterns/GORF-P__GORF-PAT.png" alt="GORF-PAT" height="96"> | <img src="extracted/patterns/PLY-P__PLY1-P.png" alt="PLY1-P" height="96"> | <img src="extracted/patterns/PLY-P__PLY2-P.png" alt="PLY2-P" height="96"> | <img src="extracted/patterns/LAZON-P__LAZON.png" alt="LAZON" height="96"> | <img src="extracted/patterns/PLUP__P1UP.png" alt="P1UP" height="96"> <img src="extracted/patterns/PLUP__P2UP.png" alt="P2UP" height="96"> |
+
+### CLONE frames (`CLN0` → `CLN32` → `CLN64`)
+
+| CLN0 | CLN32 | CLN64 |
+|:--:|:--:|:--:|
+| <img src="extracted/patterns/CLONE-P__CLN0.png" alt="CLN0" height="112"> | <img src="extracted/patterns/CLONE-P__CLN32.png" alt="CLN32" height="112"> | <img src="extracted/patterns/CLONE-P__CLN64.png" alt="CLN64" height="112"> |
+
+### KAMI / SPINV frames
+
+| COMC5 | COMC5A | COMC5B | COMC6 |
+|:--:|:--:|:--:|:--:|
+| <img src="extracted/patterns/KAMI-P__COMC5.png" alt="COMC5" height="72"> | <img src="extracted/patterns/KAMI-P__COMC5A.png" alt="COMC5A" height="72"> | <img src="extracted/patterns/KAMI-P__COMC5B.png" alt="COMC5B" height="72"> | <img src="extracted/patterns/KAMI-P__COMC6.png" alt="COMC6" height="72"> |
+
+### Critters & hardware
+
+| TRION-P | MITE-P | HK-P | GB-P | GRD-P | DEB-P | SHLD-P |
+|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| <img src="extracted/patterns/TRION-P__TRION-P.png" alt="TRION-P" height="64"> | <img src="extracted/patterns/MITE-P__MITE-P.png" alt="MITE-P" height="64"> | <img src="extracted/patterns/HK-P__HK-P.png" alt="HK-P" height="64"> | <img src="extracted/patterns/GB-P__GB-P.png" alt="GB-P" height="64"> | <img src="extracted/patterns/GRD-P__GRD-P.png" alt="GRD-P" height="64"> | <img src="extracted/patterns/DEB-P__DEB-P.png" alt="DEB-P" height="64"> | <img src="extracted/patterns/SHLD-P__SHLD-P.png" alt="SHLD-P" height="64"> |
+
+### Mines, base, bang, indicator
+
+| SMINE0 | SMINE1 | SBASE | FBEXP5 | FBEXP6 | INDICATING |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| <img src="extracted/patterns/SMINE-P__SMINE0.png" alt="SMINE0" height="80"> | <img src="extracted/patterns/SMINE-P__SMINE1.png" alt="SMINE1" height="80"> | <img src="extracted/patterns/PLY-P__SBASE.png" alt="SBASE" height="64"> | <img src="extracted/patterns/BANG__FBEXP5.png" alt="FBEXP5" height="92"> | <img src="extracted/patterns/BANG__FBEXP6.png" alt="FBEXP6" height="92"> | <img src="extracted/patterns/PLY-P__INDICATING.png" alt="INDICATING" height="64"> |
+
+### GORF4A QUADPAT (from MSGORF)
+
+One of four frames from the GORF4A strip (`gorf4a_frame0`–`3`); full strip in [`extracted/patterns/`](extracted/patterns/).
+
+<img src="extracted/patterns/gorf4a_frame0.png" alt="GORF4A frame 0" width="480">
+
+---
+
+### Prototype stills & disk labels
 
 Prototype / playfield photos (web gallery + local). On-screen **PLAY** is almost certainly a **VCR/tape overlay**, not game HUD — see [`docs/findings/display.md`](docs/findings/display.md).
 
 **Gameplay stills** mirrored from [Matthew Garrett’s Gorf page](https://www.professionalmagic.com/gorf) → [`docs/references/garrett_ms_gorf_gallery/`](docs/references/garrett_ms_gorf_gallery/):
 
-| | |
+| Still 1 — score / lives / sprites | Still 6 — spiral / warp field |
 |:--:|:--:|
-| ![ms_gorf_1](docs/references/garrett_ms_gorf_gallery/ms_gorf_1.png) **Still 1** — score / lives / sprites | ![ms_gorf_6](docs/references/garrett_ms_gorf_gallery/ms_gorf_6.png) **Still 6** — spiral / warp field |
-| ![ms_gorf_2](docs/references/garrett_ms_gorf_gallery/ms_gorf_2.png) **Still 2** — many figures + **PLAY** overlay | ![local shot](msgorf_screenshot.jpg) **Local** `msgorf_screenshot.jpg` (same era / similar frame) |
+| <img src="docs/references/garrett_ms_gorf_gallery/ms_gorf_1.png" alt="ms_gorf_1" width="360"> | <img src="docs/references/garrett_ms_gorf_gallery/ms_gorf_6.png" alt="ms_gorf_6" width="360"> |
+| **Still 2** — figures + **PLAY** overlay | **Local** `msgorf_screenshot.jpg` |
+| <img src="docs/references/garrett_ms_gorf_gallery/ms_gorf_2.png" alt="ms_gorf_2" width="360"> | <img src="msgorf_screenshot.jpg" alt="local screenshot" width="360"> |
 
 Also in that gallery: phone captures of wiki pages (`ms_gorf_3`–`5`) that embed further stills and 8″-disk notes.
 
 Disk labels in this dump:
 
-| Photo | Label |
-|-------|--------|
-| ![Pattern Disk](MSGORPAT/MSGORPAT.jpg) | Ms. Gorf — **Pattern Disk** |
-| ![PATLOAD](MSGPATLD/MSGPATLD.jpg) | **PATLOAD** / MS GORF / 5/17/83 |
-| ![GORF4A](MSGORF/MSGORF.jpg) | Ms. Gorf — **GORF4A** |
+| Pattern Disk | PATLOAD | GORF4A |
+|:--:|:--:|:--:|
+| <img src="MSGORPAT/MSGORPAT.jpg" alt="Pattern Disk" width="220"> | <img src="MSGPATLD/MSGPATLD.jpg" alt="PATLOAD" width="220"> | <img src="MSGORF/MSGORF.jpg" alt="GORF4A" width="220"> |
+| Ms. Gorf — **Pattern Disk** | **PATLOAD** / MS GORF / 5/17/83 | Ms. Gorf — **GORF4A** |
 
 ---
 
