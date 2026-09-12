@@ -100,7 +100,9 @@ static int galaxy_phase; /* 0 in, 1 out, 2 done */
 static float galaxy_age, galaxy_peel_age;
 static int galaxy_stars_drawn, galaxy_shells_peeled;
 
-static int ipart(float v) { return (int)v; }
+static int pix(float v) {
+  return (int)floorf(v);
+}
 
 static int name_eq(const char *a, const char *b) {
   /* Match GORF-PAT / GORF_PAT */
@@ -348,7 +350,7 @@ static void draw_galaxy(uint8_t *rgb) {
     gstar_t *st = &galaxy_stars[i];
     if (galaxy_phase == 1 && st->shell < galaxy_shells_peeled) continue;
     if (st->shell >= total) continue;
-    put_px(rgb, ipart(st->x), ipart(st->y), FONT_RGB[0], FONT_RGB[1], FONT_RGB[2]);
+    put_px(rgb, pix(st->x), pix(st->y), FONT_RGB[0], FONT_RGB[1], FONT_RGB[2]);
   }
 }
 
@@ -682,23 +684,23 @@ static void update_play(game_t *g, float dt) {
 
 static void draw_world(uint8_t *rgb, int with_galaxy) {
   fb_clear(rgb);
-  for (int i = 0; i < n_foes; i++) blit_named(rgb, foes[i].kind, ipart(foes[i].x), ipart(foes[i].y), 0);
+  for (int i = 0; i < n_foes; i++) blit_named(rgb, foes[i].kind, pix(foes[i].x), pix(foes[i].y), 0);
   if (with_galaxy) draw_galaxy(rgb);
   for (int i = 0; i < n_fx; i++)
-    blit_named(rgb, fx[i].hp > 0.22f ? "FBEXP5" : "FBEXP6", ipart(fx[i].x), ipart(fx[i].y), 0);
+    blit_named(rgb, fx[i].hp > 0.22f ? "FBEXP5" : "FBEXP6", pix(fx[i].x), pix(fx[i].y), 0);
   if (clone_vis) {
     const clone_frame_t *cf = current_clone_frame();
-    blit_named(rgb, cf->name, ipart(clone_x), ipart(clone_y), cf->flip);
+    blit_named(rgb, cf->name, pix(clone_x), pix(clone_y), cf->flip);
   }
-  if (player_vis) blit_named(rgb, "PLY1_P", ipart(player_x), ipart(player_y), 0);
+  if (player_vis) blit_named(rgb, "PLY1_P", pix(player_x), pix(player_y), 0);
   for (int i = 0; i < n_bullets; i++) {
     bullet_t *b = &bullets[i];
     float ang = atan2f(b->vy, b->vx);
     float len = 5.f;
-    int x0 = ipart(b->x - cosf(ang) * len);
-    int y0 = ipart(b->y - sinf(ang) * len);
-    int x1 = ipart(b->x + cosf(ang) * len);
-    int y1 = ipart(b->y + sinf(ang) * len);
+    int x0 = pix(b->x - cosf(ang) * len);
+    int y0 = pix(b->y - sinf(ang) * len);
+    int x1 = pix(b->x + cosf(ang) * len);
+    int y1 = pix(b->y + sinf(ang) * len);
     draw_line(rgb, x0, y0, x1, y1, 240, 220, 180);
   }
   draw_hud(rgb);

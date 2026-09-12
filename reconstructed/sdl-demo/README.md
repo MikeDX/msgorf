@@ -55,5 +55,9 @@ python3 -m http.server -d web 8080
 | `font_gen.h` | HUD glyphs from `video-demo/font_guess.json` |
 | `Makefile` | `native` + `web` |
 
-Window presents the buffer at `VIEW_SCALE` (default 3) with
-`SDL_HINT_RENDER_SCALE_QUALITY=0` so **1 buffer pixel = 1 game pixel**.
+Window presents the **320×204** buffer with an **integer** nearest-neighbour
+scale (letterboxed). Physics keeps float / sub-pixel; sprites are **floored**
+onto buffer pixels before present — nothing moves in window/scaled space.
+
+`SDL_RenderSetLogicalSize` is intentionally **not** used (it allows fractional
+stretch). Resize keeps the largest integer scale that fits.

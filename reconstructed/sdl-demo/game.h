@@ -1,5 +1,9 @@
 /* GUESS: video-derived Ms. Gorf sketch — not XC.LOGIC.
- * Integer 320×204 playfield. Pattern art from disk via assets_gen. */
+ * Integer 320×204 playfield. Pattern art from disk via assets_gen.
+ *
+ * Pipeline: float sim (sub-pixel) → floor onto buffer pixels → host integer-scales
+ * that buffer to the window. Nothing is drawn or moved in window/scaled space.
+ */
 #ifndef GAME_H
 #define GAME_H
 
