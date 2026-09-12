@@ -1,0 +1,51 @@
+
+File Size: 2048.000000 Bytes    2.000000 Blocks  0-1.000000
+
+
+Last Block = 1
+
+
+
+FILE = WA
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( WALL PATTERNS )                                               
+    1|DECIMAL DATA WAL0 12 B, 12 B, 4 B, 3 B,                         
+    2|-1 , -1 B, 0 B, -1 , -1 B, 0 B, -1 , -1 B, 0 B,                 
+    3|DECIMAL DATA WAL1 12 B, 12 B, 1 B, 24 B, HEX                    
+    4|0E0E0 , 0E0E0 , 0E0E0 , 0E0E0 , 0E0E0 , 0E0E0 ,                 
+    5|0E0E0 , 0E0E0 , 0E0E0 , 0E0E0 , 0E0E0 , 0E0E0 ,                 
+    6|DECIMAL DATA WAL2 -9 B, 12 B, 1 B, 24 B, HEX                    
+    7|0E0E0 , 0E0E0 , 0E0E0 , 0E0E0 , 0E0E0 , 0E0E0 ,                 
+    8|0E0E0 , 0E0E0 , 0E0E0 , 0E0E0 , 0E0E0 , 0E0E0 ,                 
+    9|DECIMAL DATA WAL3 12 B, -9 B, 4 B, 3 B,                         
+   10|-1 , -1 B, 0 B, -1 , -1 B, 0 B, -1 , -1 B, 0 B,                 
+   11|-->                                                             
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( WRITE ALL THE WALLS )                                         
+    1|CODE WALDO DI, H POP, D POP, L D MOV,                           
+    2|B PUSH, X PUSHX,                                                
+    3|NBX C MVI, node^ CALL, M C MOV, H INX, M B MOV, H INX,          
+    4|RCX SBCD, M C MOV, H INX, M B MOV, RCY SBCD,                    
+    5|D A MOV, NROWS 1- CPI, 0<>, IF,                                 
+    6|WAL0 X LXIX, 0 C MVI, WALRUS CALL, THEN,                        
+    7|E A MOV, A ANA, 0<>, IF,                                        
+    8|WAL1 X LXIX, 1 C MVI, WALRUS CALL, THEN,                        
+    9|E A MOV, NCOLS 1- CPI, 0<>, IF,                                 
+   10|WAL2 X LXIX, 2 C MVI, WALRUS CALL, THEN,                        
+   11|D A MOV, A ANA, 0<>, IF,                                        
+   12|WAL3 X LXIX, 3 C MVI, WALRUS CALL, THEN,                        
+   13|X POPX, B POP, NEXT                                             
+   14|;S                                                              
+   15|                                                                
+
+
+
+
+

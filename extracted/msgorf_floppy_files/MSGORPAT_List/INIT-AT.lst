@@ -1,0 +1,32 @@
+
+File Size: 1024.000000 Bytes    1.000000 Blocks  0-0.000000
+
+
+Last Block = 0
+
+
+
+FILE = INIT-AT
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( INITIALIZE ANIMATION TABLE WITH POINTERS TO BLOCK PATTERN )   
+    1|PATTERN blkp HEX 0 B, 0 B, 1 B, 4 B, 11 B, 22 B, 33 B,          
+    2|FFFF , FFFF , FFFF , FFFF ,                                     
+    3|DECIMAL                                                         
+    4|( LONG WAIT FOLLOWS )                                           
+    5|192 0 << blkp I AT! >>                                          
+    6|-->                                                             
+    7|                                                                
+    8|                                                                
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

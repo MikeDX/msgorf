@@ -1,0 +1,70 @@
+
+File Size: 3072.000000 Bytes    3.000000 Blocks  0-2.000000
+
+
+Last Block = 2
+
+
+
+FILE = GL
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( DUNGEON GAME LOADER )                                         
+    1|XC? IFTRUE DECIMAL xcsys XCCONT ASM ( .HOU .OPS ) .NOPS         
+    2|IFEND                                                           
+    3|FLOAD PA FLOAD VE                                               
+    4|FLOAD WP FLOAD RND                                              
+    5|FLOAD VA                                                        
+    6|FLOAD VC                                                        
+    7|FLOAD DI                                                        
+    8|FLOAD NM                                                        
+    9|FLOAD VR                                                        
+   10|FLOAD CD                                                        
+   11|FLOAD WR                                                        
+   12|FLOAD SC                                                        
+   13|-->                                                             
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|FLOAD NGM                                                       
+    1|FLOAD GM                                                        
+    2|FLOAD LD                                                        
+    3|FLOAD OT                                                        
+    4|FLOAD HF                                                        
+    5|FLOAD LFN                                                       
+    6|FLOAD R                                                         
+    7|FLOAD AR                                                        
+    8|FLOAD T                                                         
+    9|FLOAD RS                                                        
+   10|FLOAD H                                                         
+   11|FLOAD K                                                         
+   12|XC? IFTRUE EX ;S IFEND                                          
+   13|-->                                                             
+   14|                                                                
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|XC? IFTRUE xcsys XCCONT ( ASM .HOU .OPS ) IFEND                 
+    1|FLOAD MR                                                        
+    2|FLOAD M                                                         
+    3|FLOAD MA ( MAGIC )                                              
+    4|FLOAD PR                                                        
+    5|FLOAD P                                                         
+    6|FLOAD IP                                                        
+    7|FLOAD SWP                                                       
+    8|FLOAD GR                                                        
+    9|FLOAD G                                                         
+   10|FLOAD RD                                                        
+   11|FLOAD E                                                         
+   12|NEWVECT JAYVECT 1+ U! XC? IFTRUE FLUSH xcsys XCSTAT IFEND ;S    
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

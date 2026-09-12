@@ -1,0 +1,108 @@
+
+File Size: 5120.000000 Bytes    5.000000 Blocks  0-4.000000
+
+
+Last Block = 4
+
+
+
+FILE = GR
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( CLEAR BLOCK COMMAND - USES THE PATTERN BOARD )                
+    1|HEX ( THIS VERSION CLEARS A 1K BLOCK )                          
+    2|DATA p& 0 B,                                                    
+    3|SUBR c1k 20 A MVI, 07A OUT, p& H LXI,                           
+    4|L A MOV, 078 OUT, H A MOV, 079 OUT,                             
+    5|E A MOV, 7B OUT, D A MOV, 7C OUT,                               
+    6|1 A MVI, 7B OUT,                                                
+    7|7F A MVI, 7D OUT, 7 A MVI, 7E OUT, RET,                         
+    8|F= cll                                                          
+    9|CODE CL 4000 D LXI, <ASSEMBLE                                   
+   10|LABEL cll c1k CALL, D A MOV, 4 ADI, A D MOV, cll JP,            
+   11|NEXT ASSEMBLE>                                                  
+   12|DECIMAL -->                                                     
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( GROWL OUT ALREADY DUG FEATURES )                              
+    1|HEX F= Nrp F= rpE F= Rpm                                        
+    2|CODE f& <ASSEMBLE H POP, L A MOV, RPDIR STA, ( A= DIR )         
+    3|H POP, D POP, L D MOV, B PUSH, X PUSHX, Y PUSHX,                
+    4|( GET MAX DIST IF IT EXISTS )                                   
+    5|A C MOV, noder^ CALL, M A MOV, 2 CPI, Nrp JC,                   
+    6|RPMD STA,                                                       
+    7|( YES - IS IT EQUAL TO MAX DISTANCE )                           
+    8|MPL0 RVMD - B LXI, B DAD, M CMP, CY~, IF, M A MOV, RPMD STA,    
+    9|A ANA, B DSBC, A M MOV, B DAD, ( FIX RVMD TO MAX ! )            
+   10|( IF SO ONLY REPAINT IF MY DIRECTION IS 2 THRU 3 )              
+   11|RPDIR LDA, 2 CPI, Nrp JC, THEN,                                 
+   12|-->                                                             
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( THEN SET DELTAS )                                             
+    1|LABEL rpE 10 IN,                                                
+    2|NDX0 MPL0 - B LXI, B DAD, M A MOV, RPDX STA,                    
+    3|SGNA CALL, RPDX 1+ STA, NDY0 NDX0 - B LXI,                      
+    4|B DAD, M A MOV, RPDY STA, SGNA CALL, RPDY 1+ STA,               
+    5|( AND THEN COORDINATE VALUES )                                  
+    6|NBX C MVI, node^ CALL, M E MOV, H INX, M D MOV, H INX,          
+    7|RPX SDED, M E MOV, H INX, M D MOV, RPY SDED,                    
+    8|( LASTLY DISTANCE COUNTER )                                     
+    9|A XRA, RPD STA,                                                 
+   10|-->                                                             
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   3
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( FUDGE DELTA VALUES TO SAVE TIME )                             
+    1|RPDX LHLD, H DAD, H DAD, RPDX SHLD,                             
+    2|RPDY LHLD, H DAD, H DAD, RPDY SHLD,                             
+    3|( LOOP TO DO THE MAD PAINTING )                                 
+    4|LABEL Rpm                                                       
+    5|RPX LHLD, RPDX LDED, D DAD, RPX SHLD, XCHG,                     
+    6|RPY LHLD, RPDY LBCD, B DAD, RPY SHLD, RPCOL LBCD,               
+    7|rv-p X LXIX,                                                    
+    8|SLEZR2A CALL, X INXX, X INXX, 0 X E LDX, X INXX,                
+    9|0 X D LDX, X INXX, write CALL,                                  
+   10|RPMD LDA, A C MOV,                                              
+   11|RPD LDA, 8 ADI, RPD STA, C SUB, Rpm JM,                         
+   12|8 CPI, Nrp JRNC, C A MOV, RPD STA, Rpm JMPR,                    
+   13|LABEL Nrp Y POPX, X POPX, B POP, NEXT ASSEMBLE>                 
+   14|                                                                
+   15|-->                                                             
+
+BLOCK =   4
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( GROWL ALL EXISTING PATHS )                                    
+    1|HEX                                                             
+    2|CODE RP& H POP, L A MOV, ( A= DIR )                             
+    3|H POP, D POP, L D MOV, B PUSH, X PUSHX, Y PUSHX,                
+    4|( REJECT GRUNGY VALUES )                                        
+    5|2 CPI, Nrp JC,                                                  
+    6|( GET MAX DIST IF IT EXISTS )                                   
+    7|A C MOV, noded^ CALL, M A MOV, A ANA, Nrp JZ,                   
+    8|RPMD STA, rpE JMP, NEXT                                         
+    9|-->                                                             
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

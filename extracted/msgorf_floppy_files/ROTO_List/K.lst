@@ -1,0 +1,70 @@
+
+File Size: 3072.000000 Bytes    3.000000 Blocks  0-2.000000
+
+
+Last Block = 2
+
+
+
+FILE = K
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( DOOR STUFF )                                                  
+    1|HEX : DORWR DIVG ST-X ST-Y ROT 828 SWAP WRITEP ; DECIMAL        
+    2|XC? IFTRUE                                                      
+    3|CODE TSET DI, H POP, M A MOV, A ANA, 0=, IF, M INR, 0 H LXI,    
+    4|ELSE, 1 H LXI, THEN, H PUSH, NEXT                               
+    5|: CLDR BEGIN DSM4 TSET WHILE SYNC REPEAT                        
+    6|DORS B@ IF DOR2 DORWR DOR1 DORWR 3 TIMER!-ON                    
+    7|WAIT DOR1 DORWR DOR0 DORWR DORS BZERO THEN DSM4 BZERO COGO ;    
+    8|( OPEN DOOR ROUTINE )                                           
+    9|: OPDR BEGIN DSM4 TSET WHILE SYNC REPEAT                        
+   10|DORS B@ 0= IF DOR0 DORWR DOR1 DORWR                             
+   11|3 TIMER!-ON WAIT DOR1 DORWR DOR2 DORWR DORS BONE THEN           
+   12|DSM4 BZERO COGO ;                                               
+   13|OTHERWISE : CLDR COGO ; : OPDR COGO ; IFEND -->                 
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( KEY MONITOR )                                                 
+    1|<ANIM-TBL F-K KEY1 20 NULPAT 20 TBL>                            
+    2|XC? NOT IFTRUE F-K C= ex-p IFEND                                
+    3|                                                                
+    4|: EXAT ;TASK: START-COL START-ROW Snm DVECT-ON ESTPOS           
+    5|1STWRITE XOR-ON                                                 
+    6|4 XPAND!-ON ex-p ANIM! BEGIN GO 0 END ;                         
+    7|                                                                
+    8|: KEYMAN ;TASK:                                                 
+    9|DIVG                                                            
+   10|HIDE? DVECT-ON ESTPOS                                           
+   11|SELF PUSH:CCR >TREASURE NODE!                                   
+   12|-->                                                             
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( KEY REVEALER )                                                
+    1|NULPAT ANIM!                                                    
+    2|DIVG                                                            
+    3|' CH:R SETCO COGO                                               
+    4|1STWRITE                                                        
+    5|XPAND-OFF F-K ANIM! XOR-ON                                      
+    6|POA DVECT-ON GO DIVG                                            
+    7|KYOPEN OBJSV VB!                                                
+    8|NULPAT ANIM! 1 TIMER!-ON GO DIVG                                
+    9|KEY-S                                                           
+   10|' OPDR SETCO COGO GA# B@ NOT IF SELF EXAT THEN ;                
+   11|-->                                                             
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

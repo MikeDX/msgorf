@@ -1,0 +1,184 @@
+
+File Size: 9216.000000 Bytes    9.000000 Blocks  0-8.000000
+
+
+Last Block = 8
+
+
+
+FILE = H
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( PLAYER HOSTAGE INTERFACE JUNK )                               
+    1|SUBR dishos 0 H LXI, PLYRV AHEAD + SHLD,                        
+    2|PLYRV BEHIND + SHLD, A XRA, Hctr STA, 0 HOSTAB H LXI,           
+    3|BEGIN, M E MOV, H INX, M D MOV, H INX, D A MOV, E ORA, 0<>,     
+    4|WHILE, XCHG, OBJSV B LXI, B DAD, M A MOV, HSATP CPI, 0=, IF,    
+    5|HSFREE M MVI, ASSMSV OBJSV - B LXI, B DAD, ASNOT M MVI,         
+    6|MYFLAG ASSMSV - B LXI, B DAD, 1 M MVI,                          
+    7|BEHIND MYFLAG - B LXI, B DAD, A XRA, A M MOV, H INX, A M MOV,   
+    8|H INX, A M MOV, H INX, A M MOV, THEN, XCHG, REPEAT, RET,        
+    9| CODE DISHOS B PUSH, dishos CALL, B POP, NEXT                   
+   10|-->                                                             
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( PLAYER HOSTAGE INTERFACE JUNK )                               
+    1|SUBR cutup Y PUSHX, X POPX,                                     
+    2|BEGIN, Hctr H LXI, M DCR, BEHIND X E LDX, BEHIND 1+ X D LDX,    
+    3|A XRA, A BEHIND X STX, A BEHIND 1+ X STX, A AHEAD X STX,        
+    4|A AHEAD 1+ X STX,                                               
+    5|D A MOV, E ORA, 0<>, WHILE,                                     
+    6|D PUSH, X POPX, HSFREE OBJSV X MVIX,                            
+    7|ASNOT ASSMSV X MVIX, ( AND UNASSIM )                            
+    8|1 MYFLAG X MVIX, REPEAT, RET, -->                               
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( FREE HOSTAGES FROM MONSTER )                                  
+    1|CODE FREM B PUSH, 0 H LXI, PLYRV AHEAD + SHLD,                  
+    2|PLYRV BEHIND + SHLD, A XRA, Hctr STA, 0 HOSTAB H LXI,           
+    3|BEGIN, M E MOV, H INX, M D MOV, H INX, D A MOV, E ORA, 0<>,     
+    4|WHILE, XCHG, OBJSV B LXI, B DAD, M A MOV, HSATM CPI, 0=, IF,    
+    5|HSFREE M MVI, ASSMSV OBJSV - B LXI, B DAD, ASNOT M MVI,         
+    6|MYFLAG ASSMSV - B LXI, B DAD, 1 M MVI,                          
+    7|BEHIND MYFLAG - B LXI, B DAD, A XRA, A M MOV, H INX, A M MOV,   
+    8|H INX, A M MOV, H INX, A M MOV, THEN, XCHG, REPEAT,             
+    9|B POP, NEXT                                                     
+   10|-->                                                             
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   3
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( HOSTAGE TABLE, HOSTAGE INTERCEPT CHECKER )                    
+    1|( CHECK HOSTAGE INTERCEPT WITH MONSTERS )                       
+    2|HEX ( HOSTAGES INTERCEPT CHECKER, RUNS AS HOOK )                
+    3|SUBR HOS-MON? FREEZE? CALL, RNZ, OBJSV Y A LDX, HSATP CPI, RNZ, 
+    4|P-S LDA, A DCR, 2 CPI, RNC, ( MAKE SURE PLAYER IN MAZE )        
+    5|EXX, 0280 B LXI, PX-M CALL, ( WIDER WINDOW FOR MON - HOS )      
+    6|0<>, IF, 1 MYFLAG Y MVIX, ( SET ME EATEN )                      
+    7|ASNOT ASSMSV Y MVIX, ( SET UNASSIMILATED )                      
+    8|X PUSHX, Y PUSHX, D POP, B POP,                                 
+    9|XC? IFTRUE JAWSV H LXI, A ANA, B DSBC,                          
+   10|OTHERWISE 1 A MVI, A ANA, IFEND                                 
+   11|0=, IF, HSFREE OBJSV Y MVIX, XC? IFTRUE chomp-s CALL, IFEND     
+   12|ELSE, HSATM OBJSV Y MVIX, MSSNA OBJSV X MVIX,                   
+   13|1 MYFLAG X MVIX, B H MOV, C L MOV, FUZH CALL, THEN,             
+   14|X PUSHX, cutup CALL, X POPX, HALTNOW CALL,                      
+   15|THEN, EXX, RET, DECIMAL -->                                     
+
+BLOCK =   4
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( UNLINK ROUTINE )                                              
+    1|CODE UNLINK Y PUSHX, vaddr LIYD, AHEAD Y E LDX,                 
+    2|AHEAD 1+ Y D LDX, D PUSH, XTIX,                                 
+    3|A XRA, A AHEAD Y STX, A AHEAD 1+ Y STX,                         
+    4|A AHEAD X STX, A AHEAD 1+ X STX, A DRPO X STX,                  
+    5|A BEHIND Y STX, A BEHIND 1+ Y STX,                              
+    6|A BEHIND X STX, A BEHIND 1+ X STX, X POPX, Y POPX, NEXT         
+    7|-->                                                             
+    8|                                                                
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   5
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( HOSTAGE INDEXER GOODIES )                                     
+    1|: I:H V#L * HOSV1 SWAP - ;                                      
+    2|: HOS#? HOSV1 SWAP - V#L / ;                                    
+    3|                                                                
+    4|( CALCULATE POSITION ON FREED HOSTAGE LINE )                    
+    5|: FH-P -16 SWAP 16 * + 94 ;                                     
+    6|: H-DIS FH-P 96 JHOS-S WRITEP ;                                 
+    7|DECIMAL                                                         
+    8|<ANIM-TBL Ha1 JHOS-S 100 TBL>                                   
+    9|<ANIM-TBL Ha2 IJHOS-S 100 TBL>                                  
+   10|<PER-ANIM-TBL Hsml Ha1 Ha2 TBL>                                 
+   11|-->                                                             
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   6
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( TASK FOR A TEST HOSTAGE )                                     
+    1|: H-T ;TASK: DIVG H-H-D DISPF VB!                               
+    2|EMOV 1STWRITE HSFREE OBJSV VB! RNIT BEGIN DIVG                  
+    3|OBJSV VB@ HSFREE CASE 0 DELTADIST V! DVECT-ON                   
+    4|DISTANCE V@ NOT IF PUSH:CCR G-D? NOT IF                         
+    5|ESTPOS NULPAT ANIM! ERASEWRITE DIVG                             
+    6|' CH:R SETCO COGO XPAND-OFF THEN THEN                           
+    7|( SELF HOS#? 1+ DUP GA# B@ + 10 < IF                            
+    8|I:M DUP HGSV OVB@ MPCHP >= IF                                   
+    9|MPRTH SWAP HGSV OVB! ELSE DROP THEN ELSE DROP THEN )            
+   10|JHOS-F ANIM!                                                    
+   11|XOR-ON 10 TIMEBSCALE! 0 TIMEBMAX! POA GO                        
+   12|ELSE HSATP CASE                                                 
+   13|NULPAT ANIM! ERASEWRITE DIVG                                    
+   14|Hctr B@ CAPT-S Hsml ANIM!                                       
+   15|TBCL POA HOS-MON? HOOK!-ON -->                                  
+
+BLOCK =   7
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|100 INCSCORE HVECT-ON GO DIVG                                   
+    1|DEST? OBJSV VB@ HSATP = AND IF HSLPF OBJSV VB! THEN             
+    2|( FOLLOW MONSTER TO NEW HANGOUT )                               
+    3|ELSE HSATM CASE Hctr B@ DRUG-S JHOS-F ANIM!                     
+    4|HVECT-ON                                                        
+    5|400 TIMER!-ON ( PREVENT HOSTAGE HANGUP )                        
+    6|( FOLLOW MONSTER TO ITS TARGET POSITION )                       
+    7|POA GO DIVG                                                     
+    8|UNLINK                                                          
+    9|FLAG? NOT IF                                                    
+   10|ARRIVE:NODE ESTPOS                                              
+   11|HSFREE OBJSV VB! ASNOT ASSMSV VB! THEN                          
+   12|-->                                                             
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   8
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|                                                                
+    1|                                                                
+    2|                                                                
+    3|                                                                
+    4|                                                                
+    5|                                                                
+    6|                                                                
+    7|                                                                
+    8|                                                                
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

@@ -1,0 +1,51 @@
+
+File Size: 2048.000000 Bytes    2.000000 Blocks  0-1.000000
+
+
+Last Block = 1
+
+
+
+FILE = VC
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( SPECIAL VECTOR GETTERS AND PUTTERS )                          
+    1|CODE PUSH:CCR 0 H MVI, H D MOV, Y PUSHX, vaddr LIYD,            
+    2|NOWC Y L LDX, NOWR Y E LDX, Y POPX, H PUSH, D PUSH, NEXT        
+    3|                                                                
+    4|CODE PUSH:CCRD 0 H MVI, H D MOV, Y PUSHX, vaddr LIYD,           
+    5|NOWC Y L LDX, NOWR Y E LDX, NOWD Y A LDX,                       
+    6|Y POPX, H PUSH, D PUSH, A E MOV, D PUSH, NEXT                   
+    7|                                                                
+    8|CODE COGO  ( exchage BC with VCOR )                             
+    9| vaddr LHLD, VCOR D LXI, D DAD,                                 
+   10| M A MOV, C M MOV, A C MOV, H INX,                              
+   11| M A MOV, B M MOV, A B MOV, NEXT                                
+   12|: SETCO 1+ VCOR V! ;                                            
+   13|                                                                
+   14|DECIMAL -->                                                     
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MORE STUFF )                                                  
+    1|: Rip INTR VB@ NOWR VB! INTC VB@ NOWC VB! ;                     
+    2|: Snm NOWR VB! NOWC VB! ;                                       
+    3|: Sim DUP ROLL INTR OVB! INTC OVB! ;                            
+    4|: ON:TARGET? PUSH:CCR INTR VB@ = SWAP INTC VB@ = AND ;          
+    5|: POA MYFLAG V^ FLAG!-ON ; : Src START-COL START-ROW ;          
+    6|CODE GRCD XTIX, Y PUSHX,                                        
+    7|vaddr LIYD, NOWD X A LDX, A NOWD Y STX,                         
+    8|NOWR X A LDX, A NOWR Y STX,                                     
+    9|NOWC X A LDX, A NOWC Y STX, Y POPX, X POPX, NEXT                
+   10|: EMOV DIVG ZERODXDYAXAY ;                                      
+   11|SUBR FREEZE F-F H LXI, M INR, RET,                              
+   12|SUBR FREEZE? F-F LDA, A ANA, RET,                               
+   13|CODE FREEZETH FREEZE CALL, NEXT                                 
+   14|CODE UNFREEZE .ABS F-F H LXI, M DCR, 0<, IF, 0 M MVI, THEN,     
+   15|.REL NEXT -->                                                   
+
+
+
+
+

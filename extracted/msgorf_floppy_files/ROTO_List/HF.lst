@@ -1,0 +1,70 @@
+
+File Size: 3072.000000 Bytes    3.000000 Blocks  0-2.000000
+
+
+Last Block = 2
+
+
+
+FILE = HF
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( NEW ASSIMILATED HOSTAGE CRUDOLA )                             
+    1|SUBR Hass ( IX= OTHER IY= ME )                                  
+    2|DELTADIST Y A LDX, DELTADIST 1+ Y ORAX, RZ, ( DELTADIST )       
+    3|DISTANCE X L LDX, DISTANCE 1+ X H LDX, DISPF X D LDX, 0 E MVI,  
+    4|A ANA, D DSBC, .ABS 0<, IF, ( SET AT MAXDIST + DIFFER )         
+    5|MAXDIST Y D LDX, D DAD, ( COMPUTE NEW BIG DISTANCE )            
+    6|ELSE, H PUSH, ( IMPORT STUFF, THEN SET NEW CALC DISTANCE )      
+    7|Y PUSHX, H POP, NOWR B LXI, B DAD, XCHG, X PUSHX, H POP, B DAD, 
+    8|POSLEN B LXI, LDIR, H POP, THEN, .REL                           
+    9|L DISTANCE Y STX, H DISTANCE 1+ Y STX, RET,                     
+   10|                                                                
+   11|-->                                                             
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( ASS HOS SPECIAL VECTORING ROUTINE )                           
+    1|SUBR HASSIM PSW PUSH, B PUSH, X PUSHX,                          
+    2|AHEAD Y L LDX, AHEAD 1+ Y H LDX, H PUSH, X POPX,                
+    3|DRPO X A LDX, A ANA, 0<>, IF, B A MOV, DISTVECT CALL,           
+    4|ELSE, Hass CALL, THEN,                                          
+    5|CALCXY CALL, OBJSV Y A LDX, HSATP CPI, LOOKASS CZ,              
+    6|X POPX, B POP, PSW POP,                                         
+    7|RET,                                                            
+    8|( SPECIAL MASTER VECTORING ROUTINE FOR HOSTAGES )               
+    9|SUBR H!V PSW PUSH,                                              
+   10|ASSMSV Y A LDX, A ANA,                                          
+   11|0<>, IF, PSW POP, HASSIM JMP,                                   
+   12|THEN, B PUSH, CALCXY CALL, B POP, PSW POP, RET,                 
+   13|: HVECT-ON H!V CV-ON ;                                          
+   14|-->                                                             
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( FORCE HOSTAGE TO HAVE SAME POSITION AS INTERCEPTOR )          
+    1|SUBR FUZH ( DE= HOSTAGE, HL= OTHER )                            
+    2|NOWR B LXI, B DAD, XCHG, B DAD, XCHG, SNATLEN B LXI, LDIR, RET, 
+    3|( SPECIAL ROUTINE FOR EXITING MAZE )                            
+    4|SUBR PL-VR PSW PUSH, B PUSH, B A MOV,                           
+    5|DISTPA CALL,                                                    
+    6|LOOKASS CALL,                                                   
+    7|B POP, PSW POP, vect JMP,                                       
+    8|                                                                
+    9|: EV:R ZERODXDYAXAY Src Snm ESTPOS                              
+   10|256 DELTADIST V! PROPDELTAS 63 MAXDIST VB! 0 NOWD VB!           
+   11|RX-T TIMER!-ON 256 DY!                                          
+   12|0 DELTAX V! -64 DELTAY V!                                       
+   13|1 DRPO VB! PL-VR CV-ON ;                                        
+   14|-->                                                             
+   15|                                                                
+
+
+
+
+

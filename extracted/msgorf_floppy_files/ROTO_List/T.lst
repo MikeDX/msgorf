@@ -1,0 +1,70 @@
+
+File Size: 3072.000000 Bytes    3.000000 Blocks  0-2.000000
+
+
+Last Block = 2
+
+
+
+FILE = T
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( PLACE TREASURE IN MAZE ) XC? IFTRUE                           
+    1|4 C= T-LIM                                                      
+    2|TABLE T/I THEFLOWER , THESYM , THEJEWEL , THESTAR , 0 ,         
+    3|TABLE T/F FL , SYM , JL1 , ST1 ,                                
+    4|( CAPTURED TREASURE DISPLAY STUFF )                             
+    5|: TP-1 -82 SWAP 15 * + 95 ;                                     
+    6|: TP-2 82 SWAP 15 * - 95 ;                                      
+    7|: T-POS NERDUP IF TP-2 ELSE TP-1 THEN ;                         
+    8|: TRw 96 SWAP T/F @ WRITEP ;                                    
+    9|: T-DIS DUP T-POS ROT TRw ;                                     
+   10|: Tgr1 0 tr# B@ -DUP IF 0 DO I TP-1 I TRw LOOP THEN ;           
+   11|: Tgr2 1 tr# B@ -DUP IF 0 DO I TP-2 I TRw LOOP THEN ;           
+   12|OTHERWISE : Tgr1 ; : Tgr2 ; IFEND                               
+   13|-->                                                             
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( TASK FOR A HUNK OF TREASURE IN THE MAZE )                     
+    1|XC? IFTRUE : TRS-T ;TASK:                                       
+    2|BEGIN DIVG TR# B@ T-LIM < WHILE HIDE?                           
+    3|SELF PUSH:CCR >TREASURE NODE^ ! ( HAVE PTR PT AT ME )           
+    4|NULPAT ANIM! ' CH:R SETCO COGO                                  
+    5|( MAKE SELF APPEAR )                                            
+    6|ESTPOS TR# B@ T/I @ ANIM! 1STWRITE                              
+    7|XOR-ON EMOV                                                     
+    8|10 TIMEBSCALE!                                                  
+    9|POA GO DIVG GA# B@ -DUP IF 5 MIN 200 * ELSE 100 THEN            
+   10|INCSCORE TREA-S                                                 
+   11|NULPAT ANIM! ERASEWRITE DIVG                                    
+   12|TR# B@ DUP T-POS ROT TRw TR# 1+WPB! 0 0 Snm ( REHIDETH )        
+   13|2 TIMER!-ON WAIT                                                
+   14|REPEAT ; OTHERWISE : TRS-T ; : TRSV ; IFEND -->                 
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( CHECK PLAYER INTERCEPT WITH TREASURE )                        
+    1|                                                                
+    2|SUBR TR:CHK O-M LDA, A ANA, RZ,                                 
+    3|NOWR Y D LDX, NOWC Y E LDX,                                     
+    4|PLYRV DISTANCE 1+ + LDA, 8 CPI, CY~, IF,                        
+    5|A C MOV, PLYRV MAXDIST + LDA, C SUB, 8 CPI, RNC,                
+    6|PLYRV NOWD + LDA, A C MOV, move:node CALL, THEN,                
+    7|>TREASURE C MVI,                                                
+    8|node^ CALL, M C MOV, H INX, M B MOV,                            
+    9|B A MOV, C ORA, RZ,                                             
+   10|XCHG, MYFLAG H LXI, B DAD, 1 M MVI,                             
+   11|XCHG, 0 M MVI, H DCX, 0 M MVI,                                  
+   12|RET,                                                            
+   13|-->                                                             
+   14|;S                                                              
+   15|                                                                
+
+
+
+
+

@@ -1,0 +1,108 @@
+
+File Size: 5120.000000 Bytes    5.000000 Blocks  0-4.000000
+
+
+Last Block = 4
+
+
+
+FILE = GM
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( CONNECTIVITY TESTING )                                        
+    1|HEX                                                             
+    2|: ZAM NCOLS 0 DO NROWS 0 DO J I                                 
+    3|COMP:XY J I NODY NODE! J I NODX NODE! LOOP LOOP                 
+    4|ST-X Src NODX NODE!                                             
+    5|ST-Y Src NODY NODE!                                             
+    6|81 Src NODMSK NODE^ B!                                          
+    7|NROWS 0 DO 0 I NODX NODE@ 0FF70 <                               
+    8|IF 0FF70 0 I NODX NODE! THEN                                    
+    9|0A I NODX NODE@ 8F >                                            
+   10|IF 8F 0A I NODX NODE! THEN LOOP ;                               
+   11|: START:CHAMBER?                                                
+   12|2DUP START-ROW = IF START-COL = IF 2DROP 0 ELSE 1 THEN          
+   13|ELSE DROP 1 THEN ;                                              
+   14|DECIMAL -->                                                     
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( CREATE MAZE )                                                 
+    1|HEX ( MAKE NODE ENTRY )                                         
+    2|SUBR MN-L H PUSH, B PUSH,                                       
+    3|A B MOV, 0 C MVI,                                               
+    4|BEGIN, 0 B BIT, 0<>, IF,                                        
+    5|B PUSH, D PUSH, addpath CALL, D POP, B POP, THEN,               
+    6|B RRCR, C INR, C A MOV, 2 CPI, 0=, END,                         
+    7|E INR, E A MOV, NCOLS CPI, CY~, IF, 0 E MVI, D INR, THEN,       
+    8|B POP, H POP, RET,                                              
+    9|DECIMAL                                                         
+   10|-->                                                             
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( HOSTAGE HIDER AND MAZE GENERATOR )                            
+    1|HEX                                                             
+    2|CODE flm                                                        
+    3|( FIRST DEAL WITH HOSTAGE STUFF )                               
+    4|H POP, ( XVSA ) D POP, ( HOSTAGE TABLE )                        
+    5|B PUSH, D PUSH, TOTAL-HOSTAGES DO,                              
+    6|D LDAX, A C MOV, 0F ANI, A M MOV, H INX,                        
+    7|C A MOV, RRC, RRC, RRC, RRC, 0F ANI, A M MOV, H INX,            
+    8|H INX, H INX, H INX, H INX,  D INX, LOOP,                       
+    9|H POP, 0B D LXI, D DAD, 0 D LXI, ( ADVANCE TO NODE AREA )       
+   10|NNODES 2/ DO, M A MOV, RRC, RRC, RRC, RRC, MN-L CALL,           
+   11|M A MOV, MN-L CALL,                                             
+   12|H INX, LOOP, B POP, NEXT                                        
+   13|: FILMAT DUP MZP ! 0 XVSA flm ;                                 
+   14|DECIMAL -->                                                     
+   15|                                                                
+
+BLOCK =   3
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MAZE TABLE )                                                  
+    1|XC? IFTRUE --> IFEND                                            
+    2|HEX                                                             
+    3|DATA MTMD 1 B, ( # OF MAZES )                                   
+    4|02 B, 51 B, 92 B, ( HOSPOS )                                    
+    5|XC? IFTRUE 3 B, OTHERWISE 1 B, IFEND ( # OF SPIDERS )           
+    6|50 B, 00 B, 0A0 B, 70 B, 30 B, ( SPIDER LOCATIONS )             
+    7|0 , ( GROWL ROUTINE )                                           
+    8|( AND THE MAZE DATA )                                           
+    9|13 B, 22 B, 32 B, 32 B, 23 B,                                   
+   10|31 B, 21 B, 33 B, 33 B, 33 B, 03 B,                             
+   11|03 B, 21 B, 12 B, 31 B, 03 B, 21 B,                             
+   12|0AF B, FF B, FF B, 5F B, 0AF B,                                 
+   13|11 B, 21 B, 32 B, 33 B, 03 B,                                   
+   14|10 B, 22 B, 20 B, 22 B, 20 B, 02 B,                             
+   15|DECIMAL -->                                                     
+
+BLOCK =   4
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MAZE LOOKER UPPER ) DECIMAL                                   
+    1|XC? IFTRUE                                                      
+    2|( MAZE TABLES )                                                 
+    3|( DATA MZTTBL MTMD , MTMD , MTMD , MTMD , )                     
+    4|DATA MAZELST 0 , ( DANGEROUS )                                  
+    5|: MAKE:MAZE CL:NM ZAM                                           
+    6|GA# B@ DIF B@ 5 > +                                             
+    7|2 MIN 2* MAZELST @ + @ DUP                                      
+    8|B@ ?M URND 44 * 1+ + FILMAT ;                                   
+    9|OTHERWISE                                                       
+   10|." SLEAZED MAZE STUFF"                                          
+   11|: MAKE:MAZE CL:NM ZAM MTMD 1+ FILMAT ; IFEND                    
+   12|-->                                                             
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

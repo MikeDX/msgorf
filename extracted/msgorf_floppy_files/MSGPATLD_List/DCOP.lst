@@ -1,0 +1,89 @@
+
+File Size: 4096.000000 Bytes    4.000000 Blocks  0-3.000000
+
+
+Last Block = 3
+
+
+
+FILE = DCOP
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( SENDER ROUTINE )                                              
+    1|HEX C000 C= BLKPTR C002 C= CSTAT C004 C= DBUF DECIMAL           
+    2|CODE LDIR EXX, B POP, D POP, H POP, LDIR, EXX, NEXT             
+    3|: 4. FLD B@ 4 FLD ! SWAP . FLD ! ;                              
+    4|EDIT DEFINITIONS                                                
+    5|: SENDER E-C NOFILES 0 BLKPTR ! 0 CSTAT B! CR                   
+    6|309 1 DO                                                        
+    7|BEGIN CSTAT B@ 0= END ( AWAIT CLEAR BUFFER )                    
+    8|I DRIVE+ BLOCK DBUF 1024 LDIR ( SHOVEL TO INTERCHANGE BUFFER )  
+    9|I BLKPTR ! ( SET BLOCK POINTER )                                
+   10|1 CSTAT B! ( SET DATA READY )                                   
+   11|I 4.                                                            
+   12|LOOP ;                                                          
+   13|-->                                                             
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( RECIEVER ROUTINE )                                            
+    1|: RECV E-C NOFILES CR                                           
+    2|309 1 DO                                                        
+    3|BEGIN CSTAT B@ END ( AWAIT XMITED BUFFER )                      
+    4|BLKPTR @ 4.                                                     
+    5|DBUF BLKPTR @ DRIVE+ BUFFER 1024 LDIR ( GRAB FROM BUFFER )      
+    6|0 CSTAT B! ( SET DATA USED )                                    
+    7|UPDATE FLUSH                                                    
+    8|LOOP ;                                                          
+    9|-->                                                             
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( GAS MULTI DISK TRANSCIEVERS )                                 
+    1|: GS CR SWAP 1+ SWAP DO                                         
+    2|." INSTALL DISK # " I 4. ."  INTO ICEBOX THEN TYPE A CHAR"      
+    3|GETC CR I DRIVE SENDER                                          
+    4|CR ." TRANSFER COMPLETE" CR LOOP ;                              
+    5|: GR CR SWAP 1+ SWAP DO                                         
+    6|." INSTALL DISK # " I 4. ."  INTO ICEBOX " CR                   
+    7|." TYPE A CHAR AFTER ICEBOX IS CUED TO GO"                      
+    8|GETC CR I DRIVE RECV                                            
+    9|CR ." TRANSFER COMPLETE" CR LOOP ;                              
+   10|-->                                                             
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   3
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( ICE MULTI DISK ROUTINES )                                     
+    1|: IS CR SWAP 1+ SWAP DO                                         
+    2|." INSTALL DISK # " I 4. ."  INTO ICEBOX THEN TYPE A CHAR"      
+    3|GETC CR SENDER                                                  
+    4|CR ." TRANSFER COMPLETE" CR LOOP ;                              
+    5|: IR CR SWAP 1+ SWAP DO                                         
+    6|." INSTALL DISK # " I 4. ."  INTO ICEBOX " CR                   
+    7|." TYPE A CHAR AFTER GAS WAS CUED TO GO"                        
+    8|GETC CR RECV                                                    
+    9|CR ." TRANSFER COMPLETE" CR LOOP ;                              
+   10|TERSE DEFINITIONS                                               
+   11|-->                                                             
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

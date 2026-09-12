@@ -1,0 +1,32 @@
+
+File Size: 1024.000000 Bytes    1.000000 Blocks  0-0.000000
+
+
+Last Block = 0
+
+
+
+FILE = XCLOAD
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( LOAD BLK FOR CROSS-COMPILING ) DECIMAL                        
+    1|FSLD FS.XC                                                      
+    2|xcsys xc ASM .OPS                                               
+    3|MORE-BUFFERS ( allocate 2 more disk buffers )                   
+    4|OBJECT-FILE XC.PATTERNS                                         
+    5|HEX 4000 ROMSTART !  0F000 PSTACK !                             
+    6|   0F800 RAMSTART !  0F400 RSTACK !                             
+    7|XCBEG DECIMAL xcsys xc ASM .OPS                                 
+    8|{ V= PT-HERE } HEX 04200 PT-HERE !                              
+    9|4000 C= ATBL                                                    
+   10|8000 DP ! DECIMAL                                               
+   11|FLOAD CODE-LOAD                                                 
+   12|FLOAD PAT-LOAD                                                  
+   13|EX DED DESTROY FS.PAT xcsys XCFSYSAVE FS.PAT                    
+   14|DECIMAL ;S                                                      
+   15|                                                                
+
+
+
+
+

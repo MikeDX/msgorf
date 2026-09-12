@@ -1,0 +1,222 @@
+
+File Size: 11264.000000 Bytes    11.000000 Blocks  0-10.000000
+
+
+Last Block = 10
+
+
+
+FILE = MR
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( INDEXER AND VISABLE MONSTER WRITER )                          
+    1|                                                                
+    2|SUBR VM-W ( VISABLE MONSTER WRITER )                            
+    3|  VBNOERASE VLOGICSTAT Y BITX, 0=, IF,                          
+    4|  VOPATH Y A LDX, VOPAT Y ORAX, 0<>, IF,                        
+    5|  VERASE CALL, THEN, ( don't erase if no pattern )              
+    6|  ELSE, VBNOERASE VLOGICSTAT Y RESX, THEN,                      
+    7|  VBNOWRITE VLOGICSTAT Y BITX, 0=, IF, INTCPT IN, VWRITE CALL,  
+    8|INTCPT IN, A ANA, 0<>, IF, 1 A MVI, THEN,                       
+    9|1 XRI, VPERINX Y CMPX, 0<>, IF, A VPERINX Y STX,                
+   10|1 VANIMTIMER Y MVIX, 0 VANIMINX Y MVIX, THEN,                   
+   11|  ELSE, VBNOWRITE VLOGICSTAT Y RESX, THEN,                      
+   12|  transition JMP, -->                                           
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( USEFULL MONSTER STUFF )                                       
+    1|( MONSTER CLASSIFY ROUTINE )                                    
+    2|BTABLE CLSTB 1 B, 0 B, 0 B, 0 B, 2 B,                           
+    3|: CLASS? SELF MON#? CLSTB B@ ;                                  
+    4|HEX                                                             
+    5|: IMP SELF MON#? MZP @ 4 + + B@                                 
+    6|DUP 0F AND SWAP SWAN 0F AND ;                                   
+    7|: SPOTMONS H-P-D DISPF VB!                                      
+    8|CLASS? IF Src                                                   
+    9|ELSE IMP THEN                                                   
+   10|DUP INTC VB! NOWC VB!                                           
+   11|DUP INTR VB! NOWR VB! ESTPOS ;                                  
+   12|                                                                
+   13|DECIMAL -->                                                     
+   14|                                                                
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MONSTER VECTOR ROUTINE )                                      
+    1|( FREEZE IF PLAYER DEAD OR MAGIC ACTIVE )                       
+    2|F= Mfz                                                          
+    3|SUBR MON-VR <ASSEMBLE PSW PUSH, MAFLG LDA, A ANA, Mfz JRNZ,     
+    4|P-S LDA, PLDOA CPI, 0=, IF,                                     
+    5|Y PUSHX, H POP, MONV1 D LXI, A ANA, D DSBC,                     
+    6|Mfz JRNZ, OBJSV Y A LDX, MSSNA CPI, Mfz JRNZ, THEN,             
+    7|DISTVECT CALL,                                                  
+    8|OBJSV Y A LDX, MSSNA CPI, LKBUN CZ,                             
+    9|PSW POP, RET,                                                   
+   10|LABEL Mfz B PUSH, CALCXY CALL, B POP,                           
+   11|PSW POP, RET, ASSEMBLE>                                         
+   12|: MVECT-ON MON-VR CV-ON ;                                       
+   13|CODE EXX RET, NEXT                                              
+   14|-->                                                             
+   15|                                                                
+
+BLOCK =   3
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( HOOK ROUTINE TO FUDGE MONSTERS VELOCITY IF IN REVEALED ZONE ) 
+    1|F= Mfs                                                          
+    2|SUBR MONSPD <ASSEMBLE EXX,                                      
+    3|NOWD Y C LDX, NOWC Y E LDX, NOWR Y D LDX,                       
+    4|noder^ CALL, M A MOV, DISTANCE Y 1+ CMPX, Mfs JRNC,             
+    5|move:node CALL, C A MOV, CMA, 3 ANI, A C MOV, noder^ CALL,      
+    6|A B MOV, noded^ CALL, M A MOV, B SUB, DISTANCE 1+ Y CMPX,       
+    7|CY~, IF, LABEL Mfs MSPDS Y E LDX, MSPDS 1+ Y D LDX, ELSE,       
+    8|MSPDF Y E LDX, MSPDF 1+ Y D LDX, THEN,                          
+    9|E DELTADIST Y STX, D DELTADIST 1+ Y STX, EXX, RET,              
+   10|ASSEMBLE> HEX                                                   
+   11|: MVSET SMARTS B@ 7 MIN 30 * MMSV VB@ MMSCU = IF 80 + THEN      
+   12|CLASS? 40 * + GA# B@ IF 180 ELSE 100 THEN + DUP MSPDS V!        
+   13|40 + MSPDF V! MONSPD HOOK!-ON ;                                 
+   14|DECIMAL -->                                                     
+   15|                                                                
+
+BLOCK =   4
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( SUBROUTINE TO CHECK FOR VALID BANISHMENT POINT )              
+    1|F= AARF F= NULRET                                               
+    2|SUBR OKBAN <ASSEMBLE B PUSH,                                    
+    3|D A MOV, A ANA, AARF JRZ, NROWS 1- CPI, AARF JRZ,               
+    4|START-ROW CPI, E A MOV, 0=, IF, START-COL CPI,                  
+    5|AARF JRZ, THEN, A ANA, AARF JRZ, NCOLS 1- CPI, AARF JRZ,        
+    6|X PUSHX, XCHG, ( HL= COORDS )                                   
+    7|EXX, PCONFT H LXI, NEARBYLIST CALL, X POPX, AARF JRNZ,          
+    8|Y PUSHX, MON-LS H LXI, TRC X B LDX, B A MOV, 15 ANI, A C MOV,   
+    9|B A MOV, RRC, RRC, RRC, RRC, 15 ANI, A B MOV, BEGIN,            
+   10|M E MOV, H INX, M D MOV, H INX, D A MOV, E ORA, 0<>, WHILE,     
+   11|D PUSH, Y POPX, OBJSV Y A LDX, MSSNA CPI,                       
+   12|0=, IF, INTR Y A LDX, B CMP,                                    
+   13|0=, IF, INTC Y A LDX, C CMP,                                    
+   14|0=, IF, Y POPX, AARF JMPR, THEN, THEN, THEN, REPEAT,            
+   15|-->                                                             
+
+BLOCK =   5
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|Y POPX, ( WE PASS ) B INTR Y STX, C INTC Y STX,                 
+    1|X PUSHX, D POP, E FNDPTR Y STX, D FNDPTR 1+ Y STX,              
+    2|LABEL AARF B POP, LABEL NULRET RET, ASSEMBLE>                   
+    3|                                                                
+    4|( FIND NEAT PLACE OF BANISHMENT AT LEAST N MOVES AWAY )         
+    5|: B:M   NULRET FPSS SYNC LAH SYNC                               
+    6|LAH SYNC GA# B@ 3 > IF LAH SYNC THEN OKBAN TREECK V!            
+    7|BEGIN SYNC LAH END TRACKPTR V!                                  
+    8|DIVG COGO ;                                                     
+    9|-->                                                             
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   6
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MORE MONSTER STUFF )                                          
+    1|( COMPARE POSITION IN D AND E WITH POSITION IN VECTOR )         
+    2|SUBR compos D A MOV, NOWR Y CMPX, RNZ,                          
+    3|E A MOV, NOWC Y CMPX, RET,                                      
+    4|CODE CHASEPLAYER <ASSEMBLE EXX, X PUSHX, Y PUSHX,               
+    5|PLYRV X LXIX, vaddr LIYD,                                       
+    6|NOWR X D LDX, NOWC X E LDX, NOWD X C LDX,                       
+    7|move:node CALL, movecheck CALL, CY, IF,                         
+    8|NODMSK C MVI, node^ CALL, NMEXS M BIT, 0<>, IF,                 
+    9|compos CALL, 0=, IF, ( IF AT PLAYERS DEST, GRAB HIS SOURCE )    
+   10|NOWR X D LDX, NOWC X E LDX, THEN,                               
+   11|D INTR Y STX, E INTC Y STX,                                     
+   12|THEN, THEN, EXX, Y POPX, X POPX, NEXT ASSEMBLE> DECIMAL         
+   13|: EXV? OBJSV VB@ MSRIP = IF 1535 ELSE 1024 THEN ;               
+   14|-->                                                             
+   15|                                                                
+
+BLOCK =   7
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( ROUTE MONSTER TO TARGET ) DECIMAL                             
+    1|: rmon                                                          
+    2|4 TIMEBMAX!                                                     
+    3|PMOD VB@ IF FOLLOWTRACK NOWD VB@ <> IF ( REVERSE WANTED )       
+    4|R:D THEN                                                        
+    5|EXV? DELTADIST V!                                               
+    6|BEGIN MVECT-ON                                                  
+    7|VM-W ZGO DIVG DEST? END ARRIVE:NODE                             
+    8|THEN                                                            
+    9|BEGIN ESTPOS                                                    
+   10|ON:TARGET? NOT IF FOLLOWTRACK NOWD VB!                          
+   11|DEPART:NODE EXV? DELTADIST V!                                   
+   12|BEGIN MVECT-ON VM-W ZGO DIVG DEST? END ARRIVE:NODE              
+   13|0 ELSE 1 THEN END 0 TIMEBMAX! COGO ;                            
+   14|: RMON ' rmon SETCO ;                                           
+   15|-->                                                             
+
+BLOCK =   8
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|CODE CLOSE? EXX, B POP, XTIX, Y PUSHX, vaddr LIYD,              
+    1|0 H LXI,                                                        
+    2|NOWR Y A LDX, NOWR X SUBX, BABS CALL, C CMP, CY, IF,            
+    3|NOWC Y A LDX, NOWC X SUBX, BABS CALL, C CMP, CY, IF,            
+    4|1 H LXI, THEN, THEN,                                            
+    5|Y POPX, X POPX, H PUSH, EXX, NEXT                               
+    6|CODE RANMOVE EXX, Y PUSHX,                                      
+    7|vaddr LIYD, LDAR, 3 ANI, A C MOV,                               
+    8|NOWR Y D LDX, NOWC Y E LDX,                                     
+    9|BEGIN, noder^ CALL, M A MOV, A ANA, 0=, WHILE,                  
+   10|C A MOV, A INR, 3 ANI, A C MOV, REPEAT,                         
+   11|move:node CALL, E INTC Y STX, D INTR Y STX, Y POPX, EXX, NEXT   
+   12|-->                                                             
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   9
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( SPIDERS MOVE ROUTINE )                                        
+    1|HEX DATA B2DP 00 B, 02 B, 22 B, 23 B, 33 B, 13 B, 11 B, 01 B,   
+    2|DECIMAL F= Sm0 F= Sm1 F= Sm2 F= Sm3                             
+    3|CODE SPDMOV <ASSEMBLE EXX, Y PUSHX, X PUSHX, vaddr LIYD,        
+    4|RMctr Y A LDX, A ANA, Sm0 JRNZ, ( RANDOMLY MOVING )             
+    5|LDAR, 7 ANI, 3 CPI, Sm0 JRZ, ( RANDOM BREAK )                   
+    6|( SPIDER CHASE PLAYER ROUTINE )                                 
+    7|PLYRV X LXIX, BEARV CALL,                                       
+    8|A E MOV, 0 D MVI, B2DP H LXI, D DAD,                            
+    9|LDAR, 1 ANI, M A MOV, 0<>, IF, RRC, RRC, RRC, RRC, THEN,        
+   10|A B MOV, NOWR Y D LDX, NOWC Y E LDX,                            
+   11|3 ANI, A C MOV, noded^ CALL, M A MOV, A ANA, Sm3 JRNZ,          
+   12|B A MOV, RRC, RRC, RRC, RRC, 3 ANI, A C MOV, noded^ CALL,       
+   13|M A MOV, A ANA, Sm3 JRNZ,                                       
+   14|LDAR, RRC, RRC, RRC, 3 ANI, 1 ADI, ( SET RANDOM MOVE COUNTER )  
+   15|-->                                                             
+
+BLOCK =  10
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( SPIDERS MOVE ROUTINE )                                        
+    1|LABEL Sm0 A DCR, A RMctr Y STX,                                 
+    2|LDAR, 3 ANI, A C MOV, 0 B MVI,                                  
+    3|NOWR Y D LDX, NOWC Y E LDX,                                     
+    4|LABEL Sm1 noder^ CALL, M A MOV, A ANA, Sm2 JRZ,                 
+    5|B A MOV, 5 CPI, Sm3 JRNC,                                       
+    6|NOWD Y A LDX, CMA, 3 ANI, C CMP, Sm3 JRNZ,                      
+    7|LABEL Sm2 C A MOV, A INR, 3 ANI, A C MOV, B INR, Sm1 JMPR,      
+    8|LABEL Sm3 C NOWD Y STX, X POPX, Y POPX, EXX, NEXT ASSEMBLE>     
+    9|-->                                                             
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

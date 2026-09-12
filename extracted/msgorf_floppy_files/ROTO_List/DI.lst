@@ -1,0 +1,70 @@
+
+File Size: 3072.000000 Bytes    3.000000 Blocks  0-2.000000
+
+
+Last Block = 2
+
+
+
+FILE = DI
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( 16 BIT INTEGER DIVIDE ROUTINE: M N UN/ Q R ) DECIMAL          
+    1|FORWARD .ZERO FORWARD i5 FORWARD i6                             
+    2|FORWARD i1 FORWARD i2 FORWARD i3 FORWARD i4                     
+    3|SUBR unsdiv <ASSEMBLE L C MOV, H B MOV, D A MOV, 0 H LXI,       
+    4|E ORA, .ZERO JRZ, B A MOV, 16 B MVI,                            
+    5|LABEL i1 C RALR, RAL, H DADC, D DSBC,                           
+    6|LABEL i2 CMC, i5 JRNC,                                          
+    7|LABEL i3 i1 DJNZ, i6 JMPR,                                      
+    8|LABEL i4 C RALR, RAL, H DADC, A ANA, D DADC,                    
+    9|i3 JRC, i2 JRZ,                                                 
+   10|LABEL i5 i4 DJNZ, D DAD, A ANA, ( MAKE IT POS )                 
+   11|LABEL i6 C RALR, RAL, A D MOV, C E MOV,                         
+   12|LABEL .ZERO RET, ASSEMBLE>                                      
+   13|SUBR UNSDIV H PUSH, D DSBC, CY, IF, 0 D LXI, H POP, ELSE,       
+   14|H POP, unsdiv CALL, THEN, RET, CODE UN/ EXX, D POP, H POP,      
+   15|UNSDIV CALL, H PUSH, D PUSH, EXX, NEXT DECIMAL -->              
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( COMPUTE DELTA FOR 1 COORDINATE - CLEAR VECTOR )               
+    1|( FIRST A NEGATION SUBROUTINE )                                 
+    2|SUBR CMPHL H A MOV, CMA, A H MOV, L A MOV, CMA, A L MOV, H INX, 
+    3|RET,                                                            
+    4|( IN: HL=TARGET, DE=TIME, BC=START )                            
+    5|SUBR CDELTA B PUSH, A ANA, B DSBC, CY~, IF, UNSDIV CALL,        
+    6|ELSE, CMPHL CALL, UNSDIV CALL, CMPHL CALL, XCHG, CMPHL CALL,    
+    7|XCHG, THEN, B POP, B DAD, RET,                                  
+    8|( NEW SQUARE ROOT ROUTINE )                                     
+    9|F= sqrtl                                                        
+   10|SUBR sqrt <ASSEMBLE                                             
+   11|1 A MVI, 1 B LXI, 1 D LXI,                                      
+   12|LABEL sqrtl A ANA, D DSBC, RZ, RC, D DAD, B INX, B INX,         
+   13|XCHG, B DAD, A INR, XCHG, sqrtl JMPR, ASSEMBLE>                 
+   14|DECIMAL -->                                                     
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( ROUTINE TO VECTOR BETWEEN CURRENT POSITION AND DEST           
+    1|IN TIME GIVEN IN VECTOR )                                       
+    2|CODE A->DEST/TIME B PUSH, Y PUSHX,                              
+    3|vaddr LIYD,                                                     
+    4|VXH Y B LDX, VX Y C LDX, VDESTXH Y H LDX, VDESTX Y L LDX,       
+    5|TTIMERH Y D LDX, TTIMER Y E LDX, D PUSH, CDELTA CALL,           
+    6|H VXH Y STX, L VX Y STX, D VDXH Y STX, E VDX Y STX,             
+    7|VYH Y B LDX, VY Y C LDX, VDESTYH Y H LDX, VDESTY Y L LDX,       
+    8|D POP, CDELTA CALL,                                             
+    9|H VYH Y STX, L VY Y STX, D VDYH Y STX, E VDY Y STX,             
+   10|Y POPX, B POP, NEXT                                             
+   11|DECIMAL -->                                                     
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

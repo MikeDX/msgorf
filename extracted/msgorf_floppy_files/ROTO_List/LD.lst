@@ -1,0 +1,184 @@
+
+File Size: 9216.000000 Bytes    9.000000 Blocks  0-8.000000
+
+
+Last Block = 8
+
+
+
+FILE = LD
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( COMPUTE DISTANCES BETWEEN TWO VECTORS )                       
+    1|( THIS GUY USES THE COORDINATES IN THE VECTOR )                 
+    2|HEX                                                             
+    3|SUBR ABSHL H A MOV, A ANA, RP, CMA, A H MOV, L A MOV,           
+    4|CMA, A L MOV, H INX, RET,                                       
+    5|                                                                
+    6|SUBR LRDIST B PUSH, D PUSH, H PUSH,                             
+    7|VXH X D LDX, VX X E LDX, VXH Y H LDX, VX Y L LDX,               
+    8|A ANA, D DSBC, ABSHL CALL, L C MOV, H B MOV,                    
+    9|VYH X D LDX, VY X E LDX, VYH Y H LDX, VY Y L LDX,               
+   10|A ANA, D DSBC, ABSHL CALL, B DAD,                               
+   11|H A MOV, 1F CPI, CY~, IF, 7F A MVI, ELSE,                       
+   12|H DAD, H DAD, H A MOV, THEN, H POP, D POP, B POP, RET,          
+   13|DECIMAL -->                                                     
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( COORDINATE SHOVELERS )                                        
+    1|SUBR PUSHyc H POP, VX Y E LDX, VXH Y D LDX, D PUSH,             
+    2|VY Y E LDX, VYH Y D LDX, D PUSH, PCHL,                          
+    3|SUBR POPyc H POP, D POP, E VY Y STX, D VYH Y STX,               
+    4|D POP, E VX Y STX, D VXH Y STX, PCHL,                           
+    5|                                                                
+    6|SUBR PUSHxc H POP, VX X E LDX, VXH X D LDX, D PUSH,             
+    7|VY X E LDX, VYH X D LDX, D PUSH, PCHL,                          
+    8|SUBR POPxc H POP, D POP, E VY X STX, D VYH X STX,               
+    9|D POP, E VX X STX, D VXH X STX, PCHL,                           
+   10|-->                                                             
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( BEARING CALCULATOR - RETURNS BEARING 0-7 )                    
+    1|DATA BEART 1 B, 3 B, 7 B, 5 B, 0 B, 4 B, 0 B, 4 B, 2 B, 2 B,    
+    2|6 B, 6 B,                                                       
+    3|SUBR BEARING 0 C MVI, XCHG, H A MOV, RAL, C RALR, ABSHL CALL,   
+    4|XCHG, H A MOV, RAL, CMC, C RALR, ABSHL CALL,                    
+    5|( CHECK ABS X > ABS Y*2 )                                       
+    6|H PUSH, H DAD, A ANA, D DSBC, H POP,                            
+    7|CY, IF, 3 C SET, ELSE, ( NOW CHECK Y CASE )                     
+    8|XCHG, H DAD, A ANA, D DSBC, CY, IF, 2 C SET, THEN, THEN,        
+    9|0 B MVI, BEART H LXI, B DAD, M A MOV, RET,                      
+   10|-->                                                             
+   11|CODE BT EXX, H POP, D POP, B POP, A ANA, B DSBC,                
+   12|XCHG, B POP, A ANA, B DSBC, XCHG, BEARING CALL,                 
+   13|EXX, A L MOV, 0 H MVI, H PUSH, NEXT                             
+   14|;S                                                              
+   15|                                                                
+
+BLOCK =   3
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MORE BEARING STUFF )                                          
+    1|( IY= ME, IX= HIM )                                             
+    2|SUBR BEARV VX X L LDX, VXH X H LDX,                             
+    3|VX Y C LDX, VXH Y B LDX, A ANA, B DSBC,                         
+    4|XCHG, VY X L LDX, VYH X H LDX,                                  
+    5|VY Y C LDX, VYH Y B LDX, A ANA, B DSBC,                         
+    6|BEARING JMP,                                                    
+    7|( TABLE TO CONVERT DIRECTION TO BEARING ANGLE )                 
+    8|DATA DIR2B 0 B, 6 B, 2 B, 4 B,                                  
+    9|SUBR Dxy B PUSH, D PUSH, H PUSH, Txy CALL,                      
+   10|H POP, D POP, B POP, RET,                                       
+   11|                                                                
+   12|( UPDATE POSITION OF VECTOR POINTED AT BY X )                   
+   13|SUBR Xxy X PUSHX, XTIY, X POPX, Dxy CALL,                       
+   14|X PUSHX, XTIY, X POPX, RET,                                     
+   15|-->                                                             
+
+BLOCK =   4
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( NEW FINDCLOSE ROUTINE )                                       
+    1|DECIMAL                                                         
+    2|F= SRCL F= FCLD F= uF                                           
+    3|SUBR FINDCLOSE <ASSEMBLE                                        
+    4|0 HOSTAB H LXI, EXX, A E MOV, 127 C MVI, EXX,                   
+    5|LABEL SRCL M E MOV, H INX, M D MOV, H INX, D A MOV, E ORA,      
+    6|FCLD JRZ, D PUSH, X POPX, ASSMSV X A LDX, ASNOT CPI,            
+    7|SRCL JRNZ, OBJSV X A LDX, EXX, E CMP, EXX, SRCL JRNZ,           
+    8|LRDIST CALL, EXX, C CMP, uF JRZ, CY, IF,                        
+    9|LABEL uF A C MOV, X PUSHX, H POP, EXX, B A MOV, EXX, A B MOV,   
+   10|THEN, EXX, SRCL JMPR,                                           
+   11|LABEL FCLD EXX, RET, ASSEMBLE>                                  
+   12|-->                                                             
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   5
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( CHECK FINDCLOSE, AND IF FOUND LIGHT UP FOLLOWER )             
+    1|SUBR LOOKFOLLOWER ( SEARCH LIST ) FINDCLOSE CALL,               
+    2|C A MOV, MAXASSM CPI, ( IS FOLLOWER CLOSE ENUF? )               
+    3|RNC, ( IF TOO FAR AWAY ) DISPF Y B LDX, B DCR, B DCR,           
+    4|B CMP, RC, ( OR TOO CLOSE ) H PUSH, X POPX, ( IX= FOLLOWER )    
+    5|DISTANCE 1+ Y A LDX, 8 ADI, A B MOV, PUSHyc CALL,               
+    6|Dxy CALL, LRDIST CALL, POPyc CALL,                              
+    7|C CMP, RC, X PUSHX, H POP,                                      
+    8|Y PUSHX, D POP, ( DE=LDR )                                      
+    9|( LINK HER IN ) L BEHIND Y STX, H BEHIND 1+ Y STX,              
+   10|E AHEAD X STX, D AHEAD 1+ X STX, ASSIM ASSMSV X MVIX,           
+   11|DELTADIST Y A LDX, A DELTADIST X STX,                           
+   12|DELTADIST 1+ Y A LDX, A DELTADIST 1+ X STX,                     
+   13|-->                                                             
+   14|                                                                
+   15|                                                                
+
+BLOCK =   6
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( CHECK FOR REVERSAL NEED )                                     
+    1|PUSHxc CALL, DISTANCE 1+ X A LDX,                               
+    2|8 ADI, A B MOV, Xxy CALL,                                       
+    3|LRDIST CALL, POPxc CALL, A D MOV,                               
+    4|C A MOV, D CMP, RNC,                                            
+    5|( FIX RESULT OF REVERSAL )                                      
+    6|Y PUSHX, X PUSHX, Y POPX, r:d CALL, H B MOV, Txy CALL,          
+    7|Y POPX, RET,                                                    
+    8|-->                                                             
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   7
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( LOOKASS ROUTINE )                                             
+    1|F= ASSL                                                         
+    2|SUBR LOOKASS <ASSEMBLE HSATP A MVI,                             
+    3|LABEL ASSL                                                      
+    4|PSW PUSH, BEHIND Y A LDX, BEHIND 1+ Y ORAX, 0=, IF,             
+    5|PSW POP, B PUSH, D PUSH, H PUSH, X PUSHX,                       
+    6|LOOKFOLLOWER CALL,                                              
+    7|X POPX, H POP, D POP, B POP, ELSE, PSW POP, THEN, RET,          
+    8|ASSEMBLE>                                                       
+    9|SUBR LKBUN HSATM A MVI, ASSL JMPR,                              
+   10|-->                                                             
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   8
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( CHECK VECTOR FOR INTERCEPT WITH OTHER VECTORS )               
+    1|( ROUTINE TO FIND INTERCEPTORS, IF ANY )                        
+    2|( ENTRY: BC= NEARNESS X AND Y, HL= CHECKLIST ADDR )             
+    3|( IY= SUBJECT VECTOR )                                          
+    4|( RETURNS Z= NOFIND NZ= FIND, IX= FOUND THANG )                 
+    5|DATA MON-LS MONV1 , MONV2 , XC? IFTRUE MONV3 , MONV4 , JAWSV ,  
+    6|IFEND 0 ,                                                       
+    7|SUBR PX-M MON-LS H LXI,                                         
+    8|BEGIN,                                                          
+    9|M E MOV, H INX, M D MOV, H INX, D A MOV, E ORA,                 
+   10|0<>, WHILE, D PUSH, X POPX, TBACT TSTAT X BITX, 0<>, IF,        
+   11|OBJSV X A LDX, MSPRO CPI, 0=, IF,                               
+   12|PRXC CALL, RNZ, THEN, THEN, REPEAT, RET,                        
+   13|-->                                                             
+   14|                                                                
+   15|                                                                
+
+
+
+
+

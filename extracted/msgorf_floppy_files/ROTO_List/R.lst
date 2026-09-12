@@ -1,0 +1,203 @@
+
+File Size: 10240.000000 Bytes    10.000000 Blocks  0-9.000000
+
+
+Last Block = 9
+
+
+
+FILE = R
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( ROUTINE TO LINK TO VGER WRITE ROUTINE )                       
+    1|SUBR XOR-FLIP VOXPAND Y B LDX, VOMAGIC Y C LDX,                 
+    2|VOPATH Y H LDX,                                                 
+    3|  VOPAT Y L LDX, H INX, H INX, ( pat off set) H PUSH, X POPX,   
+    4|  VOSCRADRH Y H LDX, VOSCRADR Y L LDX,                          
+    5|  writep JMP, ( erase it )                                      
+    6|SUBR WRITE-LINK                                                 
+    7|  VBNOWRITE VLOGICSTAT Y BITX, 0=, IF, VWRITE CALL,             
+    8|  ELSE, VBNOWRITE VLOGICSTAT Y RESX, THEN, RET,                 
+    9|( CHECK:NEAR )                                                  
+   10|DATA PCON PLYRV , MONV1 , MONV2 , XC? IFTRUE MONV3 , JAWSV ,    
+   11|MONV4 , IFEND KEY , HOSV1 , ARV , XC? IFTRUE TRSV ,             
+   12|HOSV2 , HOSV3 , IFEND 0 , -->                                   
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( SPECIAL WRITE ROUTINE FOR REVEALS )                           
+    1|DECIMAL                                                         
+    2|F= REML F= RESL F= LISTEND                                      
+    3|SUBR REVEALWRITE <ASSEMBLE 0 H LXI, H PUSH, ( MARK STACK )      
+    4|( Y PUSHX, H POP, CONFTAB D LXI, D DAD, )                       
+    5|PCON H LXI,                                                     
+    6|LABEL REML M E MOV, H INX, M D MOV, H INX, D A MOV, E ORA,      
+    7|LISTEND JRZ,                                                    
+    8|Y PUSHX, B POP, B A MOV, D CMP, 0=, IF, C A MOV, E CMP,         
+    9|REML JRZ, THEN, D PUSH, X POPX,                                 
+   10| VBON-SCR VLOGICSTAT X BITX, REML JRZ,                          
+   11|   VBNOERASE VLOGICSTAT X BITX, REML JRNZ,                      
+   12|  VOPATH X A LDX, VOPAT X ORAX, REML JRZ,                       
+   13|                                                                
+   14|-->                                                             
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MORE OF SPECIAL WRITE ROUTINE FOR REVEALS )                   
+    1|VOSCRADRH X A LDX, VSCRADRH Y SUBX, 10 ADI, 20 CPI, REML JRNC,  
+    2|X PUSHX, H PUSH, Y PUSHX, X PUSHX, Y POPX, XOR-FLIP CALL,       
+    3|Y POPX, H POP, REML JMPR,                                       
+    4|LABEL LISTEND WRITE-LINK CALL,                                  
+    5|LABEL RESL D POP, D A MOV, E ORA, transition JZ,                
+    6|Y PUSHX, D PUSH, Y POPX,                                        
+    7|XOR-FLIP CALL, Y POPX, RESL JMPR,                               
+    8|ASSEMBLE>                                                       
+    9|                                                                
+   10|HEX                                                             
+   11|( 4 C= HDST ) 800 C= REVVEL                                     
+   12|DECIMAL -->                                                     
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   3
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( CHANGE PLAYERS PERSPECTIVE INDEX ROUTINE )                    
+    1|SUBR C-PX H PUSH, B PUSH, 1 ANI, A C MOV, ( C= WHAT TO GO TO )  
+    2|VPERINX PLYRV + H LXI, M A MOV, 1 ANI, C CMP,                   
+    3|0<>, IF, M A MOV, 2 ANI, C ORA, A M MOV,                        
+    4|A XRA, VANIMINX PLYRV + STA,                                    
+    5|A INR, VANIMTIMER PLYRV + STA, D PUSH,                          
+    6|M A MOV, 1 ANI, 0<>, IF, dig-s CALL, ELSE, walk-s CALL, THEN,   
+    7|D POP, THEN, B POP, H POP, RET,                                 
+    8|-->                                                             
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   4
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( REVEALER SLAVE TO PLAYER ROUTINE )                            
+    1|F= ruk F= JCXY F= SAM F= DIX                                    
+    2|SUBR SLV! .ABS <ASSEMBLE PSW PUSH, B PUSH,                      
+    3|DIRFLAG LDA, A ANA, 0<>, IF, A XRA, C-PX CALL, JCXY JMP,        
+    4|THEN, O-M LDA, A ANA, JCXY JZ,                                  
+    5|PLYRV NOWD + LDA, NOWD Y CMPX, DIX JRNZ,                        
+    6|NOWR PLYRV + LDED, NOWR REVV + LHLD, A ANA, D DSBC, SAM JRZ,    
+    7|LABEL DIX PLYRV NOWR + LHLD, REVV NOWR + SHLD,                  
+    8|PLYRV NOWD + LDA, REVV NOWD + STA, NEWPATH CALL,                
+    9|-->                                                             
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   5
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( FETCH R,C,D )                                                 
+    1|LABEL SAM NOWC Y E LDX, NOWR Y D LDX, NOWD Y C LDX,             
+    2|noder^ CALL, M B MOV, B DISTANCE 1+ Y STX,                      
+    3|DISTANCE 1+ PLYRV + LDA, A L MOV, B A MOV,                      
+    4|L SUB, 0>=, IF, 12 CPI, CY~, IF, A XRA, C-PX CALL, THEN,        
+    5|( WE ARE AHEAD OF THE PLAYER - ARE WE NEAR MAX? )               
+    6|noded^ CALL, M A MOV, B SUB, JCXY JZ, 8 CPI, JCXY JNC,          
+    7|THEN,                                                           
+    8|-->                                                             
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   6
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( BUMP MUNCH CTR ) DIGSCR H LXI, M INR, 1 A MVI,                
+    1|C-PX CALL, 1 A MVI, DISTPA CALL,                                
+    2|NOWC Y E LDX, NOWR Y D LDX, NOWD Y C LDX,                       
+    3|TBDEST TCHGSTAT Y BITX, ruk JRNZ,                               
+    4|B PUSH, D PUSH, move:node CALL, C A MOV, CMA, 3 ANI, A C MOV,   
+    5|noder^ CALL, D POP, M B MOV,                                    
+    6|REVV DISTANCE 1+ + LDA, B ADD, B POP, MAXDIST Y CMPX, ruk JRNC, 
+    7|noder^ CALL, REVV DISTANCE 1+ + LDA, A M MOV, JCXY JMPR,        
+    8|LABEL ruk noded^ CALL, M B MOV, noder^ CALL, B M MOV,           
+    9|move:node CALL,                                                 
+   10|C A MOV, CMA, 3 ANI, A C MOV, noder^ CALL, B M MOV, ( BOTH )    
+   11|TBDEST TCHGSTAT Y RESX, A XRA, C-PX CALL,                       
+   12|LABEL JCXY CALCXY CALL, B POP, PSW POP, RET, ASSEMBLE> .REL     
+   13|-->                                                             
+   14|                                                                
+   15|                                                                
+
+BLOCK =   7
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( CHAMBER REVEALER )                                            
+    1|                                                                
+    2|HEX                                                             
+    3|: CH:R DIVG                                                     
+    4|ESTPOS DVECT-ON PUSH:CCR G-D? NOT IF                            
+    5|( PUSH:CCR WALDO )                                              
+    6|gr-p ANIM! 1STWRITE 0C XPAND!-ON OR-ON                          
+    7|1 TIMER!-ON REVEALWRITE ZGO DIVG                                
+    8|XPAND-OFF XOR-ON                                                
+    9|PUSH:CCR S-GD THEN COGO ;                                       
+   10|                                                                
+   11|CODE RVECT-ON Y PUSHX, vaddr LIYD, SLV! H LXI,                  
+   12|L CUSVEC Y STX, H CUSVEC 1+ Y STX,                              
+   13|TB-DVECT TVMROPT2 Y SETX, Y POPX, NEXT                          
+   14|                                                                
+   15|DECIMAL -->                                                     
+
+BLOCK =   8
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( BIZARRE REVEALER FUNCTION )                                   
+    1|HEX : H:R ;TASK: DIVG                                           
+    2|BEGIN PLYRV GRCD                                                
+    3|ESTPOS                                                          
+    4|rv-p ANIM! 0C XPAND!-ON OR-ON 1STWRITE 1 TIMEBMAX!              
+    5|BEGIN REVVEL DELTADIST V!                                       
+    6|( HOTROD THE REVEALER )                                         
+    7|RVECT-ON REVEALWRITE ZGO DIVG 0 END ;                           
+    8|-->                                                             
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   9
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( CHAMBER REVEALER TASK )                                       
+    1|: C:RT ;TASK: DIVG PLYRV GRCD ' CH:R SETCO COGO ;               
+    2|DECIMAL -->                                                     
+    3|                                                                
+    4|                                                                
+    5|                                                                
+    6|                                                                
+    7|                                                                
+    8|                                                                
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

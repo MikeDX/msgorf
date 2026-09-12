@@ -1,0 +1,51 @@
+
+File Size: 2048.000000 Bytes    2.000000 Blocks  0-1.000000
+
+
+Last Block = 1
+
+
+
+FILE = NGM
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MOVE CHECKER AND ADD PATH GOODIES )                           
+    1|HEX                                                             
+    2|SUBR movecheck                                                  
+    3|D A MOV, NROWS CPI, RNC, E A MOV, NCOLS CPI, RET,               
+    4|SUBR S-DF B PUSH,                                               
+    5|NODMSK C MVI, node^ CALL, NMEXS M SET,                          
+    6|B POP, 2 B BIT, 0<>, IF, NMDRW M SET, THEN, RET,                
+    7|SUBR S-RD 2 B BIT, 0=, IF, 1 M MVI, ELSE, 7F M MVI, THEN, RET,  
+    8|DECIMAL -->                                                     
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( ADD PATH ROUTINE ) ( THIS IS A MESS! )                        
+    1|SUBR addpath ( B= DISTANCE TO CRAM IN )                         
+    2|noder^ CALL, M A MOV, A ANA, RNZ, GMNRP SHLD,                   
+    3|D PUSH, move:node CALL, GMNRC SDED,                             
+    4|D POP,                                                          
+    5|GMNRP LHLD, S-RD CALL,                                          
+    6|S-DF CALL,                                                      
+    7|C A MOV, CMA, 3 ANI, A C MOV,                                   
+    8|GMNRC LDED, noder^ CALL, S-RD CALL,                             
+    9|S-DF CALL,                                                      
+   10|RET,                                                            
+   11|-->                                                             
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

@@ -1,0 +1,184 @@
+
+File Size: 9216.000000 Bytes    9.000000 Blocks  0-8.000000
+
+
+Last Block = 8
+
+
+
+FILE = VR
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( HOPPED UP 8 BIT MPY ROUTINE )                                 
+    1|SUBR BABS A ANA, RP, CMA, A INR, RET,                           
+    2|( HL= INITIAL DISP, DE= DELTA, A= DIST )                        
+    3|SUBR HOTMPY RRC, CY, IF, D DAD, THEN, E SLAR, D RALR,           
+    4|RRC, CY, IF, D DAD, THEN, E SLAR, D RALR,                       
+    5|RRC, CY, IF, D DAD, THEN, E SLAR, D RALR,                       
+    6|RRC, CY, IF, D DAD, THEN, E SLAR, D RALR,                       
+    7|RRC, CY, IF, D DAD, THEN, E SLAR, D RALR,                       
+    8|RRC, CY, IF, D DAD, THEN, E SLAR, D RALR,                       
+    9|RRC, CY, IF, D DAD, THEN, E SLAR, D RALR,                       
+   10|RRC, CY, IF, D DAD, THEN, RET,                                  
+   11|SUBR SQUARE BABS CALL, A E MOV, 0 D MVI, 0 H LXI,               
+   12|HOTMPY JMPR,                                                    
+   13|-->                                                             
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( CALCULATE X Y POSITION OF OBJECT FROM DISTANCE, BASE, AND )   
+    1|( DELTAS ) F= Txy                                               
+    2|SUBR CALCXY <ASSEMBLE 0 C MVI,                                  
+    3|NOWR Y A LDX, MEMR Y CMPX, 0<>, IF, C INR, A MEMR Y STX, THEN,  
+    4|NOWC Y A LDX, MEMC Y CMPX, 0<>, IF, C INR, A MEMC Y STX, THEN,  
+    5|NOWD Y A LDX, MEMD Y CMPX, 0<>, IF, C INR, A MEMD Y STX, THEN,  
+    6|DISTANCE 1+ Y A LDX, A B MOV, MEMDIST Y CMPX, 0<>, IF,          
+    7|C INR, A MEMDIST Y STX, THEN,                                   
+    8|C A MOV, A ANA, 0=, IF,                                         
+    9|VX Y E LDX, VX 1+ Y D LDX,                                      
+   10|VY Y L LDX, VY 1+ Y H LDX,                                      
+   11|RET,                                                            
+   12|THEN, VBSUPDATE VLOGICSTAT Y SETX,                              
+   13|-->                                                             
+   14|                                                                
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MORE CUTE CALCULATIONS )                                      
+    1|LABEL Txy B A MOV,                                              
+    2|BASEX Y L LDX, BASEX 1+ Y H LDX, DELTAX Y E LDX,                
+    3|DELTAX 1+ Y D LDX, HOTMPY CALL, L VX Y STX, H VX 1+ Y STX,      
+    4|H PUSH,                                                         
+    5|BASEY Y L LDX, BASEY 1+ Y H LDX, DELTAY Y E LDX,                
+    6|DELTAY 1+ Y D LDX, HOTMPY CALL, L VY Y STX, H VY 1+ Y STX,      
+    7|D POP,                                                          
+    8|RET, ASSEMBLE>                                                  
+    9|-->                                                             
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   3
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|                                                                
+    1|                                                                
+    2|                                                                
+    3|                                                                
+    4|                                                                
+    5|                                                                
+    6|                                                                
+    7|                                                                
+    8|                                                                
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   4
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( ROUTINE TO ESTABLISH NEW BASE POSITIONS AND DELTAS )          
+    1|( FIRST A SIGN ROUTINE )                                        
+    2|SUBR SGNA A ANA, 0 A MVI, RP, A DCR, RET,                       
+    3|SUBR NEWPATH                                                    
+    4|NOWR Y D LDX, NOWC Y E LDX,                                     
+    5|SETBASEPOS CALL, NOWD Y A LDX, MPL0 ADI, A C MOV,               
+    6|node^ CALL, M A MOV, A MAXDIST Y STX, 4 D LXI, D DAD,           
+    7|M A MOV, A DELTAX Y STX, SGNA CALL, A DELTAX 1+ Y STX,          
+    8|D DAD, M A MOV, A DELTAY Y STX, SGNA CALL, A DELTAY 1+ Y STX,   
+    9|RET,                                                            
+   10|( ROUTINE TO CAUSE OBJECT TO ARRIVE AT A NEW POSITION )         
+   11|SUBR ARRIVE                                                     
+   12|NOWR Y D LDX, NOWC Y E LDX, NOWD Y C LDX,                       
+   13|move:node CALL, D NOWR Y STX, E NOWC Y STX,                     
+   14|SETBASEPOS CALL, FREEZEBASE CALL, RET,                          
+   15|-->                                                             
+
+BLOCK =   5
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( DISTANCE PHASE ACCUMULATOR )                                  
+    1|( DISTANCE HAS BOTH DELTA AND ACCELERATION )                    
+    2|( IN A= TIMEBASE TO USE )                                       
+    3|SUBR DISTPA TBDEST TCHGSTAT Y BITX, RNZ,                        
+    4|DISTANCE Y L LDX, DISTANCE 1+ Y H LDX,                          
+    5|DELTADIST Y E LDX, DELTADIST 1+ Y D LDX,                        
+    6|( ACCDIST Y C LDX, ACCDIST 1+ Y B LDX, )                        
+    7|BEGIN, D DAD, ( XCHG, B DAD, XCHG, ) A DCR, 0=, END,            
+    8|( IF BEYOND MAX DISTANCE, SET AT MAX DISTANCE AND FLAG )        
+    9|MAXDIST Y A LDX, A ANA, 0<>, IF, H A MOV, MAXDIST Y CMPX,       
+   10|CY~, IF, TBDEST TCHGSTAT Y SETX, MAXDIST Y H LDX, 0 L MVI,      
+   11|THEN, THEN, E DELTADIST Y STX, D DELTADIST 1+ Y STX,            
+   12|L DISTANCE Y STX, H DISTANCE 1+ Y STX,                          
+   13|RET,                                                            
+   14|-->                                                             
+   15|                                                                
+
+BLOCK =   6
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( DISTANCE VECTORING ROUTINE AND VGER VERBS )                   
+    1|5 C= TB-DVECT ( TVMROPT2 BIT TO ACTIVATE DISTANCE VECTORING )   
+    2|SUBR DISTVECT PSW PUSH, B PUSH,                                 
+    3|B A MOV, DISTPA CALL,                                           
+    4|CALCXY CALL, B POP, PSW POP, RET,                               
+    5|SUBR NEWVECT TB-DVECT TVMROPT2 Y BITX, vect JZ,                 
+    6|H PUSH, CUSVEC Y L LDX, CUSVEC 1+ Y H LDX, XTHL, RET,           
+    7|NEWVECT JAYVECT 1+ U!                                           
+    8|CODE DVECT-OFF Y PUSHX, vaddr LIYD, TB-DVECT TVMROPT2 Y RESX,   
+    9|Y POPX, NEXT                                                    
+   10|CODE CV-ON H POP, Y PUSHX, vaddr LIYD,                          
+   11|L CUSVEC Y STX, H CUSVEC 1+ Y STX,                              
+   12|TB-DVECT TVMROPT2 Y SETX, Y POPX, NEXT                          
+   13|: DVECT-ON DISTVECT CV-ON ;                                     
+   14|-->                                                             
+   15|                                                                
+
+BLOCK =   7
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( CODE FOR TASKS TO INTERFACE TO NEW GOODIES )                  
+    1|CODE ESTPOS B PUSH, Y PUSHX, vaddr LIYD,                        
+    2|NOWC Y E LDX, NOWR Y D LDX,                                     
+    3|SETBASEPOS CALL, FREEZEBASE CALL, Y POPX, B POP, NEXT           
+    4|CODE RNIT B PUSH, Y PUSHX, vaddr LIYD,                          
+    5|NEWPATH CALL, Y POPX, B POP, NEXT                               
+    6|( TRAVEL AWAY FROM NODE )                                       
+    7|CODE DEPART:NODE B PUSH, Y PUSHX, vaddr LIYD,                   
+    8|NEWPATH CALL,                                                   
+    9|Y POPX, B POP, NEXT                                             
+   10|( ARRIVE NODE )                                                 
+   11|CODE ARRIVE:NODE B PUSH, Y PUSHX, vaddr LIYD,                   
+   12|ARRIVE CALL,                                                    
+   13|Y POPX, B POP, NEXT                                             
+   14|DATA CK8 0 B,                                                   
+   15|-->                                                             
+
+BLOCK =   8
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( REVERSE DIRECTION ROUTINE )                                   
+    1|SUBR r:d                                                        
+    2|NOWR Y D LDX, NOWC Y E LDX, NOWD Y C LDX,                       
+    3|move:node CALL, C A MOV, CMA, 3 ANI,                            
+    4|D NOWR Y STX, E NOWC Y STX, A NOWD Y STX,                       
+    5|NEWPATH CALL, MAXDIST Y H LDX, 0 L MVI,                         
+    6|DISTANCE Y E LDX, DISTANCE 1+ Y D LDX,                          
+    7|A ANA, D DSBC, L DISTANCE Y STX, H DISTANCE 1+ Y STX,           
+    8|RET,                                                            
+    9|CODE R:D B PUSH, Y PUSHX, vaddr LIYD,                           
+   10|r:d CALL,                                                       
+   11|Y POPX, B POP, NEXT                                             
+   12|-->                                                             
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

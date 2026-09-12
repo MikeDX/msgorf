@@ -1,0 +1,32 @@
+
+File Size: 1024.000000 Bytes    1.000000 Blocks  0-0.000000
+
+
+Last Block = 0
+
+
+
+FILE = BINLOAD
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( Load the Binary from a Xcompile Game File )                   
+    1|: BINLOAD [ EDIT ]                                              
+    2|  FILE  TERSE  UNPROT                                           
+    3|10 00 DO I BLOCK I 400 * 4000 + 400 BMOVE LOOP ( 0-4000H )      
+    4| (   38 20 DO I BLOCK I 400 * 400 BMOVE LOOP 8000-E000H )       
+    5|    ( 10 00 DO DUP I + BLOCK I 400 * 8000 + 400 BMOVE LOOP )    
+    6|(      24 20 DO DUP I + BLOCK I 400 * 4000 + 400 BMOVE LOOP )   
+    7|  RESET ; DECIMAL                                               
+    8|BINLOAD XC.LOGIC ( !!! YOUR NAME GOES HERE !!! )                
+    9|;S                                                              
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

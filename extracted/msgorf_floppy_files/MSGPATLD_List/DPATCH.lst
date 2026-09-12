@@ -1,0 +1,32 @@
+
+File Size: 1024.000000 Bytes    1.000000 Blocks  0-0.000000
+
+
+Last Block = 0
+
+
+
+FILE = DPATCH
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MERGE CROSS COMPILE DATA INTO LOGIC AND VIDEO OBJECT )        
+    1|HEX 0A000 C= TBUF DECIMAL                                       
+    2|CODE LDIR EXX, B POP, D POP, H POP, LDIR, EXX, NEXT             
+    3|: STUF TBUF SWAP 1024 LDIR UPDATE FLUSH ;                       
+    4|FILE XC.PATTERNS 0 BLOCK TBUF 1024 LDIR                         
+    5|15 <DRIVE 15 DRIVE FILE TFILE 0 BLOCK DUMP H. DRIVE>            
+    6|;S                                                              
+    7|                                                                
+    8|                                                                
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

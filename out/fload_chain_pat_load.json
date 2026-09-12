@@ -1,0 +1,25 @@
+{
+  "start": "PAT-LOAD",
+  "order": [
+    "PAT-LOAD",
+    "NULPAT",
+    "PLY-P",
+    "PLUP",
+    "BANG",
+    "CLONE-P",
+    "GORF-P",
+    "LAZON-P",
+    "KAMI-P",
+    "SMINE-P",
+    "SHLD-P",
+    "MITE-P",
+    "TRION-P",
+    "DEB-P",
+    "HK-P",
+    "GB-P",
+    "GRD-P"
+  ],
+  "missing": [],
+  "binary_or_opaque": [],
+  "disk": "extracted/msgorf_floppy_files/MSGORPAT_Disk"
+}

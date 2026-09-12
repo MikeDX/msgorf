@@ -1,0 +1,51 @@
+
+File Size: 2048.000000 Bytes    2.000000 Blocks  0-1.000000
+
+
+Last Block = 1
+
+
+
+FILE = ANIM-MAP
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( ANIMATION/PATTERN MAP FILE - BELONGS TO KASEY AND JAN )       
+    1|NULPAT NULPATi AT!                                              
+    2|PLY1-P P1i AT!                                                  
+    3|PLY2-P P2i AT!                                                  
+    4|SBASE SBi AT!                                                   
+    5|P1UP P1Ui AT!                                                   
+    6|P2UP P2Ui AT!                                                   
+    7|BANGA BANGAi AT!                                                
+    8|BANGP BANGPi AT!                                                
+    9|CLONETBL CLNi AT!                                               
+   10|-->                                                             
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MORE MAP ASSIGNMENTS )                                        
+    1|GORF-PAT GORFi AT!                                              
+    2|LAZON LAZONi AT!                                                
+    3|SPINV KAMIi AT!                                                 
+    4|SMINE SMINEi AT!                                                
+    5|SHLD-P SHLDi AT!                                                
+    6|MITE-P MITEi AT!                                                
+    7|TRION-P TRIONi AT!                                              
+    8|DEB-P DEBi AT!                                                  
+    9|HK-P HKi AT!                                                    
+   10|GB-P GBi AT!                                                    
+   11|GRD-P GRDi AT!                                                  
+   12|-->                                                             
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

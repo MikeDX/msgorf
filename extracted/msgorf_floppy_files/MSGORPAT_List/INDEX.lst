@@ -1,0 +1,51 @@
+
+File Size: 2048.000000 Bytes    2.000000 Blocks  0-1.000000
+
+
+Last Block = 1
+
+
+
+FILE = INDEX
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( PATTERN INDEX NUMBERS -- THIS FILE COMES FROM JAY )           
+    1|0 SC= NULPATi ( NULL PATTERN )                                  
+    2|NC= P1i ( PLAYER ONE'S SHIP )                                   
+    3|NC= P2i ( PLAYER TWO'S SHIP )                                   
+    4|NC= SBi ( SMALL BASE FOR SHIPS REMAINING DISPLAY )              
+    5|NC= P1Ui ( PLAYER 1 UP INDICATOR -- FLASHES NEAR SCORE )        
+    6|NC= P2Ui ( PLAYER 2 UP INDICATOR -- FLASHES NEAR SCORE )        
+    7|NC= BANGAi ( EXPLOSION ANIMATION FOR GORF DESTROYED )           
+    8|NC= BANGPi ( EXPLOSION ANIMATION FOR PLAYER DESTROYED )         
+    9|NC= CLNi ( CLONE MACHINE ANIMATION )                            
+   10|-->                                                             
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MORE INDEX NUMBERS )                                          
+    1|NC= GORFi ( GORF ANIMATION )                                    
+    2|NC= LAZONi ( LASER SHIP ANIMATION )                             
+    3|NC= KAMIi ( KAMIKAZI ANIMATION )                                
+    4|NC= SMINEi ( SPACE MINE ANIMATION )                             
+    5|NC= SHLDi ( SHIELD DEPLOYER ANIMATION )                         
+    6|NC= MITEi ( SHIELD EATER ANIMATION )                            
+    7|NC= TRIONi ( TRION ANIMATION )                                  
+    8|NC= DEBi ( UFO ANIMATION )                                      
+    9|NC= HKi ( HUNTER-KILLER SATELITE ANIMATION )                    
+   10|NC= GBi ( GROUND BASE PATTERN ANIMATION )                       
+   11|NC= GRDi ( GUARDIAN ANIMATION )                                 
+   12|DROP -->                                                        
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

@@ -1,0 +1,260 @@
+
+File Size: 13312.000000 Bytes    13.000000 Blocks  0-12.000000
+
+
+Last Block = 12
+
+
+
+FILE = PR
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( JOYSTICK ROUTINES )                                           
+    1|HEX DATA JOYTBL                                                 
+    2|-1 B, 0 B, 3 B, -1 B, 1 B, -1 B, -1 B, -1 B,                    
+    3|2 B, -1 B, -1 B, -1 B, -1 B, -1 B, -1 B, -1 B,                  
+    4|SUBR g;j Ijs CALL, CMA, 0F ANI, A E MOV, 0 D MVI,               
+    5|JOYTBL H LXI, D DAD, M A MOV, A ANA, RET,                       
+    6|DECIMAL -->                                                     
+    7|                                                                
+    8|                                                                
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( PLAYER VELOCITY SETTER )                                      
+    1|HEX                                                             
+    2|SUBR PVD PSW PUSH, B PUSH,                                      
+    3|Hctr LDA, 3 ANI, A INR, A B MOV, -20 A MVI, BEGIN,              
+    4|20 ADI, LOOP, A C MOV, 0 B MVI,                                 
+    5|VPERINX PLYRV + LDA, 1 ANI, 0<>, IF, Vps LHLD, ELSE,            
+    6|Vpf LHLD, THEN, A ANA, B DSBC, XCHG, B POP, PSW POP, RET,       
+    7|SUBR btrk? PLYRV BEHIND + LHLD, H A MOV, L ORA, RZ,             
+    8|NOWD D LXI, D DAD, PLYRV NOWD + LDA, CMA, 3 ANI, M CMP, RNZ,    
+    9|HALTNOW JMP,                                                    
+   10|DECIMAL -->                                                     
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( PLAYER VELOCITY SET UP )                                      
+    1|DECIMAL CODE EPLYRV EXX, SOB LDA, A ANA, 0<>, IF,               
+    2|448 H LXI, 320 D LXI,                                           
+    3|ELSE, 0 g#m H LXI, nerd+ CALL, nerd+ CALL, M A MOV, 2 CPI,      
+    4|CY~, IF, 2 A MVI, THEN,                                         
+    5|RLC, RLC, RLC, A C MOV, 0 B MVI, XCHG, 320 H LXI, B DAD,        
+    6|RLC, A C MOV, B DAD, D LDAX, 2 CPI, CY~, IF, 2 A MVI, THEN,     
+    7|RLC, RLC, RLC, A C MOV, 0 B MVI, XCHG, 448 H LXI, B DAD,        
+    8|RLC, A C MOV, B DAD,                                            
+    9|THEN, ( MAFLG LDA, A ANA, 0<>, IF, 64 B LXI, B DAD, XCHG, B DAD,
+   10|XCHG, THEN, ) Vpf SHLD, XCHG, Vps SHLD,                         
+   11|PLYRV DELTADIST + SHLD, 1 A MVI, O-M STA,                       
+   12|EXX, NEXT                                                       
+   13|-->                                                             
+   14|                                                                
+   15|                                                                
+
+BLOCK =   3
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( INTERRUPT LEVEL JOY MONITOR )                                 
+    1|F= FDG F= F90 F= Lsd                                            
+    2|SUBR JOYCHECK <ASSEMBLE O-M LDA, A ANA, RZ,                     
+    3|P-S LDA, A DCR, 2 CPI, RNC, ( MAKE CERTAIN WE MOVING )          
+    4|TBDEST TCHGSTAT Y BITX, RNZ, PLYRV DISTANCE 1+ + LDA,           
+    5|A ANA, RZ,  g;j CALL,                                           
+    6|.ABS 0<, IF,                                                    
+    7|0 H LXI, ( NOT IN COAST ZONE )                                  
+    8|PLYRV DELTADIST + SHLD, COPYDELTS JMP, THEN, .REL               
+    9|( JUMP IF SAME DIRECTION AS LAST TIME )                         
+   10|A C MOV, PLYRV NOWD + LDA, C CMP, FDG JZ,                       
+   11|-->                                                             
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   4
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( REVERSE ENTERED? )                                            
+    1|PLYRV NOWD + LDA, CMA, 3 ANI, C CMP, F90 JRNZ,                  
+    2|DIRFLAG LDA, CMA, DIRFLAG STA,                                  
+    3|r:d CALL, HALTNOW CALL, FDG JMP,                                
+    4|( SHOULD WE CHECK FOR 90 ???? )                                 
+    5|LABEL F90                                                       
+    6|PLYRV DISTANCE 1+ + LDA, JMLZ CPI, FDG JNC,                     
+    7|-->                                                             
+    8|                                                                
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   5
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MORE OF 90 CHECK )                                            
+    1|DIRFLAG LDA, A ANA, FDG JRNZ, ( ONLY OUTBOUND )                 
+    2|NOWR Y D LDX, NOWC Y E LDX,                                     
+    3|KEY OBJSV + LDA, KYOPEN CPI, Lsd JRZ,                           
+    4|MAFLG LDA, A ANA, 0<>, IF,                                      
+    5|LABEL Lsd D A MOV, START-ROW CPI, 0=, IF, E A MOV,              
+    6|START-COL CPI, 0=, IF, C A MOV, A ANA, 0=, IF, PLESC A MVI,     
+    7|P-S STA,                                                        
+    8|1 A MVI, PLYRV MYFLAG + STA, HALTNOW JMP, THEN, THEN,           
+    9|THEN, THEN, noded^ CALL, M A MOV, A ANA, FDG JZ, ( BAD DIR )    
+   10|C NOWD Y STX, ( VALID - ESTABLISH IT )                          
+   11|NEWPATH CALL, ( CHANGE ALL INNER PARAMETERS OF THANG )          
+   12|btrk? CALL, ( CHECK FOR BACKTRACK MODE )                        
+   13|FDG JMP, ( GO HOME, CHANGE ROT )                                
+   14|-->                                                             
+   15|                                                                
+
+BLOCK =   6
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|LABEL FDG DIRFLAG LDA, A ANA, 0<>, IF, PVD CALL,                
+    1|ELSE, ( ONLY WORRY ABOUT REVEALER OUTBOUND )                    
+    2|NOWR Y D LDX, NOWC Y E LDX, NOWD Y C LDX, noder^ CALL,          
+    3|M A MOV, DISTANCE 1+ Y SUBX, 0 D LXI, .ABS 0>=, IF,             
+    4|PVD CALL, THEN, .REL THEN,                                      
+    5|PLYRV DELTADIST + LHLD, PLYRV DELTADIST + SDED,                 
+    6|A ANA, D DSBC, 0<>, IF, XCHG, COPYDELTS CALL, THEN,             
+    7|NOWD Y E LDX, 0 D MVI, 0 ROTN H LXI, D DAD, M A MOV,            
+    8|A VANGLE Y STX, RET, ASSEMBLE>                                  
+    9|-->                                                             
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   7
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( PLAYER INTERRUPT ROUTINE )                                    
+    1|SUBR PL-M JOYCHECK CALL, Pac CALL, PILOTC CALL,                 
+    2|MS-F CALL, ( CHECK MAGIC BUTTON )                               
+    3|SMTMR LHLD, H A MOV, L ORA, RZ,                                 
+    4|H DCX, H A MOV, L ORA, 0=, IF, SMARTS H LXI, M INR,             
+    5|ASSH H LXI, M INR, M A MOV, 9 CPI, CY~, IF, SOB STA, THEN,      
+    6|SMTMRV LHLD, THEN, SMTMR SHLD, RET,                             
+    7|DECIMAL -->                                                     
+    8|                                                                
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   8
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( CHECK FOR PLAYER ESCAPING INTO EXIT CHAMBER )                 
+    1|F= etw                                                          
+    2|SUBR ESCAPE? <ASSEMBLE                                          
+    3|KEY OBJSV + LDA, KYOPEN CPI, etw JRZ,                           
+    4|MAFLG LDA, A ANA, RZ,                                           
+    5|LABEL etw PLYRV NOWC + LDA, START-COL CPI, RNZ,                 
+    6|PLYRV NOWR + LDA, START-ROW CPI, RNZ,                           
+    7|( WE WIN! - SHAZAM! )                                           
+    8|PLESC A MVI, P-S STA,                                           
+    9|RET, ASSEMBLE>                                                  
+   10|HEX ( CHECK FOR REVENGE AGAINST JAWS )                          
+   11|SUBR RJAW? XC? IFTRUE                                           
+   12|JAWSF LDA, 1 CPI, RNZ, JAWSV X LXIX, 0200 B LXI,                
+   13|PRXC CALL, RZ, 2 A MVI, JAWSF STA, IFEND RET, DECIMAL           
+   14|-->                                                             
+   15|                                                                
+
+BLOCK =   9
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( PLAYER TASK JOYSTICK CHECKER )                                
+    1|SUBR g:jc                                                       
+    2|g;j CALL, 0 H LXI, RM,                                          
+    3|A C MOV, PLYRV NOWR + LDA, A D MOV, PLYRV NOWC + LDA, A E MOV,  
+    4|noded^ CALL, M A MOV, A ANA, 0=, IF, C A MOV,                   
+    5|A ANA, 0=, IF, ESCAPE? CALL, 0 H LXI, P-S LDA, PLESC CPI, RZ,   
+    6|THEN,                                                           
+    7|PLYRV NOWD + LDA, A C MOV, noded^ CALL, M A MOV, A ANA,         
+    8|THEN, 0 H LXI, RZ, C A MOV, PLYRV NOWD + STA,                   
+    9|A E MOV, 0 D MVI, 0 ROTN H LXI, D DAD, M A MOV,                 
+   10|PLYRV VANGLE + STA,                                             
+   11|btrk? CALL, 1 H LXI, RET,                                       
+   12|                                                                
+   13|CODE G:JC B PUSH, g:jc CALL, B POP, H PUSH, NEXT                
+   14|-->                                                             
+   15|                                                                
+
+BLOCK =  10
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( CHECK PLAYER INTERCEPT WITH HOSTAGES )                        
+    1|( ROUTINE TO FIND INTERCEPTORS, IF ANY )                        
+    2|( ENTRY: BC= NEARNESS X AND Y, HL= CHECKLIST ADDR )             
+    3|( IY= SUBJECT VECTOR )                                          
+    4|( RETURNS Z= NOFIND NZ= FIND, IX= FOUND THANG )                 
+    5|F= C:UH F= C:UL                                                 
+    6|SUBR C:U:H <ASSEMBLE                                            
+    7|LABEL C:UH                                                      
+    8|M E MOV, H INX, M D MOV, H INX, D A MOV, E ORA,                 
+    9|RZ, D PUSH, X POPX,                                             
+   10|OBJSV X A LDX, HSFREE CPI, C:UL JRZ, HSATM CPI, C:UH JRNZ,      
+   11|MAFLG LDA, A ANA, C:UH JRZ,                                     
+   12|LABEL C:UL PRXC CALL, RNZ, C:UH JMPR,                           
+   13|ASSEMBLE>                                                       
+   14|-->                                                             
+   15|                                                                
+
+BLOCK =  11
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( CHECK PLAYER INTERCEPT WITH OTHER VECTORS )                   
+    1|HEX                                                             
+    2|SUBR P:I:C FREEZE? CALL, EXX, 0=, IF,                           
+    3|P-S LDA, A DCR, 2 CPI, CY, IF,                                  
+    4|0200 B LXI, PX-M CALL, 0<>, IF,                                 
+    5|LRDIST CALL, 8 CPI, CY, IF,                                     
+    6|1 A MVI, MYFLAG PLYRV + STA, FREEZE CALL,                       
+    7|PLDOA A MVI, P-S STA, EXX, RET, THEN, THEN, THEN, THEN,         
+    8|0 HOSTAB H LXI, 0202 B LXI, C:U:H CALL,                         
+    9|0<>, IF, 1 MYFLAG X MVIX, HSATP OBJSV X MVIX,                   
+   10|X PUSHX, Y PUSHX, H POP, D POP, FUZH CALL,                      
+   11|Hctr H LXI, M INR, HALTNOW CALL, THEN,                          
+   12|MAFLG LDA, A ANA, RJAW? CNZ, TR:CHK CALL, EXX, RET,             
+   13|DECIMAL -->                                                     
+   14|                                                                
+   15|                                                                
+
+BLOCK =  12
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( SETVEL, ETC )                                                 
+    1|HEX CODE SETVEL H POP, PLYRV DELTADIST + SHLD, NEXT             
+    2|( CODE BTRK? btrk? CALL, NEXT )                                 
+    3|CODE HALTER HALTNOW CALL, NEXT                                  
+    4|CODE PERZAP Y PUSHX, vaddr LIYD, PLYRV VPERINX + LDA,           
+    5|2 ANI, CH-PX CALL, Y POPX, NEXT                                 
+    6|CODE WALKER B PUSH, Y PUSHX, vaddr LIYD,                        
+    7|NOWR Y D LDX, NOWC Y E LDX, NOWD Y C LDX, noder^ CALL,          
+    8|M A MOV, 6 CPI, CY~, IF, walk-s CALL, THEN,                     
+    9|Y POPX, B POP, NEXT                                             
+   10|DECIMAL -->                                                     
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

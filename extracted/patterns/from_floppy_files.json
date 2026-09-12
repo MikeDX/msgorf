@@ -1,0 +1,177 @@
+[
+  {
+    "file": "BANG",
+    "pattern": "FBEXP4",
+    "w": 20,
+    "h": 23,
+    "png": "extracted/patterns/BANG__FBEXP4.png"
+  },
+  {
+    "file": "BANG",
+    "pattern": "FBEXP5",
+    "w": 20,
+    "h": 46,
+    "png": "extracted/patterns/BANG__FBEXP5.png"
+  },
+  {
+    "file": "BANG",
+    "pattern": "FBEXP6",
+    "w": 20,
+    "h": 23,
+    "png": "extracted/patterns/BANG__FBEXP6.png"
+  },
+  {
+    "file": "CLONE-P",
+    "pattern": "CLN0",
+    "w": 36,
+    "h": 57,
+    "png": "extracted/patterns/CLONE-P__CLN0.png"
+  },
+  {
+    "file": "CLONE-P",
+    "pattern": "CLN32",
+    "w": 36,
+    "h": 47,
+    "png": "extracted/patterns/CLONE-P__CLN32.png"
+  },
+  {
+    "file": "CLONE-P",
+    "pattern": "CLN64",
+    "w": 32,
+    "h": 32,
+    "png": "extracted/patterns/CLONE-P__CLN64.png"
+  },
+  {
+    "file": "DEB-P",
+    "pattern": "DEB-P",
+    "w": 16,
+    "h": 7,
+    "png": "extracted/patterns/DEB-P__DEB-P.png"
+  },
+  {
+    "file": "GB-P",
+    "pattern": "GB-P",
+    "w": 12,
+    "h": 10,
+    "png": "extracted/patterns/GB-P__GB-P.png"
+  },
+  {
+    "file": "GORF-P",
+    "pattern": "GORF-PAT",
+    "w": 12,
+    "h": 13,
+    "png": "extracted/patterns/GORF-P__GORF-PAT.png"
+  },
+  {
+    "file": "GRD-P",
+    "pattern": "GRD-P",
+    "w": 12,
+    "h": 10,
+    "png": "extracted/patterns/GRD-P__GRD-P.png"
+  },
+  {
+    "file": "HK-P",
+    "pattern": "HK-P",
+    "w": 12,
+    "h": 10,
+    "png": "extracted/patterns/HK-P__HK-P.png"
+  },
+  {
+    "file": "KAMI-P",
+    "pattern": "COMC5B",
+    "w": 16,
+    "h": 36,
+    "png": "extracted/patterns/KAMI-P__COMC5B.png"
+  },
+  {
+    "file": "KAMI-P",
+    "pattern": "COMC5A",
+    "w": 16,
+    "h": 27,
+    "png": "extracted/patterns/KAMI-P__COMC5A.png"
+  },
+  {
+    "file": "KAMI-P",
+    "pattern": "COMC5",
+    "w": 16,
+    "h": 18,
+    "png": "extracted/patterns/KAMI-P__COMC5.png"
+  },
+  {
+    "file": "KAMI-P",
+    "pattern": "COMC6",
+    "w": 16,
+    "h": 9,
+    "png": "extracted/patterns/KAMI-P__COMC6.png"
+  },
+  {
+    "file": "LAZON-P",
+    "pattern": "LAZON",
+    "w": 16,
+    "h": 13,
+    "png": "extracted/patterns/LAZON-P__LAZON.png"
+  },
+  {
+    "file": "MITE-P",
+    "pattern": "MITE-P",
+    "w": 12,
+    "h": 11,
+    "png": "extracted/patterns/MITE-P__MITE-P.png"
+  },
+  {
+    "file": "PLY-P",
+    "pattern": "PLY1-P",
+    "w": 16,
+    "h": 30,
+    "png": "extracted/patterns/PLY-P__PLY1-P.png"
+  },
+  {
+    "file": "PLY-P",
+    "pattern": "PLY2-P",
+    "w": 16,
+    "h": 23,
+    "png": "extracted/patterns/PLY-P__PLY2-P.png"
+  },
+  {
+    "file": "PLY-P",
+    "pattern": "INDICATING",
+    "w": 8,
+    "h": 8,
+    "png": "extracted/patterns/PLY-P__INDICATING.png"
+  },
+  {
+    "file": "PLY-P",
+    "pattern": "SBASE",
+    "w": 8,
+    "h": 8,
+    "png": "extracted/patterns/PLY-P__SBASE.png"
+  },
+  {
+    "file": "SHLD-P",
+    "pattern": "SHLD-P",
+    "w": 16,
+    "h": 16,
+    "png": "extracted/patterns/SHLD-P__SHLD-P.png"
+  },
+  {
+    "file": "SMINE-P",
+    "pattern": "SMINE0",
+    "w": 16,
+    "h": 26,
+    "png": "extracted/patterns/SMINE-P__SMINE0.png"
+  },
+  {
+    "file": "SMINE-P",
+    "pattern": "SMINE1",
+    "w": 4,
+    "h": 13,
+    "png": "extracted/patterns/SMINE-P__SMINE1.png"
+  },
+  {
+    "file": "TRION-P",
+    "pattern": "TRION-P",
+    "w": 16,
+    "h": 8,
+    "png": "extracted/patterns/TRION-P__TRION-P.png"
+  }
+]

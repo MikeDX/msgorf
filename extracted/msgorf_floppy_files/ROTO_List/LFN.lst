@@ -1,0 +1,70 @@
+
+File Size: 3072.000000 Bytes    3.000000 Blocks  0-2.000000
+
+
+Last Block = 2
+
+
+
+FILE = LFN
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( LOOK FOR NEARBY THANGS )                                      
+    1|( HL= R,C IX= SUBJ RET Z IF NEAR, NZ IF NOT )                   
+    2|SUBR NEARBY? NOWR X D LDX, NOWC X E LDX,                        
+    3|D A MOV, H CMP, 0=, IF, E A MOV, L CMP, RZ, THEN,               
+    4|DISTANCE 1+ X A LDX, A ANA, 0=, IF, A INR, RET, THEN,           
+    5|NOWD X C LDX, H PUSH, move:node CALL, H POP,                    
+    6|D A MOV, H CMP, RNZ, E A MOV, L CMP, RET,                       
+    7|( NEARBY LIST -- HL'= TARG HL= LIST RET Z= NONE NZ= FOUND )     
+    8|SUBR NEARBYLIST M E MOV, H INX, M D MOV, H INX,                 
+    9|D A MOV, E ORA, RZ,                                             
+   10|H PUSH, Y PUSHX, H POP, A ANA, D DSBC, H POP, NEARBYLIST JRZ,   
+   11|D PUSH, X POPX, EXX,                                            
+   12|NEARBY? CALL, EXX,                                              
+   13|NEARBYLIST JRNZ,                                                
+   14|1 A MVI, A ANA, RET,                                            
+   15|-->                                                             
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( CODE ROUTINE TO DO NEARBY CHECK )                             
+    1|( C R LIST MTC? --- T )                                         
+    2|CODE MTC? H POP, ( HL= LIST )                                   
+    3|EXX, D POP, H POP, E H MOV, EXX, ( R,C )                        
+    4|X PUSHX, NEARBYLIST CALL, 0 H LXI, 0=, IF, H INX, THEN,         
+    5|X POPX, H PUSH, NEXT                                            
+    6|DATA PCONFT MONV1 , MONV2 , HOSV1 ,                             
+    7|KEY , XC? IFTRUE JAWSV , HOSV2 , HOSV3 , TRSV ,                 
+    8|MONV3 , MONV4 ,                                                 
+    9|IFEND 0 ,                                                       
+   10|: NHY 2DUP PCONFT MTC? IF 1 ELSE 2DROP 0 THEN ;                 
+   11|: EXIST? 2DUP NODMSK NODEB@ NMEXM AND IF 1 ELSE 2DROP 0 THEN ;  
+   12|-->                                                             
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( THE GODDAMN SYSTEM PISSED ON VERSION ONE )                    
+    1|CODE MYTAR EXX, Y PUSHX, X PUSHX, vaddr LIYD,                   
+    2|0 C MVI, MON-LS H LXI,                                          
+    3|BEGIN, M E MOV, H INX, M D MOV, H INX, D A MOV, E ORA,          
+    4|0<>, WHILE, D PUSH, X POPX,                                     
+    5|OBJSV X A LDX, MSSNA CPI,                                       
+    6|0=, IF, INTC X A LDX, INTC Y CMPX,                              
+    7|0=, IF, INTR X A LDX, INTR Y CMPX,                              
+    8|0=, IF, C INR, THEN, THEN, THEN, REPEAT,                        
+    9|0 B MVI, X POPX, Y POPX, B PUSH, EXX, NEXT                      
+   10|: HIDEOUT BEGIN BEGIN BEGIN                                     
+   11|9 RND 1+ 4 RND 1+ EXIST? END                                    
+   12|NHY END INTR VB! INTC VB! Rip MYTAR 0= END ;                    
+   13|: HIDE? PUSH:CCR OR 0= IF HIDEOUT THEN ;                        
+   14|;S                                                              
+   15|                                                                
+
+
+
+
+

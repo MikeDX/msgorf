@@ -1,0 +1,32 @@
+
+File Size: 1024.000000 Bytes    1.000000 Blocks  0-0.000000
+
+
+Last Block = 0
+
+
+
+FILE = MEMV
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( PATTERN MEMORY GOODIES )                                      
+    1|HEX                                                             
+    2|( { : <ANIMATION } HERE AT-HERE ! PT-HERE @ DP ! { ; } )        
+    3|( { : ANIMATION> } HERE PT-HERE ! AT-HERE @ DP ! { ; } )        
+    4|{ : AT! } 2* ATBL + U! { ; }                                    
+    5|DECIMAL                                                         
+    6|-->                                                             
+    7|                                                                
+    8|                                                                
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

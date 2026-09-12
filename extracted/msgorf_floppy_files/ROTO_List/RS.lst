@@ -1,0 +1,165 @@
+
+File Size: 8192.000000 Bytes    8.000000 Blocks  0-7.000000
+
+
+Last Block = 7
+
+
+
+FILE = RS
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|                                                                
+    1|                                                                
+    2|                                                                
+    3|                                                                
+    4|                                                                
+    5|                                                                
+    6|                                                                
+    7|                                                                
+    8|                                                                
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( ROUTE SEARCH ROUTINE ROUTINES )                               
+    1|SUBR FORKETH PCHL,                                              
+    2|SUBR VIS? H PUSH, B PUSH, Y PUSHX, H POP, VISMAT B LXI, B DAD,  
+    3|E C MOV, 0 B MVI, B DAD, D A MOV, BIT^ CALL, M ANA, B POP,      
+    4|H POP, RET,                                                     
+    5|SUBR SETVIS H PUSH, B PUSH, Y PUSHX, H POP, VISMAT B LXI,       
+    6|B DAD, E C MOV, 0 B MVI, B DAD, D A MOV, BIT^ CALL, M ORA,      
+    7|A M MOV, B POP, H POP, RET,                                     
+    8|SUBR ZAPVIS B PUSH, H PUSH, VISMAT B LXI, Y PUSHX, H POP,       
+    9|B DAD, NCOLS DO, 0 M MVI, H INX, LOOP, H POP, B POP, RET,       
+   10|SUBR Mnd TARCHK CALL, SETVIS CALL,                              
+   11|MYBOSS Y A LDX, A TPL X STX, MYBOSS 1+ Y A LDX, A TPL 1+ X STX, 
+   12|D A MOV, RLC, RLC, RLC, RLC, E ORA, A TRC X STX, C TD X STX,    
+   13|TREECK Y L LDX, TREECK 1+ Y H LDX, FORKETH CALL, ( END CHECK? ) 
+   14|TEL D LXI, D DADX, RET, -->                                     
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( GENERATE TREE ENTRYS FOR ONE ENTRY )                          
+    1|SUBR GENTE MPL0 C MVI, node^ CALL, H PUSH, 4 B MVI,             
+    2|LDAR, 3 ANI, A C MOV,                                           
+    3|BEGIN, H POP, H PUSH, B A MOV, 0 B MVI, B DAD, A B MOV,         
+    4|M A MOV, A ANA, 0<>, IF, D PUSH, move:node CALL,                
+    5|VIS? CALL, Mnd CZ, ( GENERATE NODE )                            
+    6|D POP, THEN, C A MOV, A INR, 3 ANI, A C MOV, LOOP, H POP,       
+    7|RET,                                                            
+    8|-->                                                             
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   3
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( ADVANCE TREE ONE DEPTH DOWN )                                 
+    1|SUBR ADVT                                                       
+    2|MYBOSS Y L LDX, MYBOSS 1+ Y H LDX,                              
+    3|H INX, H INX, M E MOV,                                          
+    4|E A MOV, RRC, RRC, RRC, RRC, 15 ANI, A D MOV, E A MOV, 15 ANI,  
+    5|A E MOV,                                                        
+    6|GENTE CALL, MYBOSS Y L LDX, MYBOSS 1+ Y H LDX,                  
+    7|TEL D LXI, D DAD, M E MOV, H INX, M D MOV,                      
+    8|D INX, D A MOV, E ORA, 0=, IF, H INX, ELSE, H DCX, THEN,        
+    9|L MYBOSS Y STX, H MYBOSS 1+ Y STX, ADVT JRNZ,                   
+   10|-1 X 0 MVIX, X INXX, -1 X 0 MVIX, X INXX, RET,                  
+   11|-->                                                             
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   4
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( FIND PATH ROUTINE )                                           
+    1|( BC=TARGET R,C DE= NOWR,NOWC HL= ENDCHK IY= TREE RAM )         
+    2|CODE FPSS H POP, X PUSHX, Y PUSHX, B PUSH,                      
+    3|vaddr LIYD, ZAPVIS CALL,                                        
+    4|A XRA, A FNDPTR Y STX, A FNDPTR 1+ Y STX,                       
+    5|A MYBOSS Y STX, A MYBOSS 1+ Y STX,                              
+    6|NOWR Y D LDX, NOWC Y E LDX,                                     
+    7|L TREECK Y STX, H TREECK 1+ Y STX,                              
+    8|Y PUSHX, X POPX, TREES B LXI, B DADX,                           
+    9|X PUSHX, DISTANCE Y A LDX, DISTANCE 1+ Y ORAX, 0=, IF,          
+   10|0 PMOD Y MVIX, GENTE CALL, ELSE,                                
+   11|-->                                                             
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   5
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( IN MIDDLE OF PATH - MAKE ENTRYS FOR TWO OPTIONS )             
+    1|1 PMOD Y MVIX,                                                  
+    2|NOWD Y A LDX, CMA, 3 ANI, ( REVERSE TO SOURCE ) A C MOV,        
+    3|D PUSH, Mnd CALL, D POP,                                        
+    4|NOWD Y C LDX, move:node CALL, Mnd CALL,                         
+    5|THEN, H POP, L MYBOSS Y STX, H MYBOSS 1+ Y STX,                 
+    6|-1 X 0 MVIX, X INXX, -1 X 0 MVIX, X INXX,                       
+    7|X PUSHX, D POP, E FRONTIER Y STX, D FRONTIER 1+ Y STX,          
+    8|B POP, Y POPX, X POPX, NEXT                                     
+    9|F= TREELP F= SCANBK F= SCAN1                                    
+   10|SUBR BANGTREE <ASSEMBLE                                         
+   11|FRONTIER Y E LDX, FRONTIER 1+ Y D LDX, D PUSH, X POPX,          
+   12|FNDPTR Y L LDX, FNDPTR 1+ Y H LDX,                              
+   13|L A MOV, H ORA, SCAN1 JRNZ, ADVT CALL,                          
+   14|X PUSHX, D POP, E FRONTIER Y STX, D FRONTIER 1+ Y STX,          
+   15|A XRA, RET, -->                                                 
+
+BLOCK =   6
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MORE )                                                        
+    1|LABEL SCAN1 0 B LXI,                                            
+    2|LABEL SCANBK M E MOV, C M MOV, H INX,                           
+    3|M D MOV, B M MOV, H DCX, H B MOV, L C MOV,                      
+    4|E A MOV, D ORA,                                                 
+    5|0<>, IF, XCHG, SCANBK JMPR, THEN, 1 A MVI, A ANA, RET,          
+    6|ASSEMBLE>                                                       
+    7|                                                                
+    8|CODE LAH Y PUSHX, X PUSHX, B PUSH,                              
+    9|vaddr LIYD, BANGTREE CALL,                                      
+   10|B POP, X POPX, Y POPX,                                          
+   11|0=, IF,                                                         
+   12|0 H LXI, ELSE, H PUSH, 1 H LXI, THEN, H PUSH,                   
+   13|NEXT                                                            
+   14|                                                                
+   15|-->                                                             
+
+BLOCK =   7
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( ROUTINE TO FIND BEST PATH TOWARDS TARGET )                    
+    1|( CHECK ROUTINE - ARE WE HOME YET? )                            
+    2|SUBR BE? INTR Y A LDX, D CMP, RNZ,                              
+    3|INTC Y A LDX, E CMP, RNZ, X PUSHX, H POP,                       
+    4|L FNDPTR Y STX, H FNDPTR 1+ Y STX, RET,                         
+    5|                                                                
+    6|CODE FOLLOWTRACK Y PUSHX, vaddr LIYD,                           
+    7|TRACKPTR Y L LDX, TRACKPTR 1+ Y H LDX,                          
+    8|M E MOV, H INX, M D MOV, H INX, H INX,                          
+    9|E TRACKPTR Y STX, D TRACKPTR 1+ Y STX, M L MOV, 0 H MVI,        
+   10|Y POPX, H PUSH, NEXT ASSEMBLE> -->                              
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

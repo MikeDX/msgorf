@@ -1,0 +1,146 @@
+
+File Size: 7168.000000 Bytes    7.000000 Blocks  0-6.000000
+
+
+Last Block = 6
+
+
+
+FILE = VA
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( VARIABLES ) DECIMAL                                           
+    1|V= Vpf ( PLAYER FAST VELOCITY ) V= Vps ( PLAYER SLOW VELOCITY ) 
+    2|BV= DIRFLAG ( PLAYER DIRECTION FLAG )                           
+    3|BV= O-M ( OBJECT-MOVING - PLAYER MOVING DOWN CHAMBER )          
+    4|BV= SPEEDE ( NON ACCELERATING SPEED VALUE )                     
+    5|BV= SMARTS V= SMTMR ( MONSTER SMARTNESS FACTOR AND TIMER )      
+    6|BV= P-S ( PLAYER STATE VARIABLE )                               
+    7|CODE P.S P-S H LXI, H PUSH, NEXT                                
+    8|0 SC= PLEM NC= PLIC NC= PLMV NC= PLDOA NC= PLESC DROP           
+    9|V= SMTMRV ( SMARTS TIMER RESETER )                              
+   10|V= T-P ( TOTAL-PATHS )                                          
+   11|BV= MACT ( MAGIC COLOR COUNTER ) BV= BKC ( BACKGROUND COLOR )   
+   12|-->                                                             
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( CLEARED EACH NEW GAME STUFF )                                 
+    1|RAMMARK                                                         
+    2|2 BA= f#a : F#A NERDUP f#a ;                                    
+    3|( RANDOM #'S ALREADY USED )                                     
+    4|XC? IFTRUE                                                      
+    5|20 BA= ?m : ?M NERDUP IF 10 ?m ELSE 0 ?m THEN ;                 
+    6|IFEND                                                           
+    7|RAMLEN C= ngL VARHERE C= ngS                                    
+    8|-->                                                             
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( CLEARED EACH GAME FRAME STUFF ) RAMMARK                       
+    1|BV= DIGSCR                                                      
+    2|BV= EOF ( END OF FRAME FLAG )                                   
+    3|BV= Hctr                                                        
+    4|BV= ARS ( ARROW STATUS )                                        
+    5|( BV= ARON ARROWS ENABLED FLAG )                                
+    6|BV= F-F ( FREEZE FLAG )                                         
+    7|BV= DORS ( DOOR STATE )                                         
+    8|BV= MAFLG ( MAGIC IN USE FLAG )                                 
+    9|BV= MASCL ( MAGIC INTERRUPT PRESCALER )                         
+   10|BV= JAWSF ( JAWS ON SCREEN FLAG )                               
+   11|BV= Chw ( HOSTAGE WAIT COUNTER )                                
+   12|BV= DSM4 ( DOOR SEMIFORE )                                      
+   13|BV= ASSH ( MEANNESS COUNTER )                                   
+   14|BV= SOB ( FLAG SET WHEN GAME GETS MEAN )                        
+   15|RAMLEN C= CGFL VARHERE C= CGFS -->                              
+
+BLOCK =   3
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MORE VARIABLES )                                              
+    1|SCON IFTRUE                                                     
+    2|9 BA= AP1S 9 BA= AP2S IFEND                                     
+    3|0 SC= KYSHOW NC= KYOPEN DROP                                    
+    4|V= FOUNDIT BV= THATSALL                                         
+    5|BV= GO-C ( GAME OVER FLASH COUNTER )                            
+    6|( VARIABLES FOR MATRIX GENERATOR )                              
+    7|V= GMNRP V= GMRC V= GMD V= GMNRC                                
+    8|V= RCX V= RCY V= NRCX V= NRCY                                   
+    9|V= RPX V= RPDX V= RPY V= RPDY BV= RPD BV= RPMD                  
+   10|BV= RPDIR ( DIRECTION CHOSEN )                                  
+   11|V= RPCOL ( REPAINT COLOR ) V= WALCO ( WALL COLOR )              
+   12|DECIMAL -->                                                     
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   4
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MESH MATRIX GOODIES )                                         
+    1|0 SC= NODX NC= NODXH                                            
+    2|NC= NODY NC= NODYH NC= NBX 1+ NC= NBY 1+                        
+    3|NC= MPL0 3 +                                                    
+    4|NC= NDX0 3 +                                                    
+    5|NC= NDY0 3 +                                                    
+    6|NC= RVMD 3 +                                                    
+    7|NC= NODMSK                                                      
+    8|0 C= NMDRW ( NODE DRAWN ) 7 C= NMEXS ( NODE EXISTS )            
+    9|1 C= NMDRM ( DRAWN MASK )                                       
+   10|HEX 80 DECIMAL C= NMEXM ( EXISTS MASK )                         
+   11|                                                                
+   12|-->                                                             
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   5
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|NC= >TREASURE 1+                                                
+    1|1+ C= NODSIZ                                                    
+    2|NODSIZ NNODES * C= NM-S                                         
+    3|NM-S BA= NODEMAT                                                
+    4|( ARROW ARRAY )                                                 
+    5|( 4 24 * 4 + C= ARWL ARWL BA= ARWP )                            
+    6|( V= Ths )   BV= h-f   ( BV= MAKCON )                           
+    7|-->                                                             
+    8|                                                                
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   6
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MEMORIZOR OF STUFF )                                          
+    1|XC? IFTRUE 9 C= NMZS                                            
+    2|NMZS NNODES * C= NMS NMS BA= NMZ IFEND                          
+    3|6 C= vNS 5 C= v# vNS v# * C= vAL                                
+    4|vAL BA= VM1 XC? IFTRUE vAL BA= VM2                              
+    5|: XVSA NERDUP IF VM2 ELSE VM1 THEN ;                            
+    6|OTHERWISE : XVSA VM1 ; IFEND                                    
+    7|2 BA= frh : FREDH NERDUP frh ; ( FREED HOS CTR )                
+    8|2 A= mzp ( ACTIVE MAZE PTR )                                    
+    9|: MZP NERDUP mzp ;                                              
+   10|." RAM END **** "                                               
+   11|VPTR @ H. -->                                                   
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

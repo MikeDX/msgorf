@@ -1,0 +1,89 @@
+
+File Size: 4096.000000 Bytes    4.000000 Blocks  0-3.000000
+
+
+Last Block = 3
+
+
+
+FILE = MA
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( CHANGE VECTORS PERSPECTIVE INDEX ROUTINE )                    
+    1|SUBR CH-PX                                                      
+    2|VPERINX Y CMPX,                                                 
+    3|0<>, IF, A VPERINX Y STX,                                       
+    4|0 VANIMINX Y MVIX,                                              
+    5|1 VANIMTIMER Y MVIX, THEN, RET,                                 
+    6|SUBR CH-HX OBJSV Y A LDX, HSATP CPI, RNZ, L A MOV, CH-PX JMPR,  
+    7|CODE GHOST H POP, Y PUSHX, P-S LDA, A DCR, 2 CPI, CY, IF,       
+    8|L A MOV, RLC, A H MOV,                                          
+    9|PLYRV Y LXIX, VPERINX Y A LDX, 1 ANI, H ORA, CH-PX CALL,        
+   10|HOSV1 Y LXIX, CH-HX CALL,                                       
+   11|XC? IFTRUE HOSV2 Y LXIX, CH-HX CALL,                            
+   12|HOSV3 Y LXIX, CH-HX CALL, IFEND THEN, Y POPX, NEXT              
+   13|-->                                                             
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|DECIMAL                                                         
+    1|: MPT1 -118 SWAP 12 * - 82 ;                                    
+    2|: MPT2 118 SWAP 12 * + 82 ;                                     
+    3|: MAGw 96 MAGM WRITEP ;                                         
+    4|: M-POS NERDUP IF MPT2 ELSE MPT1 THEN ;                         
+    5|: P1FL -96 95 32 P1UP WRITEP ;                                  
+    6|: P2FL 96 95 32 P2UP WRITEP ;                                   
+    7|: FLSHR NERDUP IF P2FL ELSE P1FL THEN ;                         
+    8|HEX                                                             
+    9|SUBR Ijs INVERT LDA, A ANA, 0=, IF, 12 IN,                      
+   10|ELSE, 11 IN, THEN, RET, DECIMAL                                 
+   11|CODE IJS Ijs CALL, A L MOV, 0 H MVI, H PUSH, NEXT DECIMAL       
+   12|XC? IFTRUE                                                      
+   13|: FLSHT ;TASK: BEGIN DIVG FLSHR 30 TIMER!-ON WAIT 0 END ;       
+   14|IFEND                                                           
+   15|-->                                                             
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( INTERRUPT MAGIC MONITOR AND COLOR CHANGER )                   
+    1|HEX SUBR MS-F MAFLG LDA, A ANA, 0=, IF,                         
+    2|Ijs CALL, 5 A BIT, RNZ, ( CHECK BUTT DOWN )                     
+    3|FREEZE? CALL, RNZ, 0 ma# H LXI,                                 
+    4|nerd+ CALL, M A MOV, A ANA, RZ, P-S LDA, A DCR, 2 CPI, RNC,     
+    5|FREEZE CALL, 1 A MVI, SFXV MYFLAG + STA, MAFLG STA, RET,        
+    6|THEN, ( MAFLG SET ! )                                           
+    7|MASCL LDA, A INR, 2 CPI, CY, IF, MASCL STA, RET, THEN,          
+    8|A XRA, MASCL STA, ( RESET PRESCALER )                           
+    9|MACT LDA, 0FA CPI, RZ, 0F8 ANI, 2 ORI, 8 ADI, MACT STA,         
+   10|1F ANI, 2 CPI, MACT LDA, 0=, IF, 3 ADI, THEN, BKC STA, RET,     
+   11|DECIMAL -->                                                     
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   3
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MAGIC STUFF ) HEX XC? IFTRUE                                  
+    1|: jCK JAWSF B@ 2 = IF JAWSV J-RV JAWSF BZERO THEN ;             
+    2|OTHERWISE : jCK ; IFEND                                         
+    3|: MA-T ;TASK: 5 TIMEBSCALE! 0FA MACT B!                         
+    4|BEGIN BEGIN 6 TIMER!-ON POA WAIT DIVG                           
+    5|DIGSCR B@ 2/ DUP IF DIGSCR BZERO INCSCORE ELSE DROP THEN        
+    6|FLSHR FLAG? END                                                 
+    7|480 Vpf ! 320 Vps ! ( SOUP UP PLAYER SPEED )                    
+    8|BEGIN MAGIC-S DIVG MA# 1-WPB! MA# B@ DUP 4 < IF                 
+    9|M-POS MAGw ELSE DROP THEN 2 MACT B!                             
+   10|BEGIN MACT B@ 0FA <> P.S B@ PLESC <> AND WHILE 1 GHOST          
+   11|2 TIMER!-ON WAIT DIVG jCK                                       
+   12|REPEAT 0FA DUP BKC B! MACT B!                                   
+   13|IJS 20 AND 0<> MA# B@ 0= OR P.S B@ PLESC = OR END               
+   14|SHUTUP UNFREEZE MAFLG BZERO 0 GHOST 0 END ; DECIMAL -->         
+   15|DECIMAL -->                                                     
+
+
+
+
+

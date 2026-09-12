@@ -1,0 +1,89 @@
+
+File Size: 4096.000000 Bytes    4.000000 Blocks  0-3.000000
+
+
+Last Block = 3
+
+
+
+FILE = ANIM-VERBS
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( table verbs ) <STKH                                           
+    1|                                                                
+    2|{ : NC= } 1+ DUP C= { ; } { : SC= } DUP C= { ; }                
+    3|{ : UB@ } ( ADDR ... DATA )                                     
+    4|DP { @ SWAP } DP { ! }                                          
+    5|diskhere { save } SET-OBJ-FILE { BLOCK + B@ SWAP ;S }           
+    6|DP { ! } { ; }                                                  
+    7|                                                                
+    8|0 C= NORMAL                                                     
+    9|040 C= FLOP                                                     
+   10|080 C= FLIP                                                     
+   11|0C0 C= FLIP-FLOP                                                
+   12|-->                                                             
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( table verbs ) <STKH                                           
+    1|{ V= SPMARK } {  BV= ETYPE }  { BV= ESIZE } ( 2, or 3 bytes )   
+    2|{ V= IDX } { V= CNT } {  BV= TTYPE } {   V= #APATS }            
+    3|{ : <TBL }  ( esize etype tbltype [name] --- )                  
+    4| DATA { 0 } , { DUP } B, TTYPE { B! } ETYPE { B! }              
+    5|  ESIZE { B! } SP@ SPMARK { ! } {  -1 } #APATS { ! } { ; }      
+    6|( type bottom 3 bits match vlogicstat2 bits )                   
+    7|{ : <ANIM-TBL }         ( [name] --- )  3  00 81 <TBL { ; }     
+    8|{ : <ANIM-MAG-TBL }     ( [name] --- )  4  00 89 <TBL { ; }     
+    9|{ : <ROT-TBL }          ( [name] --- )  3  00 82 <TBL { ; }     
+   10|{ : <ROT-ANIM-TBL }     ( [name] --- )  3  81 83 <TBL { ; }     
+   11|{ : <PER-TBL }          ( [name] --- )  2  00 84 <TBL { ; }     
+   12|{ : <PER-ANIM-TBL }     ( [name] --- )  2  81 85 <TBL { ; }     
+   13|{ : <PER-ROT-TBL }      ( [name] --- )  2  82 86 <TBL { ; }     
+   14|{ : <PER-ROT-ANIM-TBL } ( [name] --- )  2  83 87 <TBL { ; }     
+   15|STK> -->                                                        
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( table verbs cont )                                            
+    1|<STKH                                                           
+    2|{ : TBL> }  ( entries --- )                                     
+    3| SP@ SPMARK { @ SWAP - 2/ } ( #words stacked )                  
+    4| ESIZE { B@ 1- / }                                              
+    5|( #entries ) { DUP } CNT { ! DUP } ESIZE { B@ * } DP { +! }     
+    6| HERE IDX { ! }                                                 
+    7|{  0 DO } ( next entry ) ESIZE { B@ 1- PICK }                   
+    8|   ETYPE { B@ 80 AND IF ( not pattern ) 3 + THEN }              
+    9|-->                                                             
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   3
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( table verbs cont )                                            
+    1|   IDX { @ 2- } U! ESIZE { B@ MINUS } IDX { +! }                
+    2|   ESIZE { B@ 2 <> IF } IDX { @ } UB!  { THEN }                 
+    3|   ESIZE { B@ 4 = IF } IDX { @ 1+ } UB!  { THEN DROP LOOP }     
+    4| TTYPE { B@ DUP DUP 81 = SWAP 89 = OR IF ( anim ) 0 }           
+    5|{ SWAP 81 = IF } B, { ELSE } , { THEN } IDX { @ } ,             
+    6|( close loop) { ELSE DROP }     { THEN }                        
+    7| TTYPE { B@ DUP DUP 81 = SWAP 89 = OR SWAP 84 = OR IF }         
+    8|( anim, anim-mag or per )                                       
+    9|   CNT { @ } IDX { @ 3 - } U! { ( #entries ) THEN }             
+   10| TTYPE { B@ DUP 82 = SWAP 83 = OR IF ( rot ) }                  
+   11|{ 0 } CNT { @ BEGIN 2/ SWAP 1+ SWAP DUP NOT END DROP            
+   12|  9 SWAP - ( shift amount ) }                                   
+   13|  IDX { @ 3 - } U! { THEN } { ; }                               
+   14|STK> ;S                                                         
+   15|                                                                
+
+
+
+
+

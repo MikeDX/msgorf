@@ -1,0 +1,51 @@
+
+File Size: 2048.000000 Bytes    2.000000 Blocks  0-1.000000
+
+
+Last Block = 1
+
+
+
+FILE = PAT-LOAD
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|FLOAD INDEX                                                     
+    1|FLOAD NULPAT                                                    
+    2|FLOAD PLY-P                                                     
+    3|FLOAD PLUP                                                      
+    4|FLOAD BANG                                                      
+    5|FLOAD CLONE-P                                                   
+    6|-->                                                             
+    7|                                                                
+    8|                                                                
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|FLOAD GORF-P                                                    
+    1|FLOAD LAZON-P                                                   
+    2|FLOAD KAMI-P                                                    
+    3|FLOAD SMINE-P                                                   
+    4|FLOAD SHLD-P                                                    
+    5|FLOAD MITE-P                                                    
+    6|FLOAD TRION-P                                                   
+    7|FLOAD DEB-P                                                     
+    8|FLOAD HK-P                                                      
+    9|FLOAD GB-P                                                      
+   10|FLOAD GRD-P                                                     
+   11|-->                                                             
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

@@ -1,0 +1,165 @@
+
+File Size: 8192.000000 Bytes    8.000000 Blocks  0-7.000000
+
+
+Last Block = 7
+
+
+
+FILE = G
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|HEX ( GROWL RETURN )                                            
+    1|XC? IFTRUE CODE K 0C X L LDX, 0D X H LDX, H PUSH, NEXT IFEND    
+    2|: G&D NCOLS 0 DO NROWS 0 DO                                     
+    3|J I G-D? IF                                                     
+    4|J I NODX NODE@ J I NODY NODE@                                   
+    5|RPCOL @ gr-p WRITEP THEN                                        
+    6|J I EXIST? IF 2DROP                                             
+    7|4 0 DO K J I f&                                                 
+    8|LOOP THEN LOOP LOOP ST-X ST-Y RPCOL @ SHFP WRITEP               
+    9|DOR0 DORWR ; ( DRAW CLOSED DOOR )                               
+   10|DECIMAL                                                         
+   11|XC? IFTRUE                                                      
+   12|: INTSCR SCV P1s #PLA B@ IF SFXV P2s THEN ;                     
+   13|OTHERWISE : INTSCR ;                                            
+   14|IFEND -->                                                       
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|HEX ( GROWL EXISTING PATHS )                                    
+    1|: G&E NCOLS 0 DO NROWS 0 DO                                     
+    2|J I EXIST? IF                                                   
+    3|NODX NODE@ J I NODY NODE@                                       
+    4|RPCOL @ gr-p WRITEP                                             
+    5|4 0 DO K J I RP&                                                
+    6|LOOP THEN LOOP LOOP ;                                           
+    7|DECIMAL -->                                                     
+    8|( GROWL OUT WALLS ROUTINE )                                     
+    9|: G&W NCOLS 0 DO NROWS 0 DO                                     
+   10|J I G-D? IF J I EXIST? IF WALDO THEN THEN                       
+   11|LOOP LOOP ;                                                     
+   12|-->                                                             
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( ANOTHER SPARSE TRASH GENERATOR )                              
+    1|HEX                                                             
+    2|CODE Sst B PUSH,                                                
+    3|INVERT LDA, A ANA, 0=, IF,                                      
+    4|8C0 D LXI, ELSE, 0 D LXI, THEN, 3700 B LXI,                     
+    5|D H MOV, E L MOV, 6 D SET, ( DE= NON, HL=MAGIC )                
+    6|BEGIN, 10 IN,                                                   
+    7|D LDAX, A ANA, 0=, IF, M A MOV, 3 ANI, MAGIC OUT,               
+    8|33 M MVI, ELSE, A XRA, D STAX, THEN,                            
+    9|H INX, D INX, B DCX, B A MOV, C ORA, 0=, END,                   
+   10|B POP, NEXT                                                     
+   11|                                                                
+   12|: Gst C18 RPCOL ! G&E Sst G&D ; ( 028 WALCO ! G&W )             
+   13|DECIMAL -->                                                     
+   14|                                                                
+   15|                                                                
+
+BLOCK =   3
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( HARD TRASH GENERATOR )                                        
+    1|HEX                                                             
+    2|CODE Sht B PUSH,                                                
+    3|INVERT LDA, A ANA, 0=, IF,                                      
+    4|8C0 D LXI, ELSE, 0 D LXI, THEN, 3700 B LXI,                     
+    5|D H MOV, E L MOV, 6 D SET, XCHG, ( DE= MAGIC HL= NON )          
+    6|18 A MVI, MAGIC OUT, 0C A MVI, XPAND OUT,                       
+    7|BEGIN, 10 IN, D LDAX, D STAX, M A MOV, CMA, A M MOV,            
+    8|H INX, D INX, B DCX, B A MOV, C ORA, 0=, END,                   
+    9|B POP, NEXT                                                     
+   10|                                                                
+   11|: Ght C18 RPCOL ! G&E Sht G&D ( 028 WALCO ! G&W ) ;             
+   12|DECIMAL -->                                                     
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   4
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( SPARSE TRASH ON PATH BACKGROUND GENERATOR )                   
+    1|HEX ( NIFTY NEATO SCREEN GENERATORS )                           
+    2|CODE Sn B PUSH,                                                 
+    3|INVERT LDA, A ANA, 0=, IF,                                      
+    4|8C0 D LXI, ELSE, 0 D LXI, THEN, 3700 B LXI,                     
+    5|D H MOV, E L MOV, 6 D SET, ( DE= NON, HL=MAGIC )                
+    6|BEGIN, D LDAX, A ANA, 0=, IF, M A MOV, 3 ANI, MAGIC OUT,        
+    7|3 M MVI, ELSE, A XRA, D STAX, THEN,                             
+    8|H INX, D INX, B DCX, B A MOV, C ORA, 0=, END,                   
+    9|B POP, NEXT                                                     
+   10|                                                                
+   11|: Gn C18 RPCOL ! G&E Sn G&D ;                                   
+   12|DECIMAL -->                                                     
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   5
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( VERY SPARSE GROWL ROUTINE )                                   
+    1|HEX ( NIFTY NEATO SCREEN GENERATORS )                           
+    2|CODE So D POP, B PUSH, INVERT LDA, A ANA, 0=, IF,               
+    3|48C0 H LXI, ELSE, 4000 H LXI, THEN, 3700 B LXI,                 
+    4|BEGIN, 10 IN, 6 H SET, M A MOV, A ANA,                          
+    5|0=, IF, 6 H RES, M A MOV, 3 ANI, MAGIC OUT,                     
+    6|M A MOV, E ANA, D CMP, 0=, IF, 0C0 M MVI,                       
+    7|ELSE, 6 H SET, 0 M MVI, THEN,                                   
+    8|ELSE, 6 H SET, 0 M MVI, THEN,                                   
+    9|H INX, B DCX, B A MOV, C ORA, 0=, END,                          
+   10|B POP, NEXT                                                     
+   11|TABLE GoTB  003C , 101C , 103C ,                                
+   12|: Go C18 RPCOL ! G&E GA# B@ 3 - 2 MIN GoTB @ So G&D ;           
+   13|: nul C18 RPCOL ! G&D ;                                         
+   14|DECIMAL -->                                                     
+   15|                                                                
+
+BLOCK =   6
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|HEX ( GROWL OUT PLAYER 2 TREASURES, ROTOS, AND MAGICS )         
+    1|XC? IFTRUE : P2gr P2FL                                          
+    2|Tgr2 ( GROWL OUT PLAYER 2 TREASURES )                           
+    3|1 ma# B@ 4 MIN -DUP IF 0 DO I MPT2 MAGw LOOP THEN               
+    4|1 rr# B@ 4 MIN -DUP IF 0 DO I RPT2 20 RTw LOOP THEN ;           
+    5|OTHERWISE : P2gr ; IFEND                                        
+    6|DECIMAL -->                                                     
+    7|                                                                
+    8|                                                                
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   7
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( BACKGROUND DRAWER )                                           
+    1|TABLE TRST ' Ght , ' Gst , ' Gn , ' Go , ' Go , ' Go , ' nul ,  
+    2|HEX DATA CKB 0 B,                                               
+    3|: M-BG CL -1 INVERT B@ IF 7700 ELSE 4000 THEN 8C0 FILL          
+    4|SETCOL ( SET COLORS ) GA# B@ 6 MIN TRST @ EXX                   
+    5|Tgr1 ( GROWL OUT PLAYER 1 TREASURES )                           
+    6|FREDH B@ -DUP IF 0 DO I H-DIS LOOP THEN                         
+    7|0 ma# B@ 4 MIN -DUP IF 0 DO I MPT1 MAGw LOOP THEN               
+    8|0 rr# B@ 4 MIN -DUP IF 0 DO I RPT1 60 RTw LOOP THEN             
+    9|P1FL                                                            
+   10|#PLA B@ IF P2gr THEN ;                                          
+   11|DECIMAL -->                                                     
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

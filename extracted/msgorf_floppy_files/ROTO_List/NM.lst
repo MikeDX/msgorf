@@ -1,0 +1,108 @@
+
+File Size: 5120.000000 Bytes    5.000000 Blocks  0-4.000000
+
+
+Last Block = 4
+
+
+
+FILE = NM
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( POSITION COMPUTERS ) <STKD                                    
+    1|                                                                
+    2|: C-c COLSIZE * COLSIZE 2 / + 159 - ;                           
+    3|: R-c ROWSIZE * ROWSIZE 2 / + 103 - ;                           
+    4|                                                                
+    5|: COMP:XY R-c ROWDEV 2 / ROWDEV RND - + SWAP                    
+    6|C-c COLDEV 2 / COLDEV RND - + SWAP ;                            
+    7|                                                                
+    8|STK> -->                                                        
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( NODE ZAMMERS )                                                
+    1|( SUBR node^ D= ROW E= COL C= DISP, OUT HL= ^ )                 
+    2|SUBR node^ D PUSH,                                              
+    3|D A MOV, RLC, A L MOV, RLC, RLC, L ADD, D ADD, E ADD, A E MOV,  
+    4|0 D MVI, E L MOV, D H MOV, D DAD, D DAD, ( HL= A*3 )            
+    5|XCHG, H DAD, H DAD, H DAD, ( A*8 ) XCHG, D DAD, D DAD, D DAD,   
+    6|C E MOV, 0 D MVI, D DAD, ( ADD DISPLACEMENT )                   
+    7|0 NODEMAT D LXI, D DAD,                                         
+    8|D POP, RET,                                                     
+    9|CODE NODE^ EXX, B POP, H POP, D POP, L D MOV, node^ CALL,       
+   10|H PUSH, EXX, NEXT                                               
+   11|SUBR noded^ node^ CALL, D PUSH, MPL0 D LXI, D DAD, D POP, RET,  
+   12|SUBR noder^ node^ CALL, D PUSH, RVMD D LXI, D DAD, D POP, RET,  
+   13|-->                                                             
+   14|                                                                
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( TEST GROTTO DRAWN AND SET GROTTO DRAWN )                      
+    1|CODE S-GD H POP, D POP, L D MOV, B PUSH,                        
+    2|NODMSK C MVI, node^ CALL, NMDRW M SET, B POP, NEXT              
+    3|                                                                
+    4|CODE G-D? H POP, D POP, L D MOV, B PUSH,                        
+    5|NODMSK C MVI, node^ CALL, M A MOV, NMDRM ANI, A L MOV,          
+    6|0 H MVI, B POP, H PUSH, NEXT                                    
+    7|                                                                
+    8|-->                                                             
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   3
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( TEST:REL AND MOVE:NODE )                                      
+    1|( D=ROW,E=COL,C=REL   COL ROW REL TEST:REL --- DIST )           
+    2|SUBR test:rel C A MOV, MPL0 ADI, A C MOV, node^ CALL,           
+    3|M A MOV, RET,                                                   
+    4|( CODE TEST:REL EXX, B POP, H POP, D POP, L D MOV, test:rel CALL
+    5|A L MOV, 0 H MVI, H PUSH, EXX, NEXT )                           
+    6|( MOVE:NODE INSTRUCTIONS TO INCREMENT )                         
+    7|SUBR INSTR D INR, RET, E DCR, RET, E INR, RET, D DCR, RET,      
+    8|SUBR move:node B PUSH, ( C=DIR, D=ROW,E=COL )                   
+    9|0 B MVI, INSTR H LXI, B DAD, B DAD, B POP, PCHL,                
+   10|CODE MOVE:NODE EXX, B POP, H POP, D POP, L D MOV,               
+   11|move:node CALL, D L MOV, 0 D MVI, D H MOV,                      
+   12|D PUSH, H PUSH, EXX, NEXT -->                                   
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   4
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|                                                                
+    1|                                                                
+    2|                                                                
+    3|                                                                
+    4|                                                                
+    5|                                                                
+    6|                                                                
+    7|                                                                
+    8|                                                                
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

@@ -1,0 +1,184 @@
+
+File Size: 9216.000000 Bytes    9.000000 Blocks  0-8.000000
+
+
+Last Block = 8
+
+
+
+FILE = P
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( COUNT OFF THE TREASURES AND HOSTAGES )                        
+    1|DECIMAL                                                         
+    2|: END-ER ;TASK: ( RUN ON OUT )                                  
+    3|plup B@ 0= ROTN B@ ANGLE!                                       
+    4|THIS:LIFE ROTOPOS DESTY! DESTX!                                 
+    5|HM-T TIMER!-ON A->DEST/TIME GO ZERODXDYAXAY                     
+    6|RR# B@ 4 > IF NULPAT ANIM! 1 TIMER!-ON GO THEN                  
+    7|20 TIMER!-ON WAIT 0 F#A B! VGER-OUT ;                           
+    8|XC? IFTRUE ( WAIT FOR ALL MONSTERS )                            
+    9|: W-AIP 0 5 0 DO I I:M ACTIVE? IF I I:M OBJSV OVB@              
+   10|MSAIP <> IF DROP 1 THEN THEN LOOP IF 5 TIMER!-ON WAIT 0         
+   11|ELSE 1 THEN COGO ; OTHERWISE                                    
+   12|: W-AIP 0 2 0 DO I I:M ACTIVE? IF I I:M OBJSV OVB@              
+   13|MSAIP <> IF DROP 1 THEN THEN LOOP IF 5 TIMER!-ON WAIT 0         
+   14|ELSE 1 THEN COGO ; IFEND                                        
+   15|-->                                                             
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( DROP INTO CHAMBER )                                           
+    1|: DROPIN DIVG 0 DELTADIST V!                                    
+    2|( 0 0 ARV Sim 2 ARS B! )                                        
+    3|0 X! RP-Y Y!                                                    
+    4|EMOV                                                            
+    5|ROTROTY ANIM! XOR-ON                                            
+    6|ST-X DESTX! ST-Y DESTY! DC-T TIMER!-ON A->DEST/TIME GO          
+    7|EMOV                                                            
+    8|H-P-D DISPF VB! ESTPOS                                          
+    9|PLIC P.S B! COGO ;                                              
+   10|XC? NOT IFTRUE : DROP-S ;                                       
+   11|: VSEN ; : TRY-PA ;                                             
+   12|: GO-SET GAMEOVER BONE ;                                        
+   13|IFEND                                                           
+   14|( FIX GAMEOVER AND VSEN SHIT )                                  
+   15|-->                                                             
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( ROTO / PLAYER TASK )         DECIMAL                          
+    1|: R:B ;TASK: ( ESTABLISH SPEEDS )                               
+    2|Src Snm REVV H:R BEGIN DIVG                                     
+    3|P.S B@ PLEM CASE                                                
+    4|DVECT-OFF                                                       
+    5|RR# B@ 5 < IF THIS:LIFE ROTOPOS NERDUP IF 32 ELSE 96 THEN RTw   
+    6|THEN THIS:LIFE ROTOPOS DUP Y! DESTY! X! 0 DESTX!                
+    7|EMOV ENTER-S                                                    
+    8|ROTROTY ANIM! XOR-ON plup B@ ROTN B@ ANGLE!                     
+    9|HM-T TIMER!-ON A->DEST/TIME GO SFXV MA-T                        
+   10|EMOV BEGIN KICKBK ' W-AIP SETCO COGO END ' OPDR SETCO COGO      
+   11|' DROPIN SETCO COGO P-RTY ANIM!                                 
+   12|KEY OBJSV OVB@ KYOPEN <> IF ' CLDR SETCO COGO THEN PERZAP       
+   13|-->                                                             
+   14|                                                                
+   15|                                                                
+
+BLOCK =   3
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|ELSE PLIC CASE ( IN A CHAMBER CASE )                            
+    1|PROPDELTAS DIRFLAG BZERO                                        
+    2|DIVG ( CHECK JOYSTICK TO SEE IF WE CAN LEAVE )                  
+    3|G:JC                                                            
+    4|IF                                                              
+    5|PLMV P.S B!                                                     
+    6|-->                                                             
+    7|                                                                
+    8|                                                                
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   4
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( GO FROM INCHAM TO MOVEABOUT )                                 
+    1|EPLYRV ( ESTABLISH PLAYER VELOCITY )                            
+    2|DEPART:NODE PERZAP P-RTY ANIM! 7 VROTINXSHF VB!                 
+    3|WALKER ( SYNC )                                                 
+    4|THEN                                                            
+    5|-->                                                             
+    6|                                                                
+    7|                                                                
+    8|                                                                
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   5
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( WE ARE DEAD STATE )                                           
+    1|ELSE PLDOA CASE                                                 
+    2|PDOA ANIM! GRAB-S                                               
+    3|RR# 1-WPB! RR# B@ 0= IF                                         
+    4|botha B@ 0= IF GO-SET THEN SFXV GO-T THEN                       
+    5|0 SETVEL HALTER DISHOS                                          
+    6|BEGIN DSM4 B@ 0<> MONV1 OBJSV OVB@ MSSNA = OR                   
+    7|WHILE SYNC REPEAT                                               
+    8|0 MYFLAG VB! MONV1 RAVISH SYNC DIVG                             
+    9|BEGIN POA GO FLAG? END 4 TIMER!-ON WAIT                         
+   10|PLEM P.S B! ' DEPARTSKI SETCO COGO UNFREEZE                     
+   11|botha B@ IF RR# B@ 0= IF 120 TIMER!-ON WAIT THEN VGER-OUT SLEEP 
+   12|ELSE RR# B@ 0= IF VSEN TRY-PA                                   
+   13|240 TIMER!-ON WAIT VGER-OUT SLEEP                               
+   14|ELSE GA# B@ 7 MIN SMARTS B!                                     
+   15|Src Snm ESTPOS THEN THEN -->                                    
+
+BLOCK =   6
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( PLAYER ESCAPE INTO EXIT CHAMBER )                             
+    1|ELSE PLESC CASE FREEZE 0 PERINX! ESTPOS 0 ASSMSV VB!            
+    2|SUCK-S                                                          
+    3|ROTROTY ANIM!                                                   
+    4|( IF # HOSTAGES FREED IS > PREV MAX THEN UPDATE IT )            
+    5|Hctr B@ MH# B@ MAX MH# WPB!                                     
+    6|Hctr B@ IF BANTOP THEN ( KICKOUT MONSTERS )                     
+    7|O-M BZERO EV:R                                                  
+    8|GO DIVG EMOV                                                    
+    9|-->                                                             
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   7
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MORE ESCAPE STUFF )                                           
+    1|( WAIT FOR HOSTAGES TO LEAVE )                                  
+    2|Hctr B@ IF Chw BZERO                                            
+    3|BEGIN Hctr B@ 0<> Chw B@ 60 < AND WHILE Chw 1+B! 5 TIMER!-ON    
+    4|WAIT DIVG BANTOP REPEAT                                         
+    5|FREDH B@ TOTAL-HOSTAGES = IF EOF BONE SELF END-ER SLEEP THEN    
+    6|BEGIN BANTOP ' W-AIP SETCO COGO END                             
+    7|ELSE 5 TIMER!-ON WAIT SMARTS 1+B! THEN                          
+    8|UNFREEZE                                                        
+    9|0 DRPO VB! ( CLEAR DROP IN FLAGOLA )                            
+   10|DROP-S ( SECOND CHECK FOR FREED HOSTAGES )                      
+   11|FREDH B@ TOTAL-HOSTAGES = IF EOF BONE SELF END-ER SLEEP THEN    
+   12|' DROPIN SETCO COGO FREM                                        
+   13|-->                                                             
+   14|                                                                
+   15|                                                                
+
+BLOCK =   8
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( LAST PART OF PLAYER TASK )                                    
+    1|ELSE PLMV CASE ( MOVING AROUND - DO NOTHIN YET )                
+    2|ELSE ( XDI ." FLAKE" ) THEN THEN THEN THEN THEN                 
+    3|( IF NOT MOVING PAUSE FOR A BIT )                               
+    4|P.S B@ PLMV <> IF 2 TIMER!-ON 0 SETVEL THEN                     
+    5|P:I:C HOOK!-ON                                                  
+    6|PROPDELTAS POA DVECT-ON mastersur IGO DIVG                      
+    7|O-M BZERO                                                       
+    8|                                                                
+    9|( YET MORE PLAYER CONTROLLER )                                  
+   10|DEST? IF ARRIVE:NODE CHRV C:RT                                  
+   11|P.S B@ PLDOA < IF PLIC P.S B! THEN                              
+   12|( ESCAPE? ) DIVG PERZAP P-RTY ANIM! THEN                        
+   13|0 END ; DECIMAL -->                                             
+   14|                                                                
+   15|                                                                
+
+
+
+
+

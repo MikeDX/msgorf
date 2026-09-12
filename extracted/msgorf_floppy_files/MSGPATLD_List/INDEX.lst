@@ -1,0 +1,51 @@
+
+File Size: 2048.000000 Bytes    2.000000 Blocks  0-1.000000
+
+
+Last Block = 1
+
+
+
+FILE = INDEX
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( PATTERN INDEX NUMBERS )                                       
+    1|0 SC= NULPATi                                                   
+    2|NC= P1i                                                         
+    3|NC= P2i                                                         
+    4|NC= SBi                                                         
+    5|NC= P1Ui                                                        
+    6|NC= P2Ui                                                        
+    7|NC= BANGAi                                                      
+    8|NC= BANGPi                                                      
+    9|NC= CLNi                                                        
+   10|-->                                                             
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MORE INDEX NUMBERS )                                          
+    1|NC= GORFi                                                       
+    2|NC= LAZONi                                                      
+    3|NC= KAMIi                                                       
+    4|NC= SMINEi                                                      
+    5|NC= SHLDi                                                       
+    6|NC= MITEi                                                       
+    7|NC= TRIONi                                                      
+    8|NC= DEBi                                                        
+    9|NC= HKi                                                         
+   10|NC= GBi                                                         
+   11|NC= GRDi                                                        
+   12|DROP -->                                                        
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

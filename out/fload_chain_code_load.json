@@ -1,0 +1,12 @@
+{
+  "start": "CODE-LOAD",
+  "order": [
+    "CODE-LOAD",
+    "PATTERN",
+    "ANIM-VERBS",
+    "INIT-AT"
+  ],
+  "missing": [],
+  "binary_or_opaque": [],
+  "disk": "extracted/msgorf_floppy_files/MSGORPAT_Disk"
+}

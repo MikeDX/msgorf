@@ -1,0 +1,70 @@
+
+File Size: 3072.000000 Bytes    3.000000 Blocks  0-2.000000
+
+
+Last Block = 2
+
+
+
+FILE = E
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( GAME PLAYER ) HEX                                             
+    1|: R-CHK RR# B@ DUP 0= SWAP 16 > OR ;                            
+    2|: P1PG                                                          
+    3|botha WPBZERO ( CLEAR PREV 2 PLAYER MODE )                      
+    4|BEGIN R-CHK IF GO-SET ELSE FUGS THEN                            
+    5|GAMEOVER B@ END ;                                               
+    6|XC? IFTRUE : P2PG                                               
+    7|BEGIN D-PU ( DISPLAY PLAYER UP MSG PLS )                        
+    8|BEGIN R-CHK IF F#A BONE RR# WPBZERO ELSE FUGS THEN              
+    9|F#A B@ END ( WAIT FOR DEATH FRAME )                             
+   10|RR# B@ ( GET REMAINING LIVES ON STK )                           
+   11|SWAPO ( SWITCH TO OTHER JERK )                                  
+   12|NERDUP 1+ 1 AND plup WPB! ( GO TO OTHER PLAYER )                
+   13|0= END ; ( CONTINUE AS LONG BOTH ARE ALIVE )                    
+   14|OTHERWISE : P2PG ; IFEND                                        
+   15|DECIMAL -->                                                     
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( HARD NEW GAME INITIALIZATION ) HEX                            
+    1|: I-GM #PLA B@ botha WPB! plup WPBZERO                          
+    2|0 ma# WPBONE 1 ma# WPBONE 0 g#m WPZERO 1 g#m WPZERO             
+    3|0 tr# WPZERO                                                    
+    4|0 sc* WPZERO 303 0 rr# WP!                                      
+    5|sc1l WPZERO sc1h WPZERO sc2l WPZERO sc2h WPZERO ;               
+    6|                                                                
+    7|( SOFT NEW GAME REINITIALIZATION )                              
+    8|: RAG MYPUP DIVG                                                
+    9|8 0 DO 0FA I OUTP LOOP 0 ngS ngL FILL ;                         
+   10|DECIMAL -->                                                     
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MORE GAME PLAYER )                                            
+    1|HEX XC? IFTRUE                                                  
+    2|: ROTO                                                          
+    3|RESTART? B@ 0= IF I-GM THEN RAG                                 
+    4|#PLA B@ IF P2PG THEN ( PLAY 2 UNTIL ONES DEAD )                 
+    5|D-PU P1PG INVERT-OFF ; ( PLAY 1 PLAYER GAME )                   
+    6|( : SX 0 E000 1F00 FILL PUP WPCLEAR                             
+    7|BEGIN GAMEOVER WPBZERO 2 RND #PLA WPB!                          
+    8|ROTO 0 END ; )                                                  
+    9|' PATTY 3FF8 U! ' ROTO 3FFA U!                                  
+   10|( LINK TO FLASHER ) ' FLSHT 3FF6 U!                             
+   11|OTHERWISE : ROTO #PLA WPBZERO I-GM RAG P1PG ;                   
+   12|IFEND                                                           
+   13|DECIMAL -->                                                     
+   14|                                                                
+   15|                                                                
+
+
+
+
+

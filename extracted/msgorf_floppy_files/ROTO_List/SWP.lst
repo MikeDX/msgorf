@@ -1,0 +1,51 @@
+
+File Size: 2048.000000 Bytes    2.000000 Blocks  0-1.000000
+
+
+Last Block = 1
+
+
+
+FILE = SWP
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( SWAP BYTES BETWEEN DE AND HL )                                
+    1|SUBR SWPO D LDAX, A C MOV, M A MOV, D STAX, C M MOV, RET,       
+    2|TABLE HID-T HOSV1 , XC? IFTRUE HOSV2 , HOSV3 , TRSV , IFEND     
+    3|KEY , 0 , ( CHANGE THIS BUGGER WITH CARE !!!!! )                
+    4|F= Dmr                                                          
+    5|SUBR SV-V <ASSEMBLE 0 HID-T H LXI, H PUSH,                      
+    6|LABEL Dmr XCHG, XTHL, M E MOV, H INX, M D MOV, H INX,           
+    7|D A MOV, E ORA, 0=, IF, PSW POP, RET, THEN, XTHL, XCHG,         
+    8|NOWR B LXI, B DAD, SWPO CALL, H INX, D INX, SWPO CALL,          
+    9|H INX, D INX, SWPO CALL, D INX,                                 
+   10|OBJSV NOWD - B LXI, B DAD, SWPO CALL, D INX,                    
+   11|DISTANCE OBJSV - B LXI, B DAD, SWPO CALL, D INX, H INX,         
+   12|SWPO CALL, D INX, Dmr JMPR, ASSEMBLE>                           
+   13|CODE swv D POP, B PUSH, SV-V CALL, B POP, NEXT                  
+   14|: SWV 0 XVSA swv ;                                              
+   15|-->                                                             
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( SWAP NODE MATRIX WITH SAVE AREA )                             
+    1|XC? IFTRUE                                                      
+    2|SUBR S-NM 0 NODEMAT H LXI, 0 NMZ D LXI, NNODES DO,              
+    3|B PUSH, SWPO CALL, H INX, D INX, SWPO CALL, H INX, D INX,       
+    4|SWPO CALL, H INX, D INX, SWPO CALL, H INX, D INX,               
+    5|H INX, H INX, H INX, H INX,                                     
+    6|RVMD MPL0 - DO, 0 M MVI, H INX, LOOP, ( ZAP DIST AND DELTS )    
+    7|4 DO, SWPO CALL, H INX, D INX, LOOP, ( SWAP RVMDS )             
+    8|SWPO CALL, H INX, D INX, ( DRAWFLG )                            
+    9|0 M MVI, H INX, 0 M MVI, H INX, ( NAIL >TREASURE )              
+   10|B POP, LOOP, RET,                                               
+   11|CODE SWAPO B PUSH, S-NM CALL, B POP, NEXT                       
+   12|IFEND                                                           
+   13|-->                                                             
+   14|                                                                
+   15|                                                                
+
+
+
+
+

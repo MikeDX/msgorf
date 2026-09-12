@@ -1,0 +1,184 @@
+
+File Size: 9216.000000 Bytes    9.000000 Blocks  0-8.000000
+
+
+Last Block = 8
+
+
+
+FILE = VE
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( VECTOR FIELDS )                                               
+    1|DECIMAL VLENGTH SC= INTR NC= INTC ( INITIAL POS AND COL )       
+    2|NC= NOWR NC= NOWC ( CURRENT ROW AND COLUMN )                    
+    3|NC= NOWD ( CURRENT DIRECTION )                                  
+    4|( NC= NXTR NC= NXTC ) ( NEXT ROW AND COLUMN )                   
+    5|( CUSTOM VECTOR ROUTINE GOODIES )                               
+    6|NC= BASEX 1+                                                    
+    7|NC= BASEY 1+                                                    
+    8|NC= DELTAX 1+                                                   
+    9|NC= DELTAY 1+                                                   
+   10|NC= MAXDIST MAXDIST NOWR - 1+ C= POSLEN                         
+   11|NC= DISTANCE 1+                                                 
+   12|NC= DELTADIST 1+ DELTADIST NOWR - C= SNATLEN                    
+   13|( NC= ACCDIST 1+ )                                              
+   14|NC= MEMDIST NC= MEMR NC= MEMC NC= MEMD -->                      
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MORE CUSTOM VECTOR FIELDS )                                   
+    1|NC= CUSVEC 1+ ( CUSTOM VECTOR ROUTINE ADDRESS )                 
+    2|NC= MYFLAG ( BUILD IN NEATO FLAG )                              
+    3|NC= DRPO ( DROP OFF FLAG )                                      
+    4|NC= DISPF ( DISPLACEMENT FACTOR )                               
+    5|NC= VCOR 1+ ( MY COROUTINE CELL )                               
+    6|NC= BEHIND 1+ ( FELLOW BEHIND ME )                              
+    7|NC= AHEAD 1+ ( FELLOW AHEAD OF ME )                             
+    8|NC= OBJSV ( OBJECT STATE VARIABLE )                             
+    9|1+ C= M#L                                                       
+   10|M#L SC= ASSMSV                                                  
+   11|NC= DIST-1 ( PREV DISTANCE )                                    
+   12|1+ C= V#L -->                                                   
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( STUFF FOR MONSTERS - PRECEEDS NORMAL VECTOR DOPE )            
+    1|{ : PC= } 1- DUP C= { ; }                                       
+    2|0 PC= MMSV ( MONSTER MOTION STATE )                             
+    3|1- PC= MSPDS ( MONSTER SLOW SPEED )                             
+    4|1- PC= MSPDF ( MONSTER FAST SPEED )                             
+    5|PC= RMctr ( HOSTAGE GUARDING STATE VAR )                        
+    6|PC= PMOD                                                        
+    7|1- PC= FNDPTR 1- PC= TRACKPTR 1- PC= TREECK TREECK C= WTCTR     
+    8|1- PC= MYBOSS                                                   
+    9|1- PC= FRONTIER                                                 
+   10|NCOLS - PC= VISMAT                                              
+   11|0 SC= TPL NC= TPH NC= TRC NC= TD 1+ C= TEL                      
+   12|TEL NNODES * C= TDEPTH 134 C= SURPLUS                           
+   13|TDEPTH SURPLUS + -                                              
+   14|PC= TREES ABS C= MONSURP                                        
+   15|-->                                                             
+
+BLOCK =   3
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MONSTER STATE VARIABLE )                                      
+    1|0 SC= MSPRO ( MONSTER ON PROWL )                                
+    2|NC= MSRIP ( RETURN INITIAL POSITION )                           
+    3|NC= MSAIP ( AT INITIAL POSITION )                               
+    4|NC= MSSNA DROP ( SNATCH HOSTAGE )                               
+    5|( MONSTER MOTION STATE VARIABLE )                               
+    6|0 SC= MMONT ( ON TARGET )                                       
+    7|NC= MMTHK ( THINKING )                                          
+    8|NC= MMSTP ( STOPPED )                                           
+    9|NC= MMINC ( IN CHAMBER )                                        
+   10|NC= MMWLK ( WALKING )                                           
+   11|NC= MMSCU DROP ( SCURRYING )                                    
+   12|-->                                                             
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   4
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( VECTOR TYPES )                                                
+    1|0 SC= T-TYP NC= H-TYP NC= M-TYP C= K-TYP                        
+    2|                                                                
+    3|-->                                                             
+    4|( MONSTER PERSONALITY CODES )                                   
+    5|0 SC= MPRTH ( RETURN TO HOSTAGE )                               
+    6|NC= MPGUA ( GUARD THE HOSTAGE )                                 
+    7|NC= MPCHP ( CHASE THE PLAYER )                                  
+    8|NC= MPRND DROP ( RANDOM MOVE )                                  
+    9|                                                                
+   10|-->                                                             
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   5
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( HOSTAGE AND PLAYER STATE VARIABLES )                          
+    1|( THE HOSTAGE STATE VARIABLE )                                  
+    2|0 SC= HSFREE ( HOSTAGE FREE )                                   
+    3|NC= HSATP ( HOSTAGE ATTACHED TO PLAYER )                        
+    4|NC= HSATM ( HOSTAGE ATTACHED TO MONSTER )                       
+    5|NC= HSLPF ( HOSTAGE LEAVING PLAYFIELD )                         
+    6|NC= HSRES DROP ( HOSTAGE COMPLETELY RESCUED )                   
+    7|( ASSIMILATION STATE VARIABLE )                                 
+    8|0 SC= ASNOT ( NOT ASSIMILATED )                                 
+    9|NC= ASSIM DROP  ( FULLY ASSIMILATED )                           
+   10|( PLAYERS ASSIMILATION STATE VARIABLE )                         
+   11|0 SC= ASCOOL ( PLAYER NOT ONTOP OF HOSTAGES )                   
+   12|NC= ASONTOP DROP ( PLAYER IS ON TOP OF HOSTAGES )               
+   13|-->                                                             
+   14|                                                                
+   15|                                                                
+
+BLOCK =   6
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MONSTER AND TREASURE STUFF )                                  
+    1|XC? NOT IFTRUE VPTR @ HEX FFF0 VPTR ! IFEND <STKD               
+    2|RAMMARK                                                         
+    3|{ : M$ } VPTR @ MONSURP - VPTR ! { ; }                          
+    4|M#L BR= MONV1 M$ M#L BR= MONV2 M$                               
+    5|XC? IFTRUE M#L BR= MONV3 M$ M#L BR= MONV4 M$                    
+    6|M#L BR= JAWSV M$ IFEND                                          
+    7|M#L BR= ARV ( ARROW VECTOR ) M#L BR= CHRV ( CHAM REV VECT )     
+    8|VLENGTH BR= SCV                                                 
+    9|M#L BR= SFXV                                                    
+   10|5 30 * 4 + C= ARWL ARWL BA= ARWP                                
+   11|RAMLEN C= vs1l VARHERE C= vs1s                                  
+   12|M#L MONSURP + C= M#B                                            
+   13|: I:M M#B * MONV1 SWAP - ;                                      
+   14|: MON#? MONV1 SWAP - M#B / ;                                    
+   15|STK> XC? NOT IFTRUE VPTR @ H. VPTR ! IFEND -->                  
+
+BLOCK =   7
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MONSTER AND TREASURE STUFF )                                  
+    1|RAMMARK                                                         
+    2|( M#L BR= ARV )                                                 
+    3|V#L BR= PLYRV                                                   
+    4|V#L BR= REVV                                                    
+    5|M#L BR= KEY                                                     
+    6|XC? IFTRUE M#L BR= TRSV IFEND                                   
+    7|DECIMAL -->                                                     
+    8|                                                                
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   8
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( HOSTAGE VECTORS )                                             
+    1|V#L BR= HOSV1                                                   
+    2|XC? IFTRUE V#L BR= HOSV2                                        
+    3|V#L BR= HOSV3 IFEND                                             
+    4|RAMLEN C= vs2l  VARHERE C= vs2s                                 
+    5|XC? IFTRUE 3 C= TOTAL-HOSTAGES                                  
+    6|TABLE HOSTAB HOSV1 , HOSV2 , HOSV3 , 0 ,                        
+    7|OTHERWISE 1 C= TOTAL-HOSTAGES TABLE HOSTAB HOSV1 , 0 , IFEND    
+    8|                                                                
+    9|( ******* )                                                     
+   10|( MORE NEAT VECTOR STUFF )                                      
+   11|: ZAP:VECT 0 vs1s vs1l FILL                                     
+   12|0 vs2s vs2l FILL ;                                              
+   13|-->                                                             
+   14|                                                                
+   15|                                                                
+
+
+
+
+

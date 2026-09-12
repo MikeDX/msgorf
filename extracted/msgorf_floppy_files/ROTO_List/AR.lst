@@ -1,0 +1,127 @@
+
+File Size: 6144.000000 Bytes    6.000000 Blocks  0-5.000000
+
+
+Last Block = 5
+
+
+
+FILE = AR
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( PATTERNS TO FORM MASTER ARROW PATTERN WITH )                  
+    1|{ : BIN } 2 BASE ! { ; }                                        
+    2|DATA SYNTBL                                                     
+    3|( UP ) DECIMAL 5 B, BIN                                         
+    4|00000010 B, 00000000 B,                                         
+    5|00000111 B, 00000000 B,                                         
+    6|00001111 B, 10000000 B,                                         
+    7|00000010 B, 00000000 B,                                         
+    8|00000010 B, 00000000 B,                                         
+    9|( LEFT ) DECIMAL 69 B, BIN                                      
+   10|00100000 B, 00000000 B,                                         
+   11|01100000 B, 00000000 B,                                         
+   12|11111000 B, 00000000 B,                                         
+   13|01100000 B, 00000000 B,                                         
+   14|00100000 B, 00000000 B,                                         
+   15|DECIMAL -->                                                     
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( PATTERNS TO FORM MASTER ARROW PATTERN WITH )                  
+    1|( RIGHT ) DECIMAL 67 B, BIN                                     
+    2|00010000 B, 00000000 B,                                         
+    3|00011000 B, 00000000 B,                                         
+    4|01111100 B, 00000000 B,                                         
+    5|00011000 B, 00000000 B,                                         
+    6|00010000 B, 00000000 B,                                         
+    7|( DN ) DECIMAL 130 B, BIN                                       
+    8|00000001 B, 00000000 B,                                         
+    9|00000001 B, 00000000 B,                                         
+   10|00000111 B, 11000000 B,                                         
+   11|00000011 B, 10000000 B,                                         
+   12|00000001 B, 00000000 B,                                         
+   13|DECIMAL -->                                                     
+   14|                                                                
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( SYNAP )                                                       
+    1|HEX SUBR SYNAP B PUSH,                                          
+    2|0 ARWP H LXI, ARWL DO, 0 M MVI, H INX, LOOP,                    
+    3|D A MOV, A ANA, 0<>, IF,                                        
+    4|0F0F H LXI, 0 ARWP SHLD, 1E05 H LXI, 2 ARWP SHLD,               
+    5|ELSE, 0F0F H LXI, 0 ARWP SHLD, 1405 H LXI, 2 ARWP SHLD, THEN,   
+    6|0 B MVI, BEGIN, B C MOV, noded^ CALL, M A MOV, A ANA, 0<>, IF,  
+    7|noder^ CALL, M A MOV, 0C CPI, CY, IF,                           
+    8|ARS LDA, A ANA, 0<>, IF, C A MOV, CMA, 3 ANI, A L MOV,          
+    9|PLYRV NOWD + LDA, L CMP, ELSE, 1 A MVI, A ANA, THEN,            
+   10|0<>, IF,                                                        
+   11|-->                                                             
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   3
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( CALCULATE PATTERN ADDRESS )                                   
+    1|B PUSH, D PUSH, B INR, 0F5 A MVI, BEGIN, 0B ADI, LOOP,          
+    2|A C MOV, SYNTBL H LXI, B DAD, M C MOV, H INX,                   
+    3|XCHG, 0 ARWP H LXI, B DAD,                                      
+    4|5 DO, D LDAX, D INX, A M MOV, H INX, D LDAX, D INX, A M MOV,    
+    5|H INX, H INX, H INX, H INX, LOOP,                               
+    6|D POP, B POP, THEN, THEN, THEN,                                 
+    7|B INR, B A MOV, 4 CPI, CY~, END,                                
+    8|B POP, RET,                                                     
+    9|DECIMAL -->                                                     
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   4
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( ARROW DISPLAY TASK )                                          
+    1|HEX                                                             
+    2|CODE ARW B PUSH, Y PUSHX, vaddr LIYD, NOWC Y E LDX,             
+    3|NOWR Y D LDX, SYNAP CALL, Y POPX, B POP, NEXT                   
+    4|SUBR Acl ( ARROW CLASSIFY )                                     
+    5|DISTANCE 1+ PLYRV + LDA, A E MOV,                               
+    6|MAXDIST PLYRV + LDA, RRC, 7F ANI, E CMP,                        
+    7|CY~, IF, A XRA, ELSE, 1 A MVI, THEN, RET,                       
+    8|SUBR Pac                                                        
+    9|Acl CALL, A E MOV, ARS LDA, E CMP, RZ, E A MOV,                 
+   10|ARS STA, 1 A MVI, MYFLAG ARV + STA, RET,                        
+   11|CODE Gb? Y PUSHX, B PUSH, vaddr LIYD, NOWD Y C LDX,             
+   12|NOWR Y D LDX, NOWC Y E LDX, move:node CALL,                     
+   13|movecheck CALL, CY, IF, D NOWR Y STX, E NOWC Y STX, THEN,       
+   14|B POP, Y POPX, NEXT                                             
+   15|DECIMAL -->                                                     
+
+BLOCK =   5
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( ARROW TASK FELLA )                                            
+    1|: ERW DIVG ERASEWRITE DIVG ;                                    
+    2|: A-T ;TASK: DIVG                                               
+    3|NULPAT ANIM! 1STWRITE XOR-ON 8 XPAND!-ON                        
+    4|BEGIN                                                           
+    5|( NEED TO CHANGE? )                                             
+    6|PLYRV GRCD ARS B@ IF Gb? THEN                                   
+    7|NULPAT ANIM! ERW                                                
+    8|ESTPOS ARW 0 ARWP ANIM! ERW                                     
+    9|POA WAIT DIVG 0 END ;                                           
+   10|                                                                
+   11|-->                                                             
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

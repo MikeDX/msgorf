@@ -31,9 +31,10 @@ class MvpCompileTests(unittest.TestCase):
         self.assertGreater(len(obj), 16)
 
     def test_bullets_partial(self):
-        # Historical fragment uses words we do not yet implement — must error clearly
+        # Historical fragment from MSGORPAT screen 0010 — stubs for p-i / P-I
         r = compile_source(": BULLETS  p-i @  -2 P-I ;")
-        self.assertFalse(r.ok)
+        self.assertTrue(r.ok, r.errors)
+        self.assertEqual(r.words[0].name, "BULLETS")
 
 
 if __name__ == "__main__":

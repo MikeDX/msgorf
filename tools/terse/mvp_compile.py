@@ -45,7 +45,11 @@ PRIMITIVES = {
     "!": 0x21,
     "LIT": 0x30,  # followed by u16 LE
     "EXIT": 0xFF,
+    # Guessed stubs for Ms. Gorf fragments — NOT verified Z80 encodings
+    "P-I": 0x40,
+    "p-i": 0x41,
 }
+
 
 
 @dataclass

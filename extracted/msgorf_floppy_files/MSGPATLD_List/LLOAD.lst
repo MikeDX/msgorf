@@ -1,0 +1,51 @@
+
+File Size: 2048.000000 Bytes    2.000000 Blocks  0-1.000000
+
+
+Last Block = 1
+
+
+
+FILE = LLOAD
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( Load the Binary from a Xcompile Game File )                   
+    1|HEX BFD7  DP ! C004 C= XFRFLG C005 C= XFRADR                    
+    2|SUBR RESET DI, C007  JMP, NOP, NOP, NOP,                        
+    3|BEGIN, BEGIN, XFRFLG LDA, A ANA, 0<>, END,                      
+    4|XFRADR LDED,                                                    
+    5|0C400 H LXI, 400 B LXI, LDIR, A XRA, XFRFLG STA,                
+    6|D A MOV, 48 CPI, 0=, END, 0FF A MVI, 0FC OUT, 0FD OUT,          
+    7|0A A MVI, 0FE OUT, 3 A MVI, 0FF OUT,                            
+    8|BEGIN, 0E1 IN, 2 ANI, 0<>, END, 0 JMP,                          
+    9|-->                                                             
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( Load the Binary from a Xcompile Game File )                   
+    1|CODE CRASHER A XRA, 0CC OUT, 0 JMP, NEXT                        
+    2|: LLOAD [ EDIT ]                                                
+    3|  FILE  TERSE XFRFLG BZERO                                      
+    4|CR ." TYPE Go At C000 ON THE ICEBOX" CR                         
+    5|  12 00 DO I 400 * XFRADR !                                     
+    6|  I BLOCK C400 400 BMOVE                                        
+    7|  XFRFLG BONE                                                   
+    8|  BEGIN XFRFLG B@ 0= END                                        
+    9| LOOP CR ." TRANSFER COMPLETE" CRASHER ;                        
+   10|LLOAD XC.LOGIC                                                  
+   11|DECIMAL ;S                                                      
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

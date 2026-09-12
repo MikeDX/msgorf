@@ -1,0 +1,35 @@
+{
+  "start": "XCLOAD",
+  "order": [
+    "XCLOAD",
+    "CODE-LOAD",
+    "PATTERN",
+    "ANIM-VERBS",
+    "INIT-AT",
+    "INDEX",
+    "PAT-LOAD",
+    "NULPAT",
+    "PLY-P",
+    "PLUP",
+    "BANG",
+    "CLONE-P",
+    "GORF-P",
+    "LAZON-P",
+    "KAMI-P",
+    "SMINE-P",
+    "SHLD-P",
+    "MITE-P",
+    "TRION-P",
+    "DEB-P",
+    "HK-P",
+    "GB-P",
+    "GRD-P",
+    "ANIM-MAP",
+    "FS.XC"
+  ],
+  "missing": [],
+  "binary_or_opaque": [
+    "FS.XC"
+  ],
+  "disk": "extracted/msgorf_floppy_files/MSGORPAT_Disk"
+}

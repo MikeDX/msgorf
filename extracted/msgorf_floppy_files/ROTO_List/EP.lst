@@ -1,0 +1,32 @@
+
+File Size: 1024.000000 Bytes    1.000000 Blocks  0-0.000000
+
+
+Last Block = 0
+
+
+
+FILE = EP
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( EPSOM ROUTINE )                                               
+    1|DED 0 C= XC?                                                    
+    2|HEX                                                             
+    3|{ CODE .eps } ASM  ( Houston and Epson printer routine )        
+    4|{ ASM   H POP, 0 D LXI, 0F8 H MVI, BEGIN,                       
+    5|  E INR, 0=, IF, D INR, 0=, IF, H INR, 0=, IF, ' offl JMP, THEN,
+    6|  THEN, THEN, PLSTAT IN, 7 ( 3 ) A BIT, 0<>, IF, 0 ( 2 ) A BIT, 
+    7|  THEN, 0<>, END, L A MOV, PLDATA OUT, NEXT }                   
+    8|{ : .EPS }  ' .eps PUT ! { ; }                                  
+    9|DECIMAL                                                         
+   10|;S                                                              
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

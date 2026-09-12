@@ -1,0 +1,279 @@
+
+File Size: 14336.000000 Bytes    14.000000 Blocks  0-13.000000
+
+
+Last Block = 13
+
+
+
+FILE = M
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( ANIMATION ACTIVATION TABLES )                                 
+    1|XC? NOT IFTRUE ( CLUDGO )                                       
+    2|DATA A.REST Spa , Zwa , Jaw ,                                   
+    3|A.REST C= A.WALK A.REST C= A.SCUR                               
+    4|OTHERWISE                                                       
+    5|DATA A.REST Spa-r , Zwa , Jaw ,                                 
+    6|DATA A.WALK Spa , Zwa , Jaw ,                                   
+    7|DATA A.SCUR Spa , Zwa-s , Jaw ,                                 
+    8|IFEND                                                           
+    9|: MASET CLASS? 2* + @ ANIM! ;                                   
+   10|-->                                                             
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( TROLL AND JAWS COMMANDER )                                    
+    1|: TJ:B                                                          
+    2|MMSV VB@ MMONT CASE ESTPOS ( MONSTER ON TARGET POS )            
+    3|A.REST MASET                                                    
+    4|CHASEPLAYER                                                     
+    5|ON:TARGET? IF RANMOVE THEN                                      
+    6|BE? FPSS MMTHK MMSV VB! 1 TIMER!-ON 1                           
+    7|ELSE MMTHK CASE                                                 
+    8|LAH                                                             
+    9|IF TRACKPTR V!                                                  
+   10|MMINC MMSV VB! ( GO INTO IN CHAMBER ) THEN                      
+   11|1 TIMER!-ON 1                                                   
+   12|ELSE MMSTP CASE                                                 
+   13|A.REST MASET                                                    
+   14|180 TIMER!-ON MMINC MMSV VB! 1                                  
+   15|-->                                                             
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( INCHAMBER )                                                   
+    1|ELSE MMINC CASE ESTPOS                                          
+    2|( RANDOMLY DECIDE TO STOP )                                     
+    3|CLASS? IF 1 ELSE 32 RND THEN                                    
+    4|0= IF MMSTP ( ENTER STOP STATE )                                
+    5|ELSE                                                            
+    6|FOLLOWTRACK NOWD VB! DEPART:NODE                                
+    7|SOB B@ IF MMSCU ( ALWAYS SCURRY WHEN MAD )                      
+    8|ELSE PLYRV 2 CLOSE? IF MMWLK ELSE                               
+    9|16 RND SMARTS B@ 8 MIN 4 +                                      
+   10|> IF MMWLK ELSE MMSCU THEN THEN THEN MMSV VB!                   
+   11|THEN 0                                                          
+   12|ELSE MMWLK CASE A.WALK MASET MVSET 1                            
+   13|ELSE MMSCU CASE A.SCUR MASET MVSET 1                            
+   14|-->                                                             
+   15|                                                                
+
+BLOCK =   3
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( STUFF )                                                       
+    1|ELSE ( FLAKEY ) DROP                                            
+    2|THEN THEN THEN THEN THEN THEN                                   
+    3|IF ( EXECUTE WANTED FLAG PASSED )                               
+    4|MVECT-ON POA VM-W ZGO DIVG 0 DELTADIST V!                       
+    5|DEST? IF ARRIVE:NODE MMINC MMSV VB!                             
+    6|CLASS? 2 = IF MMONT MMSV VB! ELSE                               
+    7|20 RND SMARTS B@ 2 + CLASS? IF 6 + THEN 12 MIN                  
+    8|< IF MMONT MMSV VB! THEN                                        
+    9|ON:TARGET? IF MMONT MMSV VB! THEN                               
+   10|THEN THEN THEN COGO ; -->                                       
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   4
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( SPIDER BRAIN )                                                
+    1|: SP:B                                                          
+    2|SPDMOV                                                          
+    3|MMWLK MMSV VB! A.WALK MASET MVSET                               
+    4|DEPART:NODE                                                     
+    5|MVECT-ON POA VM-W ZGO DIVG 0 DELTADIST V!                       
+    6|DIVG                                                            
+    7|DEST? IF ARRIVE:NODE MMINC MMSV VB! THEN                        
+    8|COGO ;                                                          
+    9|-->                                                             
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   5
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( IMPROVED MONSTER TASK )                                       
+    1|: IM-T ;TASK: SPOTMONS                                          
+    2|0 TIMEBMAX! 2 TIMEBSCALE!                                       
+    3|XOR-ON                                                          
+    4|CLASS? 2 = IF JAWSF BONE THEN                                   
+    5|BEGIN DIVG                                                      
+    6|OBJSV VB@ MSPRO CASE ( MONSTER ON DA PROWL )                    
+    7|CLASS? IF ' TJ:B ELSE ' SP:B THEN SETCO COGO                    
+    8|-->                                                             
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   6
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( RETURN TO INITIAL POSITION )                                  
+    1|ELSE MSRIP CASE 0 DELTADIST V!                                  
+    2|IMP INTC VB! INTR VB!                                           
+    3|ON:TARGET? NOT IF                                               
+    4|A.SCUR MASET BE? FPSS BEGIN SYNC LAH END TRACKPTR V! DIVG       
+    5|RMON COGO THEN A.REST MASET                                     
+    6|MSAIP OBJSV VB!                                                 
+    7|ELSE MSAIP CASE                                                 
+    8|( WAIT FOR MONSTER RELEASE )                                    
+    9|BEGIN P.S B@ DUP PLIC = SWAP PLMV = OR NOT WHILE                
+   10|5 TIMER!-ON WAIT DIVG REPEAT                                    
+   11|( CLEAR MY POINTER ) 0 BEHIND V!                                
+   12|MMONT MMSV VB! MSPRO OBJSV VB!                                  
+   13|-->                                                             
+   14|                                                                
+   15|                                                                
+
+BLOCK =   7
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|ELSE MSSNA CASE ( SNATCHER !! )                                 
+    1|0 DELTADIST V! A.SCUR MASET ' B:M SETCO COGO RMON COGO          
+    2|1 DRPO VB!                                                      
+    3|30 TIMER!-ON GO MSPRO OBJSV VB! MMONT MMSV VB!                  
+    4|ELSE                                                            
+    5|THEN THEN THEN THEN 0 END ;                                     
+    6|( ACTIVATOR FOR SPIDERS )                                       
+    7|: M-T ;TASK: 1STWRITE MSAIP OBJSV VB! SELF IM-T ;               
+    8|-->                                                             
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   8
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( ROUTINE TO AVOID SENDING IN MONSTER TILL ZONE CLEAR )         
+    1|: W-CL ( WAIT FOR PLAYER TO CLEAR ENTRY CHAMBER )               
+    2|Src Snm                                                         
+    3|0 WTCTR VB! ( RESET THE IMPATIENCE COUNTER )                    
+    4|BEGIN                                                           
+    5|PLYRV 2 CLOSE? NOT                                              
+    6|IF 0 1 ELSE ( RESET IF PLAYER NOT IN MAZE )                     
+    7|P.S B@ DUP PLIC = SWAP PLMV = OR NOT IF 0 WTCTR VB! THEN        
+    8|WTCTR VB@ 1+ DUP WTCTR VB! 10 >                                 
+    9|IF 1 1 ELSE 5 TIMER!-ON WAIT DIVG 0 THEN THEN END COGO ;        
+   10|-->                                                             
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   9
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( JAWS TASK ) XC? NOT IFTRUE : JAW-S ; IFEND                    
+    1|XC? IFTRUE : J-T ;TASK: DIVG                                    
+    2|MSAIP OBJSV VB! 4 TIMEBMAX! 2 TIMEBSCALE!                       
+    3|ST-X X! RQ-Y Y! 1STWRITE XOR-ON NULPAT ANIM!                    
+    4|18 GA# B@ 7 MIN 2* -                                            
+    5|30 * TIMER!-ON WAIT JAW-S                                       
+    6|' W-CL SETCO COGO Jaw ANIM! IF 60 TIMER!-ON GO THEN             
+    7|DIVG ' OPDR SETCO COGO EMOV                                     
+    8|ST-X DESTX! ST-Y DESTY! 40 TIMER!-ON                            
+    9|A->DEST/TIME GO ( ENTER CHAMB ) EMOV                            
+   10|( IF KEY NOT USED CLOSE DOOR BEHIND )                           
+   11|KEY OBJSV OVB@ KYOPEN <> IF ' CLDR SETCO COGO THEN DIVG         
+   12|MMONT MMSV VB! MSPRO OBJSV VB! SPOTMONS SELF IM-T ;             
+   13|IFEND                                                           
+   14|-->                                                             
+   15|                                                                
+
+BLOCK =  10
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( JAWS ELIMINATORS )                                            
+    1|XC? IFTRUE                                                      
+    2|: J-ER ;TASK: JAWSF BZERO NULPAT ANIM! 1 TIMER!-ON GO ;         
+    3|: J-RV ;TASK: DIVG 500 INCSCORE NULPAT ANIM! ERASEWRITE         
+    4|DIVG SELF J-T ;                                                 
+    5|OTHERWISE                                                       
+    6|: J-ER DROP ;                                                   
+    7|: J-RV DROP ;                                                   
+    8|: J-T DROP ;                                                    
+    9|0 C= JAWSV                                                      
+   10|IFEND -->                                                       
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =  11
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( TROLL TASK )                                                  
+    1|: R-T ;TASK: MSAIP OBJSV VB! DIVG 4 TIMEBMAX! 2 TIMEBSCALE!     
+    2|ST-X X! RQ-Y Y! 1STWRITE XOR-ON NULPAT ANIM!                    
+    3|26 DIF B@ 2* - GA# B@ 7 MIN 2* - 30 * DUP                       
+    4|0<= IF DROP 30 THEN TIMER!-ON WAIT                              
+    5|' W-CL SETCO COGO                                               
+    6|EMOV ( HOLD FOR 2 SECONDS OF WARNING )                          
+    7|ROTFLY ANIM! RODAN-S                                            
+    8|IF 60 TIMER!-ON GO DIVG THEN ' OPDR SETCO COGO                  
+    9|ST-X DESTX! ST-Y DESTY! 40 TIMER!-ON                            
+   10|A->DEST/TIME GO ( ENTER CHAMB ) EMOV                            
+   11|( IF KEY NOT USED CLOSE DOOR BEHIND )                           
+   12|KEY OBJSV OVB@ KYOPEN <> IF ' CLDR SETCO COGO THEN              
+   13|DIVG SPOTMONS                                                   
+   14|MMONT MMSV VB! MSPRO OBJSV VB! JAWSV J-T                        
+   15|SELF IM-T ; -->                                                 
+
+BLOCK =  12
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( SLUT ROUTINE AND ROUTINE TO FORCE OTHERS BACK TO INIT POS )   
+    1|HEX DATA CKA 0 B,                                               
+    2|: SLUT SELF DX@ 0 > IF 0 ELSE 80 THEN ANGLE! ;                  
+    3|                                                                
+    4|( RETURN UGLY NERDS TO INITIAL POSITION )                       
+    5|: FLGEM DO I I:M OBJSV OVB@ MSPRO = IF                          
+    6|MSRIP I I:M OBJSV OVB! 1 I I:M MYFLAG OVB! THEN LOOP ;          
+    7|( BANISH MONSTERS TO LOWER SCREEN POSITION )                    
+    8|XC? IFTRUE : KICKBK 4 1 FLGEM ; : BANTOP 5 0 FLGEM ;            
+    9|OTHERWISE : KICKBK 1 1 FLGEM ; : BANTOP 1 0 FLGEM ; IFEND       
+   10|( MONSTER MASH ROUTINE )                                        
+   11|: M:M MONV1 R-T                                                 
+   12|MZP @ 3 + B@ 1+ 1 DO I I:M M-T LOOP ;                           
+   13|DECIMAL -->                                                     
+   14|                                                                
+   15|                                                                
+
+BLOCK =  13
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( GRAB PLAYER AND LEAVE PLAYFIELD )                             
+    1|: DEPARTSKI ST-X DESTX! RQ-Y DESTY! SELF Y@ 40 > IF 256 ELSE    
+    2|512 THEN A->DEST SLUT GO EMOV                                   
+    3|NULPAT ANIM! 1 TIMER!-ON GO DIVG COGO ;                         
+    4|DECIMAL                                                         
+    5|: RAVISH ;TASK: DIVG 0 TIMEBSCALE! BKC BZERO KICKBK             
+    6|PLYRV X@ DESTX! PLYRV Y@ DESTY!                                 
+    7|EMOV DVECT-OFF                                                  
+    8|( GO FOR THE PLAYER )                                           
+    9|ROTFLY ANIM! 60 TIMER!-ON                                       
+   10|512 A->DEST                                                     
+   11|SLUT GO EMOV CARRY-S JAWSV ACTIVE? IF JAWSV J-ER THEN           
+   12|( ONCE WE GET THERE FLAG 'EM )                                  
+   13|MYFLAG PLYRV + BONE                                             
+   14|' DEPARTSKI SETCO COGO 250 BKC B! SHUTUP SELF R-T ;             
+   15|-->                                                             
+
+
+
+
+

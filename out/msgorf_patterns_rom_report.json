@@ -1,0 +1,14 @@
+{
+  "note": "Authentic XC.PATTERNS placed at ROMSTART 0x4000 from MsGorf floppy extract",
+  "romstart": "0x4000",
+  "patterns_file": "extracted/msgorf_floppy_files/MSGORPAT_Disk/XC.PATTERNS",
+  "patterns_size": 20480,
+  "patterns_sha256": "06cd924bbe075e2da0d4364452f5293081d9a102eee598933bae0a324a8602eb",
+  "image_size": 65536,
+  "image_sha256": "740a5e76662b890b1296265abf1f7299eadfe286bb9d904c2200c7d8bf83a670",
+  "output": "out/msgorf_patterns_at_4000.bin",
+  "not_a_full_game": true,
+  "next": "Need application/XC.LOGIC sources + dual-Z80 harness",
+  "fs_pat_size": 43008,
+  "fs_pat_sha256": "12302271cd28d4bb38b1518bd6e0233aecfdbd36446224fb47672af47791568e"
+}

@@ -1,0 +1,89 @@
+
+File Size: 4096.000000 Bytes    4.000000 Blocks  0-3.000000
+
+
+Last Block = 3
+
+
+
+FILE = SC
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|SCON IFTRUE ( TASK TO DISPLAY PLAYER ONES SCORE )               
+    1|: P1s ;TASK:                                                    
+    2|sc1l @ sc1h @ 0 AP1S 8 BIN->ASC                                 
+    3|8 0 AP1S B!                                                     
+    4|0 AP1S 0SUPR 6 2 AP1S B!                                        
+    5|-156 X! SC-Y Y! PLOP-ON 7 XPAND!-ON                             
+    6|2 AP1S PATTERN! EVEN-SPACE-NUMS                                 
+    7|DI STRING ;                                                     
+    8|IFEND -->                                                       
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|SCON IFTRUE ( TASK TO DISPLAY PLAYER TWOS SCORE )               
+    1|: P2s ;TASK:                                                    
+    2|sc2l @ sc2h @ 0 AP2S 8 BIN->ASC                                 
+    3|8 0 AP2S B!                                                     
+    4|0 AP2S 0SUPR 6 2 AP2S B!                                        
+    5|108 X! SC-Y Y! PLOP-ON 7 XPAND!-ON                              
+    6|2 AP2S PATTERN! EVEN-SPACE-NUMS                                 
+    7|DI STRING ;                                                     
+    8|: B1s sc1l @ sc1h @ D+ sc1h WP! sc1l WP! ;                      
+    9|: B2s sc2l @ sc2h @ D+ sc2h WP! sc2l WP! ;                      
+   10|: S*? SC* B@ DUP IF 1+ * ELSE DROP THEN ;                       
+   11|: IS-D NERDUP IF B2s ELSE B1s THEN ;                            
+   12|: US-S NERDUP IF SCV P2s ELSE SCV P1s THEN ;                    
+   13|: PATTY 0 IS-D US-S ;                                           
+   14|: INCSCORE S*? PATTY ;                                          
+   15|IFEND -->                                                       
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( SCORING DUMMIES )                                             
+    1|SCON NOT IFTRUE                                                 
+    2|: INCSCORE DROP ;                                               
+    3|: IS-D 2DROP ;                                                  
+    4|IFEND                                                           
+    5|: TBCL 0 TIMEBSCALE! ZEROTIMEB ;                                
+    6|SCON IFTRUE                                                     
+    7|: GO-T ;TASK: BEGIN TBCL -36 X! 78 Y!                           
+    8|NORMAL-SPACING 4 XPAND!-ON A" GAME OVER" PATTERN!               
+    9|XOR-ON DI STRING 20 TIMER!-ON WAIT 0 END ;                      
+   10|OTHERWISE                                                       
+   11|: GO-T DROP ;                                                   
+   12|IFEND                                                           
+   13|-->                                                             
+   14|                                                                
+   15|                                                                
+
+BLOCK =   3
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( PLAYER UP DISPLAY TASK )                                      
+    1|XC? IFTRUE                                                      
+    2|: PU-T ;TASK: TBCL -72 X! 0 Y!                                  
+    3|68 XPAND!-ON #PLA B@ NOT IF A" GET READY" ELSE                  
+    4|NERDUP IF A" PLAYER 2 UP" ELSE A" PLAYER 1 UP" THEN THEN        
+    5|PATTERN! XOR-ON DI STRING VGER-OUT ;                            
+    6|OTHERWISE : PU-T ;TASK: VGER-OUT ; IFEND                        
+    7|                                                                
+    8|( TOGGLE:LIFE, DISPLAY REMAINING LIVES, AND BITE DUST )         
+    9|: RTw ROTO WRITEP ;                                             
+   10|: THIS:LIFE RR# B@ 4 MIN 1- ;                                   
+   11|: RPT1 16 * -100 + RP-Y ;                                       
+   12|: RPT2 16 * 100 SWAP - RP-Y ;                                   
+   13|: ROTOPOS NERDUP IF RPT2 ELSE RPT1 THEN ;                       
+   14|-->                                                             
+   15|                                                                
+
+
+
+
+

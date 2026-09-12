@@ -1,0 +1,89 @@
+
+File Size: 4096.000000 Bytes    4.000000 Blocks  0-3.000000
+
+
+Last Block = 3
+
+
+
+FILE = INSTRUCTIONS
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|INSTRUCTIONS FOR MODIFYING PATTERNS                             
+    1|                                                                
+    2|CREATE PATTERNS AND ANIMATION TABLES USING THE ANIMATION TOOLS  
+    3|                                                                
+    4|INSERT 'FLOAD' COMMANDS TO LOAD THIS INFORMATION INTO THE       
+    5|FILE NAMED 'PAT-LOAD' IF THE CHANGES WOULD MAKE EXISTING        
+    6|FILES IN 'PAT-LOAD' OBSELETE, THEN DESTROY THE OBSLETE FILES    
+    7|AND REMOVE THE CORRESPONDING 'FLOAD' COMMANDS.                  
+    8|                                                                
+    9|                                                                
+   10|THE FILE NAMED 'ANIM-MAP' CONTAINS INSTRUCTIONS THAT ASSOCIATE  
+   11|ANIMATION LISTS AND PATTERNS THAT YOU CREATE WITH               
+   12|'INDEX CONSTANTS' DEFINED BY JAY. THE 'INDEX CONSTANTS'         
+   13|ARE LISTED IN THE FILE NAMED 'INDEX' WHICH JAY MAINTAINS.       
+   14|                                                                
+   15|-- MORE --                                                      
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|AN 'INDEX CONSTANT' IS A SPECIAL NAME THAT JAY'S PROGRAM        
+    1|USES TO REFER TO YOUR ANIMATION. BY UPDATING YOUR 'ANIM-MAP'    
+    2|FILE YOU FORM THE ASSOCIATION BETWEEN YOUR NAME AND JAY'S NAME. 
+    3|THUS YOU CAN CALL YOUR ANIMATIONS AND PATTERNS WHATEVER YOU LIKE
+    4|WITHOUT WORRY ABOUT CONFLICTING WITH JAY'S NAME USAGE.          
+    5|                                                                
+    6|THE FORMAT FOR SPECIFING THIS ASSOCIATION LOOKS LIKE THIS:      
+    7|                                                                
+    8|<your name> <jays name> AT!                                     
+    9|                                                                
+   10|THIS EXAMPLE WOULD DEFINE THE PATTERN CALLED 'GORF-PAT' WITH    
+   11|THE INDEX CONSTANT 'GORFi':                                     
+   12|                                                                
+   13|GORF-PAT GORFi AT!                                              
+   14|                                                                
+   15|-- MORE --                                                      
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|THE FILE 'ANIM-MAP' CONTAINS A LIST OF LINES LIKE THE           
+    1|ONE SHOWN IN THE EXAMPLE. IT IS VERY IMPORTANT THAT THE         
+    2|FOLLOWING MISTAKES NOT OCCUR:                                   
+    3|                                                                
+    4|FORGETING TO ADD A LINE IN THE 'ANIM-MAP' FILE WILL CAUSE       
+    5|A UGLY BLOCK TO APPEAR IN THE PLACE OF THE PATTERN YOU WANTED.  
+    6|                                                                
+    7|DUPLICATE LINES REFERING TO THE SAME INDEX CONSTANT WILL CAUSE  
+    8|THE ANIMATION MENTIONED LATER ON TO BE THE ONE USED BY THE      
+    9|PROGRAM.                                                        
+   10|                                                                
+   11|SPELLING MISTAKES WILL CAUSE THE COMPUTER TO PRINT THE MIS-     
+   12|SPELLED WORD FOLLOWED BY A QUESTION MARK. TYPING 'WHERE' WILL   
+   13|PRINT OUT THE LINE CONTAINING THE MISTAKE. TO CORRECT THIS YOU  
+   14|MAY HAVE TO RELOAD FROM THE BEGINING.                           
+   15|-- MORE --                                                      
+
+BLOCK =   3
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|OTHER MISTAKES YOU MAY MAKE ARE RUNNING OUT OF MEMORY SPACE     
+    1|OR OVERFLOWING THE DISK DIRECTORY. IF YOU RUN OUT OF SPACE      
+    2|TALK TO JAY ABOUT IT. IF THE DISK DIRECTORY OVERFLOWS           
+    3|IT IS RECOMMENDED THAT RELATED OBJECTS BE COMBINED INTO A       
+    4|SINGLE FILE. FOR EXAMPLE RATHER THAT HAVING 4 FILES             
+    5|EACH CONTAINING ONE PATTERN THEY COULD BE MERGED INTO A         
+    6|SINGLE FILE CONTAINING FOUR PATTERN BLOCKS. THIS WILL ALSO      
+    7|SAVE CONSIDERABLE TIME WHEN LOADING.                            
+    8|                                                                
+    9|                                                                
+   10|                                                                
+   11|GOOD LUCK, Jay Fenton 5/18/83                                   
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

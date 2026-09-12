@@ -1,0 +1,108 @@
+
+File Size: 5120.000000 Bytes    5.000000 Blocks  0-4.000000
+
+
+Last Block = 4
+
+
+
+FILE = CD
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( COMPUTE DELTAS FOR STORAGE ROUTINE )                          
+    1|( THIS ROUTINE COMPUTES DELTA FOR ONE COORDINATE )              
+    2|SUBR CDEL1 ( DE=R,C B=COORD PTR, C=DIR )                        
+    3|B PUSH, D PUSH,                                                 
+    4|B PUSH, C A MOV, MPL0 ADI, A C MOV, node^ CALL, M L MOV,        
+    5|0 H MVI, B POP, L A MOV, A ANA, 0<>, IF,                        
+    6|H PUSH, D PUSH, move:node CALL,                                 
+    7|B C MOV, node^ CALL, M E MOV, H INX, M D MOV, XCHG,             
+    8|XTHL, XCHG, node^ CALL, M C MOV, H INX, M B MOV,                
+    9|H POP, ( TARGET ) D POP, ( TIME ) CDELTA CALL, E A MOV,         
+   10|THEN, D POP, B POP, A B MOV, RET,                               
+   11|-->                                                             
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( SET DELTAS FOR BOTH COORDINATES FOR A GIVEN PATH )            
+    1|SUBR SETDELTS                                                   
+    2|NBX B MVI, CDEL1 CALL, B PUSH, C A MOV, NDX0 ADI, A C MOV,      
+    3|node^ CALL, B M MOV, B POP, NBY B MVI, CDEL1 CALL,              
+    4|B PUSH, C A MOV, NDY0 ADI, A C MOV,                             
+    5|node^ CALL, B M MOV, B POP, RET,                                
+    6|XC? IFTRUE                                                      
+    7|<STK                                                            
+    8|CODE XADJ H POP, xadj CALL, H PUSH, NEXT                        
+    9|CODE YADJ H POP, yadj CALL, H PUSH, NEXT                        
+   10|STK>                                                            
+   11|IFEND                                                           
+   12|                                                                
+   13|-->                                                             
+   14|                                                                
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( COMPUTE DISTANCES )                                           
+    1|SUBR CDD noder^ CALL, M A MOV, A ANA, RZ, B PUSH, D PUSH,       
+    2|GMRC SDED, C A MOV, GMD STA, move:node CALL, GMNRC SDED,        
+    3|NODX C MVI, GMRC LDED, node^ CALL,                              
+    4|M E MOV, H INX, M D MOV, H INX, RCX SDED,                       
+    5|M E MOV, H INX, M D MOV, RCY SDED,                              
+    6|GMNRC LDED, node^ CALL,                                         
+    7|M E MOV, H INX, M D MOV, H INX, NRCX SDED,                      
+    8|M E MOV, H INX, M D MOV, NRCY SDED,                             
+    9|-->                                                             
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   3
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( COMPUTE DISTANCE )                                            
+    1|RCY LHLD, A ANA, D DSBC, L A MOV, SQUARE CALL, H PUSH,          
+    2|NRCX LDED, RCX LHLD, A ANA, D DSBC, L A MOV,                    
+    3|SQUARE CALL, D POP, D DAD, sqrt CALL, A B MOV, ( B= DIST )      
+    4|GMRC LDED, GMD LDA, MPL0 ADI, A C MOV, node^ CALL, B M MOV,     
+    5|GMD LDA, CMA, 3 ANI, MPL0 ADI, A C MOV,                         
+    6|GMNRC LDED, node^ CALL,                                         
+    7|B M MOV, D POP, B POP, RET,                                     
+    8|F= Cdl                                                          
+    9|CODE C-DST <ASSEMBLE B PUSH,                                    
+   10|0 D LXI, 0 C MVI,                                               
+   11|LABEL Cdl CDD CALL,                                             
+   12|C A MOV, A INR, A C MOV, 4 CPI, Cdl JRNZ, 0 C MVI,              
+   13|E A MOV, A INR, A E MOV, NCOLS CPI, Cdl JRNZ, 0 E MVI,          
+   14|D A MOV, A INR, A D MOV, NROWS CPI, Cdl JRNZ,                   
+   15|B POP, NEXT ASSEMBLE> -->                                       
+
+BLOCK =   4
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( COMPUTE DELTAS FOR WHOLE MATRIX )                             
+    1|CODE MAKEDELTS B PUSH,                                          
+    2|0 D LXI, 0 C MVI,                                               
+    3|BEGIN, BEGIN, BEGIN, SETDELTS CALL,                             
+    4|C A MOV, A INR, A C MOV, 4 CPI, 0=, END, 0 C MVI,               
+    5|E A MOV, A INR, A E MOV, NCOLS CPI, 0=, END, 0 E MVI,           
+    6|D A MOV, A INR, A D MOV, NROWS CPI, 0=, END,                    
+    7|B POP, NEXT                                                     
+    8|: FIXVGER NCOLS 0 DO NROWS 0 DO                                 
+    9|J I NODX NODE@ XADJ J I NBX NODE!                               
+   10|J I NODY NODE@ YADJ J I NBY NODE! LOOP LOOP ;                   
+   11|: MD FIXVGER C-DST MAKEDELTS ;                                  
+   12|-->                                                             
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

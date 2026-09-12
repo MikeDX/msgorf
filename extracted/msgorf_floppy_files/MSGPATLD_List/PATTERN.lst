@@ -1,0 +1,32 @@
+
+File Size: 1024.000000 Bytes    1.000000 Blocks  0-0.000000
+
+
+Last Block = 0
+
+
+
+FILE = PATTERN
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( pattern creation:     ^ ~ QUADPAT BINPAT QUAD PATTERN PDUMP ) 
+    1|<STKH   0 { VARIABLE PBASE }                                    
+    2|{ : ^ } ( --- ; store bytes on stack in ram )                   
+    3|{ -1 >R BEGIN DUP -1 = IF DROP 1 ELSE >R 0 THEN END             
+    4|  BEGIN R> DUP -1 = IF DROP 1 ELSE } B, { 0 THEN END BASE ! ; } 
+    5|{ : QUADPAT } 4 PBASE ! { ; } { : BINPAT } 2 PBASE ! { ; }      
+    6|{ : ~ } { BASE @ -1 } PBASE { @ BASE ! ; } ( START OF PATTERN ) 
+    7|{ : PATTERN } DECIMAL DATA { ; } { : QUAD } 4 BASE ! { ; }      
+    8|STK> ;S                                                         
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

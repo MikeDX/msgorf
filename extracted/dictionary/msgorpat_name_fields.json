@@ -1,0 +1,3002 @@
+[
+  {
+    "offset": 114,
+    "name": ".NEXT.",
+    "name_len": 6,
+    "next_rel": 27
+  },
+  {
+    "offset": 130,
+    "name": "const",
+    "name_len": 5,
+    "next_rel": 11
+  },
+  {
+    "offset": 145,
+    "name": "LIT",
+    "name_len": 3,
+    "next_rel": 11
+  },
+  {
+    "offset": 160,
+    "name": "BLIT",
+    "name_len": 4,
+    "next_rel": 11
+  },
+  {
+    "offset": 189,
+    "name": "ALIT",
+    "name_len": 4,
+    "next_rel": 15
+  },
+  {
+    "offset": 208,
+    "name": "ABLIT",
+    "name_len": 5,
+    "next_rel": 14
+  },
+  {
+    "offset": 246,
+    "name": "DUP",
+    "name_len": 3,
+    "next_rel": 7
+  },
+  {
+    "offset": 272,
+    "name": "DROP",
+    "name_len": 4,
+    "next_rel": 6
+  },
+  {
+    "offset": 282,
+    "name": "R>",
+    "name_len": 2,
+    "next_rel": 14
+  },
+  {
+    "offset": 300,
+    "name": ">R",
+    "name_len": 2,
+    "next_rel": 14
+  },
+  {
+    "offset": 318,
+    "name": "SWAP",
+    "name_len": 4,
+    "next_rel": 9
+  },
+  {
+    "offset": 353,
+    "name": "SP@",
+    "name_len": 3,
+    "next_rel": 9
+  },
+  {
+    "offset": 366,
+    "name": "@",
+    "name_len": 1,
+    "next_rel": 7
+  },
+  {
+    "offset": 377,
+    "name": "B@",
+    "name_len": 2,
+    "next_rel": 8
+  },
+  {
+    "offset": 389,
+    "name": "!",
+    "name_len": 1,
+    "next_rel": 7
+  },
+  {
+    "offset": 400,
+    "name": "B!",
+    "name_len": 2,
+    "next_rel": 6
+  },
+  {
+    "offset": 410,
+    "name": "ZERO",
+    "name_len": 4,
+    "next_rel": 11
+  },
+  {
+    "offset": 425,
+    "name": "+",
+    "name_len": 1,
+    "next_rel": 6
+  },
+  {
+    "offset": 435,
+    "name": "-",
+    "name_len": 1,
+    "next_rel": 8
+  },
+  {
+    "offset": 447,
+    "name": "MINUS",
+    "name_len": 5,
+    "next_rel": 32
+  },
+  {
+    "offset": 459,
+    "name": "=",
+    "name_len": 1,
+    "next_rel": 20
+  },
+  {
+    "offset": 462,
+    "name": "COM",
+    "name_len": 3,
+    "next_rel": 17
+  },
+  {
+    "offset": 470,
+    "name": "L",
+    "name_len": 1,
+    "next_rel": 9
+  },
+  {
+    "offset": 538,
+    "name": "ABS",
+    "name_len": 3,
+    "next_rel": 18
+  },
+  {
+    "offset": 579,
+    "name": "<>",
+    "name_len": 2,
+    "next_rel": 16
+  },
+  {
+    "offset": 599,
+    "name": "U<",
+    "name_len": 2,
+    "next_rel": 16
+  },
+  {
+    "offset": 619,
+    "name": "U>=",
+    "name_len": 3,
+    "next_rel": 17
+  },
+  {
+    "offset": 640,
+    "name": "<",
+    "name_len": 1,
+    "next_rel": 20
+  },
+  {
+    "offset": 664,
+    "name": ">=",
+    "name_len": 2,
+    "next_rel": 21
+  },
+  {
+    "offset": 689,
+    "name": "U>",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 699,
+    "name": "U<=",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 710,
+    "name": ">",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 719,
+    "name": "<=",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 798,
+    "name": "NOT",
+    "name_len": 3,
+    "next_rel": 16
+  },
+  {
+    "offset": 807,
+    "name": "SKIP",
+    "name_len": 4,
+    "next_rel": 7
+  },
+  {
+    "offset": 818,
+    "name": "XDI",
+    "name_len": 3,
+    "next_rel": 8
+  },
+  {
+    "offset": 830,
+    "name": "AND",
+    "name_len": 3,
+    "next_rel": 13
+  },
+  {
+    "offset": 847,
+    "name": "OR",
+    "name_len": 2,
+    "next_rel": 12
+  },
+  {
+    "offset": 863,
+    "name": "XOR",
+    "name_len": 3,
+    "next_rel": 13
+  },
+  {
+    "offset": 880,
+    "name": "BMOVE",
+    "name_len": 5,
+    "next_rel": 18
+  },
+  {
+    "offset": 902,
+    "name": "DO",
+    "name_len": 2,
+    "next_rel": 28
+  },
+  {
+    "offset": 934,
+    "name": "LOOP",
+    "name_len": 4,
+    "next_rel": 49
+  },
+  {
+    "offset": 987,
+    "name": "I",
+    "name_len": 1,
+    "next_rel": 9
+  },
+  {
+    "offset": 994,
+    "name": "e",
+    "name_len": 1,
+    "next_rel": 2
+  },
+  {
+    "offset": 1000,
+    "name": "J",
+    "name_len": 1,
+    "next_rel": 9
+  },
+  {
+    "offset": 1013,
+    "name": "K",
+    "name_len": 1,
+    "next_rel": 9
+  },
+  {
+    "offset": 1026,
+    "name": "I+",
+    "name_len": 2,
+    "next_rel": 12
+  },
+  {
+    "offset": 1034,
+    "name": "Q",
+    "name_len": 1,
+    "next_rel": 4
+  },
+  {
+    "offset": 1042,
+    "name": "OVER",
+    "name_len": 4,
+    "next_rel": 10
+  },
+  {
+    "offset": 1056,
+    "name": "+!",
+    "name_len": 2,
+    "next_rel": 12
+  },
+  {
+    "offset": 1098,
+    "name": "SWAB",
+    "name_len": 4,
+    "next_rel": 10
+  },
+  {
+    "offset": 1112,
+    "name": "OUTP",
+    "name_len": 4,
+    "next_rel": 11
+  },
+  {
+    "offset": 1127,
+    "name": "INP",
+    "name_len": 3,
+    "next_rel": 12
+  },
+  {
+    "offset": 1143,
+    "name": "ROT",
+    "name_len": 3,
+    "next_rel": 9
+  },
+  {
+    "offset": 1156,
+    "name": "PICK",
+    "name_len": 4,
+    "next_rel": 13
+  },
+  {
+    "offset": 1185,
+    "name": "*",
+    "name_len": 1,
+    "next_rel": 30
+  },
+  {
+    "offset": 1219,
+    "name": "/MOD",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 1235,
+    "name": "x/Gy",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 1324,
+    "name": "+LOOP",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 1407,
+    "name": ".JUMP.",
+    "name_len": 6,
+    "next_rel": 13
+  },
+  {
+    "offset": 1424,
+    "name": ".JZERO.",
+    "name_len": 7,
+    "next_rel": 16
+  },
+  {
+    "offset": 1447,
+    "name": "LEAVE",
+    "name_len": 5,
+    "next_rel": 18
+  },
+  {
+    "offset": 1469,
+    "name": "+B!",
+    "name_len": 3,
+    "next_rel": 9
+  },
+  {
+    "offset": 1488,
+    "name": "a",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 1508,
+    "name": "MAX",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 1524,
+    "name": "/",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 1529,
+    "name": "MOVE",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 1543,
+    "name": "MIN",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 1549,
+    "name": "H",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 1564,
+    "name": "NAND",
+    "name_len": 4,
+    "next_rel": 70
+  },
+  {
+    "offset": 1578,
+    "name": "NOR",
+    "name_len": 3,
+    "next_rel": 56
+  },
+  {
+    "offset": 1591,
+    "name": "MOD",
+    "name_len": 3,
+    "next_rel": 43
+  },
+  {
+    "offset": 1617,
+    "name": ".case.",
+    "name_len": 6,
+    "next_rel": 17
+  },
+  {
+    "offset": 1647,
+    "name": "SB!",
+    "name_len": 3,
+    "next_rel": 7
+  },
+  {
+    "offset": 1658,
+    "name": "BONE",
+    "name_len": 4,
+    "next_rel": 8
+  },
+  {
+    "offset": 1670,
+    "name": "BZERO",
+    "name_len": 5,
+    "next_rel": 9
+  },
+  {
+    "offset": 1683,
+    "name": "S!",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 1693,
+    "name": "-!",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 1698,
+    "name": "E",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 1700,
+    "name": "C",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 1709,
+    "name": "BUFFER2",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 1724,
+    "name": "BUFFER1",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 1739,
+    "name": "rs-b",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 1751,
+    "name": "s-b",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 1762,
+    "name": "GAS?",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 1774,
+    "name": "DP",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 1784,
+    "name": "VPTR",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 1796,
+    "name": "BASE",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 1808,
+    "name": "LAST",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 1820,
+    "name": "STATE",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 1833,
+    "name": "SCR",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 1844,
+    "name": "IOFF",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 1856,
+    "name": "E.O",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 1867,
+    "name": "E.B",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 1878,
+    "name": "EMPTY",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 1891,
+    "name": "BPTR",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 1903,
+    "name": "prev",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 1915,
+    "name": "FLD",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 1926,
+    "name": "DELIM",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 1939,
+    "name": "memap",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 1952,
+    "name": "MEMAP!",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 1975,
+    "name": "MEMAP@",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 1991,
+    "name": "PROT",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 2010,
+    "name": "UNPROT",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 2031,
+    "name": "U!",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 2045,
+    "name": "UB!",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 2060,
+    "name": "BYE",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 2072,
+    "name": "MON",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 2088,
+    "name": "abp",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 2099,
+    "name": "okabp",
+    "name_len": 5,
+    "next_rel": 71
+  },
+  {
+    "offset": 2112,
+    "name": "err?",
+    "name_len": 4,
+    "next_rel": 58
+  },
+  {
+    "offset": 2124,
+    "name": "ABORT",
+    "name_len": 5,
+    "next_rel": 46
+  },
+  {
+    "offset": 2136,
+    "name": "OKABORT",
+    "name_len": 7,
+    "next_rel": 34
+  },
+  {
+    "offset": 2150,
+    "name": "EXECUTE",
+    "name_len": 7,
+    "next_rel": 20
+  },
+  {
+    "offset": 2174,
+    "name": "RP@",
+    "name_len": 3,
+    "next_rel": 6
+  },
+  {
+    "offset": 2184,
+    "name": "d-f-abptr",
+    "name_len": 9,
+    "next_rel": null
+  },
+  {
+    "offset": 2201,
+    "name": "s-b-ptr",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 2216,
+    "name": "s-e-abptr",
+    "name_len": 9,
+    "next_rel": null
+  },
+  {
+    "offset": 2233,
+    "name": "e-s-c",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 2260,
+    "name": "<e-s-c",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 2288,
+    "name": "rs-b-ptr",
+    "name_len": 8,
+    "next_rel": null
+  },
+  {
+    "offset": 2372,
+    "name": "all-checks",
+    "name_len": 10,
+    "next_rel": 33
+  },
+  {
+    "offset": 2391,
+    "name": "RET-CHECKS",
+    "name_len": 10,
+    "next_rel": 14
+  },
+  {
+    "offset": 2409,
+    "name": "HERE",
+    "name_len": 4,
+    "next_rel": 9
+  },
+  {
+    "offset": 2422,
+    "name": "DP+!",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 2452,
+    "name": "o",
+    "name_len": 1,
+    "next_rel": 70
+  },
+  {
+    "offset": 2462,
+    "name": "n",
+    "name_len": 1,
+    "next_rel": 60
+  },
+  {
+    "offset": 2498,
+    "name": "smark",
+    "name_len": 5,
+    "next_rel": 24
+  },
+  {
+    "offset": 2526,
+    "name": "<FRAME",
+    "name_len": 6,
+    "next_rel": 37
+  },
+  {
+    "offset": 2625,
+    "name": "FRAME>",
+    "name_len": 6,
+    "next_rel": 77
+  },
+  {
+    "offset": 2706,
+    "name": "PARAM",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 2815,
+    "name": "PARAM@",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 2921,
+    "name": "SPACES?",
+    "name_len": 7,
+    "next_rel": 32
+  },
+  {
+    "offset": 2932,
+    "name": "?",
+    "name_len": 1,
+    "next_rel": 21
+  },
+  {
+    "offset": 2965,
+    "name": "BIT-CALC",
+    "name_len": 8,
+    "next_rel": 41
+  },
+  {
+    "offset": 3010,
+    "name": "BIT@",
+    "name_len": 4,
+    "next_rel": 71
+  },
+  {
+    "offset": 3019,
+    "name": "B",
+    "name_len": 1,
+    "next_rel": 62
+  },
+  {
+    "offset": 3026,
+    "name": "BIT!",
+    "name_len": 4,
+    "next_rel": 55
+  },
+  {
+    "offset": 3064,
+    "name": "<-L",
+    "name_len": 3,
+    "next_rel": 17
+  },
+  {
+    "offset": 3085,
+    "name": "->L",
+    "name_len": 3,
+    "next_rel": 23
+  },
+  {
+    "offset": 3112,
+    "name": "PTSTAT",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 3126,
+    "name": "PTDATA",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 3140,
+    "name": "PLSTAT",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 3154,
+    "name": "PLDATA",
+    "name_len": 6,
+    "next_rel": 73
+  },
+  {
+    "offset": 3168,
+    "name": "LITES",
+    "name_len": 5,
+    "next_rel": 59
+  },
+  {
+    "offset": 3243,
+    "name": "GET",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 3254,
+    "name": "PUT",
+    "name_len": 3,
+    "next_rel": 77
+  },
+  {
+    "offset": 3265,
+    "name": "GETC",
+    "name_len": 4,
+    "next_rel": 66
+  },
+  {
+    "offset": 3278,
+    "name": "PUTC",
+    "name_len": 4,
+    "next_rel": 53
+  },
+  {
+    "offset": 3289,
+    "name": ".NLIST",
+    "name_len": 6,
+    "next_rel": 42
+  },
+  {
+    "offset": 3309,
+    "name": "POLLC",
+    "name_len": 5,
+    "next_rel": 22
+  },
+  {
+    "offset": 3335,
+    "name": "PUTCHR",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 3346,
+    "name": "f",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 3367,
+    "name": "COUNT",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 3391,
+    "name": "TYPE",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 3404,
+    "name": "S",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 3417,
+    "name": "STYPE",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 3432,
+    "name": "CR",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 3450,
+    "name": "SPACE",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 3466,
+    "name": "BKSP",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 3481,
+    "name": "BELL",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 3496,
+    "name": "BTA",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 3548,
+    "name": ".",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 3558,
+    "name": "z",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 3599,
+    "name": "d",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 3631,
+    "name": "EXEC",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 3674,
+    "name": "toff",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 3686,
+    "name": "MAXLEN",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 3700,
+    "name": "exf",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 3711,
+    "name": "TBUF",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 3723,
+    "name": "sharp",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 3741,
+    "name": "rubo",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 3750,
+    "name": "h",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 3771,
+    "name": "EXPECT",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 3786,
+    "name": "F",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 3910,
+    "name": "D",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 3954,
+    "name": "m",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 3962,
+    "name": "R",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 3973,
+    "name": "radchk",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 4005,
+    "name": "DIGIT",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 4084,
+    "name": "hihl",
+    "name_len": 4,
+    "next_rel": 68
+  },
+  {
+    "offset": 4096,
+    "name": "U*",
+    "name_len": 2,
+    "next_rel": 56
+  },
+  {
+    "offset": 4236,
+    "name": "NUMBER",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 4261,
+    "name": "P",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 4326,
+    "name": "W",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 4335,
+    "name": "LITERAL",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 4359,
+    "name": "Z",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 4390,
+    "name": "PIMODE",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 4404,
+    "name": "PDSEL",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 4417,
+    "name": "PDDATA",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 4431,
+    "name": "PDSECT",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 4445,
+    "name": "PDTRK",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 4458,
+    "name": "PDCMD",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 4471,
+    "name": "PDSTAT",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 4513,
+    "name": "DRIVE",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 4526,
+    "name": "SIDE",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 4538,
+    "name": "CYL",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 4549,
+    "name": "SECTOR",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 4659,
+    "name": "setup",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 4846,
+    "name": "werr",
+    "name_len": 4,
+    "next_rel": 69
+  },
+  {
+    "offset": 4868,
+    "name": "rerr",
+    "name_len": 4,
+    "next_rel": 47
+  },
+  {
+    "offset": 4889,
+    "name": "don",
+    "name_len": 3,
+    "next_rel": 26
+  },
+  {
+    "offset": 4919,
+    "name": "DISKON",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 4935,
+    "name": "DISKOFF",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 4954,
+    "name": "WOUT",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 4966,
+    "name": "WIN",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 4977,
+    "name": "WSTAT",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 4990,
+    "name": "WINNIE",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 5036,
+    "name": "WRDY",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 5048,
+    "name": "WRDYIN",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 5097,
+    "name": "Y",
+    "name_len": 1,
+    "next_rel": 43
+  },
+  {
+    "offset": 5150,
+    "name": "X",
+    "name_len": 1,
+    "next_rel": 45
+  },
+  {
+    "offset": 5199,
+    "name": "SEC/CYL",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 5214,
+    "name": "CYL/DISK",
+    "name_len": 8,
+    "next_rel": null
+  },
+  {
+    "offset": 5230,
+    "name": "SIDE/DISK",
+    "name_len": 9,
+    "next_rel": null
+  },
+  {
+    "offset": 5247,
+    "name": "SEC/SIDE",
+    "name_len": 8,
+    "next_rel": null
+  },
+  {
+    "offset": 5263,
+    "name": "BLK/DISK",
+    "name_len": 8,
+    "next_rel": null
+  },
+  {
+    "offset": 5279,
+    "name": "C/L",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 5319,
+    "name": "LASTWBLK",
+    "name_len": 8,
+    "next_rel": null
+  },
+  {
+    "offset": 5335,
+    "name": "DSTAT",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 5348,
+    "name": "DPBLK",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 5412,
+    "name": "WINNIE?",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 5600,
+    "name": "p",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 5602,
+    "name": "t",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 5679,
+    "name": "E-C",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 5716,
+    "name": "LOAD",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 5774,
+    "name": "link",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 5808,
+    "name": "search",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 5884,
+    "name": "flush1",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 5928,
+    "name": "FLUSH",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 5957,
+    "name": "BLOCK",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 6010,
+    "name": "UPDATE",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 6038,
+    "name": "wrd",
+    "name_len": 3,
+    "next_rel": 65
+  },
+  {
+    "offset": 6107,
+    "name": "WORD",
+    "name_len": 4,
+    "next_rel": 56
+  },
+  {
+    "offset": 6129,
+    "name": "FIND",
+    "name_len": 4,
+    "next_rel": 34
+  },
+  {
+    "offset": 6296,
+    "name": "ystr",
+    "name_len": 4,
+    "next_rel": 14
+  },
+  {
+    "offset": 6365,
+    "name": "OK",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 6385,
+    "name": "QUERY",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 6409,
+    "name": "k",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 6418,
+    "name": "FNAME",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 6439,
+    "name": "INTERPRET",
+    "name_len": 9,
+    "next_rel": null
+  },
+  {
+    "offset": 6493,
+    "name": "?BELL",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 6513,
+    "name": "typerr",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 6610,
+    "name": "enter",
+    "name_len": 5,
+    "next_rel": 42
+  },
+  {
+    "offset": 6656,
+    "name": "enterr",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 6681,
+    "name": "ENTER",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 6866,
+    "name": "rmk",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 6877,
+    "name": "CODE",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 6891,
+    "name": "VARHERE",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 6908,
+    "name": "RAMMARK",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 6927,
+    "name": "RAMLEN",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 6938,
+    "name": "s",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 6947,
+    "name": "R=",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 6979,
+    "name": "BR=",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 7022,
+    "name": "ARRAY",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 7037,
+    "name": "BARRAY",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 7053,
+    "name": "TABLE",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 7068,
+    "name": "BTABLE",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 7084,
+    "name": "CONSTANT",
+    "name_len": 8,
+    "next_rel": null
+  },
+  {
+    "offset": 7110,
+    "name": "VARIABLE",
+    "name_len": 8,
+    "next_rel": null
+  },
+  {
+    "offset": 7152,
+    "name": "BVARIABLE",
+    "name_len": 9,
+    "next_rel": null
+  },
+  {
+    "offset": 7191,
+    "name": "NEXT",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 7211,
+    "name": "T",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 7227,
+    "name": "zork",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 7297,
+    "name": "s-e-msg",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 7322,
+    "name": "d-f-msg",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 7376,
+    "name": "ES",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 7394,
+    "name": "YY",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 7407,
+    "name": "FX",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 7420,
+    "name": "FUNKEY",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 7673,
+    "name": "sign-on",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 7780,
+    "name": "!c",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 11266,
+    "name": ".eot",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 11278,
+    "name": ".o",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 11288,
+    "name": ".t",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 11298,
+    "name": ".h",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 11308,
+    "name": ".dp",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 11319,
+    "name": ".vp",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 11330,
+    "name": ".la",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 11341,
+    "name": ".svars",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 11355,
+    "name": "bload",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 11416,
+    "name": ".rvdl",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 11434,
+    "name": "q",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 11451,
+    "name": "boot",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 11496,
+    "name": "O",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 11503,
+    "name": "HEX",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 11519,
+    "name": "DECIMAL",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 11539,
+    "name": "C/L*",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 11554,
+    "name": "IMMED",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 11584,
+    "name": "COPY",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 11609,
+    "name": "+BLOCK",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 11627,
+    "name": "CONTINUED",
+    "name_len": 9,
+    "next_rel": null
+  },
+  {
+    "offset": 11665,
+    "name": "BUFFER",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 11697,
+    "name": "LINELOAD",
+    "name_len": 8,
+    "next_rel": null
+  },
+  {
+    "offset": 11726,
+    "name": "v",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 11737,
+    "name": "CCALC",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 11754,
+    "name": "dbos",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 11766,
+    "name": "ONE",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 11779,
+    "name": "iabt",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 11800,
+    "name": "eabt",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 11874,
+    "name": "r",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 11927,
+    "name": "cabt",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 11976,
+    "name": "HABORT",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 12016,
+    "name": "wabt",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 12122,
+    "name": "FLD!",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 12136,
+    "name": "nfld",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 12154,
+    "name": "BASE@",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 12169,
+    "name": "BASE!",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 12199,
+    "name": "PAGE",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 12230,
+    "name": "SPACES",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 12262,
+    "name": "BLKMOVE",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 12373,
+    "name": "BLK",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 12384,
+    "name": "LINE",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 12412,
+    "name": "Blk=",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 12421,
+    "name": "LIST",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 12455,
+    "name": "C!q",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 12472,
+    "name": "DIR",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 12530,
+    "name": "SHOW",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 12599,
+    "name": "FILECOPY",
+    "name_len": 8,
+    "next_rel": null
+  },
+  {
+    "offset": 12648,
+    "name": "DISKCOPY",
+    "name_len": 8,
+    "next_rel": null
+  },
+  {
+    "offset": 12668,
+    "name": "SYSCOPY",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 12688,
+    "name": "lnam",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 12715,
+    "name": "HELP",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 12779,
+    "name": "tell",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 12812,
+    "name": "IFEND",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 12823,
+    "name": "OTHERWISE",
+    "name_len": 9,
+    "next_rel": null
+  },
+  {
+    "offset": 12862,
+    "name": "IFTRUE",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 12916,
+    "name": "other",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 12929,
+    "name": "there",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 12942,
+    "name": "<there",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 12964,
+    "name": "there>",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 12986,
+    "name": "htb",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 13013,
+    "name": "h.",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 13056,
+    "name": "H.",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 13125,
+    "name": "PRINTOUT",
+    "name_len": 8,
+    "next_rel": null
+  },
+  {
+    "offset": 13192,
+    "name": "h!f",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 13213,
+    "name": "WHERE",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 13287,
+    "name": "<other",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 13309,
+    "name": "other>",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 13331,
+    "name": "ldmp",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 13432,
+    "name": "HEXLIST",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 13550,
+    "name": "HEXSHOW",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 13569,
+    "name": "DUMP",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 13600,
+    "name": "bootscr",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 13615,
+    "name": "bdump",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 13698,
+    "name": ".svdl",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 13729,
+    "name": "sysave",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 13805,
+    "name": "SYSAVE",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 13841,
+    "name": "CURRENT",
+    "name_len": 7,
+    "next_rel": 55
+  },
+  {
+    "offset": 13856,
+    "name": "CONTEXT",
+    "name_len": 7,
+    "next_rel": 40
+  },
+  {
+    "offset": 13871,
+    "name": "lastvoc",
+    "name_len": 7,
+    "next_rel": 25
+  },
+  {
+    "offset": 13886,
+    "name": ".v",
+    "name_len": 2,
+    "next_rel": 10
+  },
+  {
+    "offset": 13924,
+    "name": "<build",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 13946,
+    "name": "dup",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 13980,
+    "name": "<bd?",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 14008,
+    "name": "build>",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 14019,
+    "name": "w",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 14032,
+    "name": "BUILD",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 14051,
+    "name": "linkvoc",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 14076,
+    "name": "VOCABULARY",
+    "name_len": 10,
+    "next_rel": null
+  },
+  {
+    "offset": 14108,
+    "name": ".tov.",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 14145,
+    "name": "DEFINITIONS",
+    "name_len": 11,
+    "next_rel": null
+  },
+  {
+    "offset": 14261,
+    "name": "BV=",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 14294,
+    "name": "V=",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 14326,
+    "name": "C=",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 14336,
+    "name": "A=",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 14346,
+    "name": "BA=",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 14371,
+    "name": "RAMALLOT",
+    "name_len": 8,
+    "next_rel": null
+  },
+  {
+    "offset": 14402,
+    "name": "BRAMALLOT",
+    "name_len": 9,
+    "next_rel": null
+  },
+  {
+    "offset": 14419,
+    "name": "DATA",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 14461,
+    "name": "x",
+    "name_len": 1,
+    "next_rel": 43
+  },
+  {
+    "offset": 14487,
+    "name": "TERSE",
+    "name_len": 5,
+    "next_rel": 17
+  },
+  {
+    "offset": 14579,
+    "name": "vname",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 14649,
+    "name": "CURRENT=",
+    "name_len": 8,
+    "next_rel": null
+  },
+  {
+    "offset": 14666,
+    "name": "CONTEXT=",
+    "name_len": 8,
+    "next_rel": null
+  },
+  {
+    "offset": 14681,
+    "name": "find?",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 14702,
+    "name": "CHAIN",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 14801,
+    "name": "LEARN",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 14872,
+    "name": "killem",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 14922,
+    "name": "xxx",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 14972,
+    "name": "FORGET",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 14994,
+    "name": "BASE?",
+    "name_len": 5,
+    "next_rel": 63
+  },
+  {
+    "offset": 15013,
+    "name": "MAP",
+    "name_len": 3,
+    "next_rel": 44
+  },
+  {
+    "offset": 15029,
+    "name": "UNX",
+    "name_len": 3,
+    "next_rel": 28
+  },
+  {
+    "offset": 15042,
+    "name": "ASM",
+    "name_len": 3,
+    "next_rel": 15
+  },
+  {
+    "offset": 15098,
+    "name": ".NOPS",
+    "name_len": 5,
+    "next_rel": 64
+  },
+  {
+    "offset": 15111,
+    "name": "SUBR",
+    "name_len": 4,
+    "next_rel": 51
+  },
+  {
+    "offset": 15125,
+    "name": "FORWARD",
+    "name_len": 7,
+    "next_rel": 37
+  },
+  {
+    "offset": 15149,
+    "name": "-DUP",
+    "name_len": 4,
+    "next_rel": 13
+  },
+  {
+    "offset": 15166,
+    "name": "schk",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 15178,
+    "name": "<STK",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 15191,
+    "name": "u",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 15202,
+    "name": "STK>",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 15264,
+    "name": "<STKH",
+    "name_len": 5,
+    "next_rel": 42
+  },
+  {
+    "offset": 15279,
+    "name": "<STKD",
+    "name_len": 5,
+    "next_rel": 27
+  },
+  {
+    "offset": 15294,
+    "name": ".cen",
+    "name_len": 4,
+    "next_rel": 12
+  },
+  {
+    "offset": 15322,
+    "name": ".CEN",
+    "name_len": 4,
+    "next_rel": 55
+  },
+  {
+    "offset": 15340,
+    "name": ".fork.",
+    "name_len": 6,
+    "next_rel": 37
+  },
+  {
+    "offset": 15421,
+    "name": "offl",
+    "name_len": 4,
+    "next_rel": 72
+  },
+  {
+    "offset": 15448,
+    "name": ".hou",
+    "name_len": 4,
+    "next_rel": 45
+  },
+  {
+    "offset": 15497,
+    "name": ".HOU",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 15515,
+    "name": ".LIST",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 15528,
+    "name": "dmof",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 15540,
+    "name": "dmsz",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 15552,
+    "name": "DIR-BLOCK",
+    "name_len": 9,
+    "next_rel": null
+  },
+  {
+    "offset": 15569,
+    "name": "CUR-DRIVE",
+    "name_len": 9,
+    "next_rel": null
+  },
+  {
+    "offset": 15586,
+    "name": "SVblk",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 15599,
+    "name": "svblk",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 15614,
+    "name": "fileflag",
+    "name_len": 8,
+    "next_rel": null
+  },
+  {
+    "offset": 15630,
+    "name": "FILES",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 15645,
+    "name": "NOFILES",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 15662,
+    "name": "FILES?",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 15678,
+    "name": "FCHK",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 15713,
+    "name": "DRIVE+",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 15735,
+    "name": "DBLK",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 15751,
+    "name": "DBLOCK",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 15808,
+    "name": "DMAP",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 15824,
+    "name": "DMAP!",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 15841,
+    "name": "DMAP@",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 15856,
+    "name": "FREE",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 15872,
+    "name": "INUSE",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 15924,
+    "name": "i-dmap",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 15950,
+    "name": "freeb",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 16029,
+    "name": "DIR-SIZE",
+    "name_len": 8,
+    "next_rel": null
+  },
+  {
+    "offset": 16047,
+    "name": "ALLOC-BLK",
+    "name_len": 9,
+    "next_rel": null
+  },
+  {
+    "offset": 16064,
+    "name": "CUR-BLK",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 16079,
+    "name": "dtb",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 16090,
+    "name": "ablock",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 16110,
+    "name": "ABLOCK",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 16164,
+    "name": "CUR-PNT",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 16189,
+    "name": "FILE-SIZE",
+    "name_len": 9,
+    "next_rel": null
+  },
+  {
+    "offset": 16208,
+    "name": "f-e-c",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 16265,
+    "name": "DRIVE?",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 16281,
+    "name": "<DRIVE",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 16307,
+    "name": "DRIVE>",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 16329,
+    "name": "LOGBLK",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 16345,
+    "name": "PBLK",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 16361,
+    "name": "LOG-PHYS",
+    "name_len": 8,
+    "next_rel": 65
+  },
+  {
+    "offset": 16403,
+    "name": "RMOVE",
+    "name_len": 5,
+    "next_rel": 23
+  },
+  {
+    "offset": 16430,
+    "name": "mlength",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 16529,
+    "name": "insert",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 16545,
+    "name": "INSERT",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 16588,
+    "name": "INCREASE",
+    "name_len": 8,
+    "next_rel": null
+  },
+  {
+    "offset": 16614,
+    "name": "DELETE",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 16672,
+    "name": "A!",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 16688,
+    "name": "A!INIT",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 16712,
+    "name": "look",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 16730,
+    "name": "dsearch",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 16754,
+    "name": "l",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 16829,
+    "name": "rmabt",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 16866,
+    "name": "alname",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 16905,
+    "name": "CREATE",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 17004,
+    "name": "dexec",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 17017,
+    "name": "dscan",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 17078,
+    "name": "dtyp",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 17137,
+    "name": "Name",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 17149,
+    "name": "Alloc",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 17162,
+    "name": "Size",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 17189,
+    "name": "fnam?",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 17222,
+    "name": "FILE",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 17238,
+    "name": "save",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 17284,
+    "name": "reload",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 17373,
+    "name": "y",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 17382,
+    "name": "nxload",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 17402,
+    "name": "load",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 17411,
+    "name": "i",
+    "name_len": 1,
+    "next_rel": null
+  },
+  {
+    "offset": 17588,
+    "name": "DTOD",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 17668,
+    "name": "INIT-DIR",
+    "name_len": 8,
+    "next_rel": null
+  },
+  {
+    "offset": 17796,
+    "name": "DESTROY",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 17860,
+    "name": "l.+",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 17921,
+    "name": "RENAME",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 18039,
+    "name": "prtfname",
+    "name_len": 8,
+    "next_rel": null
+  },
+  {
+    "offset": 18053,
+    "name": "File=",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 18165,
+    "name": "FBSAVE",
+    "name_len": 6,
+    "next_rel": null
+  },
+  {
+    "offset": 18205,
+    "name": "FILE-PHYS",
+    "name_len": 9,
+    "next_rel": null
+  },
+  {
+    "offset": 18264,
+    "name": "PHYS-INSERT",
+    "name_len": 11,
+    "next_rel": null
+  },
+  {
+    "offset": 18301,
+    "name": "sdtyp",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 18316,
+    "name": "SDIR",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 18340,
+    "name": "sdv",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 18351,
+    "name": "finsert",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 18471,
+    "name": "-FINSERT",
+    "name_len": 8,
+    "next_rel": null
+  },
+  {
+    "offset": 18491,
+    "name": "A-FINSERT",
+    "name_len": 9,
+    "next_rel": null
+  },
+  {
+    "offset": 18510,
+    "name": "B-FINSERT",
+    "name_len": 9,
+    "next_rel": null
+  },
+  {
+    "offset": 18529,
+    "name": "FINSERT",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 18564,
+    "name": "FLOAD",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 18648,
+    "name": "XC?",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 18659,
+    "name": "EDIT",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 18673,
+    "name": "DED",
+    "name_len": 3,
+    "next_rel": null
+  },
+  {
+    "offset": 18746,
+    "name": "sflg",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 18758,
+    "name": "bflg",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 18770,
+    "name": "scrlist",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 18803,
+    "name": "BLK=",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 18877,
+    "name": ".SCR",
+    "name_len": 4,
+    "next_rel": null
+  },
+  {
+    "offset": 18893,
+    "name": ".NSCR",
+    "name_len": 5,
+    "next_rel": null
+  },
+  {
+    "offset": 19031,
+    "name": "<BUILDS",
+    "name_len": 7,
+    "next_rel": null
+  },
+  {
+    "offset": 19101,
+    "name": "<<",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 19129,
+    "name": ">>",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 19179,
+    "name": "EX",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 19189,
+    "name": "ED",
+    "name_len": 2,
+    "next_rel": null
+  },
+  {
+    "offset": 19226,
+    "name": "LED",
+    "name_len": 3,
+    "next_rel": null
+  }
+]

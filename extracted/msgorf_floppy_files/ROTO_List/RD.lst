@@ -1,0 +1,70 @@
+
+File Size: 3072.000000 Bytes    3.000000 Blocks  0-2.000000
+
+
+Last Block = 2
+
+
+
+FILE = RD
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( LINK TO BONUS, CARTOON, AND DISPLAY PLAYER UP )               
+    1|XC? IFTRUE                                                      
+    2|HEX 3FFE C= CT^ 3FFC C= BN^ DECIMAL                             
+    3|: PATR BN^ @ -1 <> IF ( MAKE SURE THIS CRUD DEFINED )           
+    4|GA# B@ 1+ NERDUP MH# B@                                         
+    5|TR# B@ BN^ @ EXX DIVG                                           
+    6|( 0 IS-D SC* WPB! ) ( NEED BONUS ROTY? )                        
+    7|RR# B@ 8 < IF                                                   
+    8|GA# B@ 3 MOD 2 = IF CT^ @ EXX DIVG RR# 1+WPB!                   
+    9|GA# B@ 5 = IF MA# 1+WPB! THEN                                   
+   10|THEN THEN THEN ;                                                
+   11|OTHERWISE                                                       
+   12|: PATR GA# B@ 2 = IF RR# 1+WPB! THEN ;                          
+   13|IFEND                                                           
+   14|: D-PU MYPUP ZAP:VECT CL SFXV PU-T SETCOL TT ;                  
+   15|-->                                                             
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( FIRE UP GAME SCREEN ) ." SWV , TRSV , SPIDER STARTER !!"      
+    1|BTABLE ISMTB 0 B, 0 B, 0 B, 1 B, 1 B, 2 B, 2 B, 3 B, 3 B,       
+    2|: FUGS MYPUP DIVG EI                                            
+    3|F#A B@ NOT IF 0 0 XVSA vAL FILL                                 
+    4|TR# WPBZERO ( CLEAR TREASURE COUNTER )                          
+    5|FREDH BZERO ( CLEAR HOSTAGES FREED CTR )                        
+    6|MH# WPBZERO ( CLEAR MAX HOSTAGES FREED CTR )                    
+    7|27 XVSA BZERO ( REHIDE THE KEY!!!!!!!!!!!!!!! )                 
+    8|MAKE:MAZE 1 F#A B! THEN MD                                      
+    9|ZAP:VECT 0 CGFS CGFL FILL STARTEXCITE                           
+   10|DIVG GA# B@ 7 MIN SPEEDE B! 375 DIF B@ 25 * - SMTMRV !          
+   11|GA# B@ DUP DIF B@ 1- ISMTB B@ + SMARTS B!                       
+   12|IF SMTMRV @ ELSE SMTMRV @ 3 * THEN SMTMR !                      
+   13|-1 HORCB OUTP M-BG ( MAKE BACKGROUND )                          
+   14|SWV TOTAL-HOSTAGES 0 DO I HOSTAB @ DUP OBJSV OVB@ HSRES         
+   15|<> IF H-T ELSE DROP THEN LOOP ( HOSTAGES ) -->                  
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|TRSV TRS-T ( TREASURE )                                         
+    1|KEY OBJSV OVB@ KYSHOW = IF KEY KEYMAN ELSE                      
+    2|GA# B@ NOT IF KEY EXAT THEN                                     
+    3|THEN                                                            
+    4|PLEM P-S B!                                                     
+    5|INTSCR ( INITIAL SCORE DISPLAY !! )                             
+    6|PLYRV R:B M:M ( MONSTER MASH )                                  
+    7|ARV A-T                                                         
+    8|0 7 OUTP BREAK EIVG TT DIVG                                     
+    9|GAMEOVER B@ NOT IF F#A B@ IF SWV ELSE                           
+   10|MA# B@ 1+ 12 MIN MA# WPB! ( GIVE PLAYER A FREE SPELL )          
+   11|PATR ( CALL PATCO CRUDOLA )                                     
+   12|GA# 1+WPB! THEN THEN ;                                          
+   13|-->                                                             
+   14|                                                                
+   15|                                                                
+
+
+
+
+

@@ -1,0 +1,70 @@
+
+File Size: 3072.000000 Bytes    3.000000 Blocks  0-2.000000
+
+
+Last Block = 2
+
+
+
+FILE = RND
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( RANDOM # WITHOUT REPLACEMENT )                                
+    1|XC? NOT IFTRUE ;S IFEND                                         
+    2|HEX F= lur                                                      
+    3|CODE URND <ASSEMBLE H POP, D POP, B PUSH,                       
+    4|M A MOV, E CMP, 0<>, IF, E M MOV,                               
+    5|LABEL lur H PUSH, M C MOV, H INX, 0 M MVI, H INX,               
+    6|C A MOV, RRC, RRC, RRC, 1F ANI, A B MOV, C A MOV, 7 ANI,        
+    7|0<>, IF, B INR, THEN,                                           
+    8|BEGIN, 0 M MVI, H INX, LOOP, H POP,                             
+    9|THEN, H INX, M A MOV, H DCX, M CMP, lur JRNC,                   
+   10|M E MOV, 0 D MVI, H PUSH,                                       
+   11|rnd CALL, L C MOV, ( C= CAND ) H POP, ( HL= TBL ) A XRA, EXAF,  
+   12|-->                                                             
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MORE NIFTY RND WITHOUT REPLACEMENT )                          
+    1|BEGIN, C A MOV, RRC, RRC, RRC, 1F ANI, 2 ADI, A E MOV, 0 D MVI, 
+    2|C A MOV, 7 ANI, BIT^ CALL, A B MOV, H PUSH, D DAD, M A MOV,     
+    3|B ANA, 0<>, WHILE, H POP, EXAF, A INR, 0=, IF,                  
+    4|lur JMPR, THEN, EXAF,                                           
+    5|C A MOV, A INR, M CMP, 0=, IF,                                  
+    6|A XRA, THEN, A C MOV, REPEAT,                                   
+    7|M A MOV, B ORA, A M MOV,                                        
+    8|H POP, H INX, M INR, C L MOV, 0 H MVI,                          
+    9|B POP, H PUSH, NEXT ASSEMBLE>                                   
+   10|DECIMAL -->                                                     
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|--> ( NEW INVERTOR )                                            
+    1|HEX                                                             
+    2|SUBR INVER INVERT LDA, A ANA, RZ,                               
+    3|D A MOV, CMA, A D MOV, E A MOV, CMA, A E MOV,                   
+    4|D INX, H A MOV, CMA, A H MOV, L A MOV, CMA, A L MOV,            
+    5|H INX, C A MOV, 0C0 XRI, A C MOV, RET,                          
+    6|DECIMAL -->                                                     
+    7|                                                                
+    8|                                                                
+    9|                                                                
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

@@ -1,0 +1,70 @@
+
+File Size: 3072.000000 Bytes    3.000000 Blocks  0-2.000000
+
+
+Last Block = 2
+
+
+
+FILE = IP
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( PROCESS A HOT ROD MISSLE )                                    
+    1|SUBR HOTROD                                                     
+    2|  TBMISSLE TSTAT Y BITX, ( are we ready to process )            
+    3|  RZ, ( NOT A MISSLE )                                          
+    4|  ( A= timebase ) mastervmr CALL,                               
+    5|  VBMISWRT VLOGICSTAT Y BITX, ( time to write ? )               
+    6|  VBMISWRT VLOGICSTAT Y RESX,                                   
+    7|  0<>, IF, TSUR Y L LDX, TSUR 1+ Y H LDX, FORKETH CALL,         
+    8|THEN, RET,                                                      
+    9|-->                                                             
+   10|                                                                
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|<STKH F= rDI                                                    
+    1|SUBR MIS-INT <ASSEMBLE ( missle interrupt test )                
+    2|  PSW PUSH, B PUSH, D PUSH, H PUSH, EXX, EXAF,                  
+    3|  PSW PUSH, B PUSH, D PUSH, H PUSH, Y PUSHX, X PUSHX,           
+    4|BKC LDA, 4 OUT, ( REFRESH BACKGROUND COLOR )                    
+    5|    SUI2L LDA, INLIN OUT, ( set interrupt line )                
+    6|    SUI2V SWAB A MVI, STAI, ( load I reg )                      
+    7|    SUI2V A MVI, INFBK OUT, ( load feedback port )              
+    8|    SU1flag LDA, ( inprogress ) 1 CPI,                          
+    9|  =, IF, ( overrun ) 2 A MVI, SU1flag STA, THEN,                
+   10|  divg LDA, A ORA, 0<>, IF, ( vger disabled )                   
+   11|  rDI D LXI, divgct H LXI, E M MOV, H INX, D M MOV,             
+   12|  ( tell eivg that we hit )   INout JMP, THEN,                  
+   13|LABEL rDI                                                       
+   14|-->                                                             
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|h-f H LXI, M A MOV, A INR, 3 CPI, CY~, IF,                      
+    1|A XRA, THEN, A M MOV, A ANA,                                    
+    2|PLYRV Y LXIX, 0=, IF, PL-M CALL,                                
+    3|ELSE, A DCR, 0=, IF, 3 A MVI, HOTROD CALL,                      
+    4|THEN, THEN,                                                     
+    5|  SUI2-DI JMP, ASSEMBLE>                                        
+    6|: MYPUP PUP MIS-INT SUI1V ! INVERT-OFF                          
+    7|#PLA B@ IF plup B@ IF 13 INP 8 AND 0= IF                        
+    8|INVERT-ON THEN THEN THEN ;                                      
+    9|CODE SETCOL A XRA, 7 OUT, 7E A MVI, 6 OUT, 52 A MVI, 5 OUT,     
+   10|0FA A MVI, 4 OUT, BKC STA, 0CC A MVI, VERBL OUT, -1 A MVI,      
+   11|HORCB OUT, NEXT STK>                                            
+   12|-->                                                             
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

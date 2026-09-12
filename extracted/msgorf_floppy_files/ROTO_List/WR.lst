@@ -1,0 +1,51 @@
+
+File Size: 2048.000000 Bytes    2.000000 Blocks  0-1.000000
+
+
+Last Block = 1
+
+
+
+FILE = WR
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|HEX SUBR SLEZR2A ( does pat offset and relabs )                 
+    1| ( in- BC= magic/exp , HL= y , DE= x , IX= pattern addr )       
+    2| ( out- HL= new vscradr , C= new vmagic )                       
+    3|  invertxy? CALL, invert? CALL, L SLAR, H RALR, L SLAR, H RALR, 
+    4|  H PUSH, XCHG, 0 X D LDX, 0 E MVI, ( x offset )                
+    5|  D SRAR, E RARR, D SRAR, E RARR, ( /4 for x offset )           
+    6|  MRFLOP C BIT, 0<>, IF, D DAD, ELSE, A ORA, D DSBC, THEN,      
+    7|  XTHL, ( push X+off, HL<-Y ) 1 X D LDX, 0 E MVI, ( y offset )  
+    8|  MRFLIP C BIT, 0<>, IF, D DAD, H DCX,                          
+    9|  ELSE, A ORA, D DSBC, THEN,                                    
+   10|  D POP,                                                        
+   11|  H A MOV, 0 H MVI, A L MOV, H DAD, H DAD, H DAD,               
+   12|  H DAD, D PUSH, L E MOV, H D MOV, H DAD, H DAD, ( *64 )        
+   13|  D DAD, ( *80 ) XCHG, H POP, ( x )                             
+   14|  L A MOV,  ( SAVE BIT CNT ) H L MOV, 0 H MVI, D DAD, ( x+y )   
+   15|-->                                                             
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( VMR )                                                         
+    1|  ( y can not get here larger then 256 )                        
+    2|  RLC, RLC, 3 ANI,                                              
+    3|  MRFLOP C BIT, 0<>, IF, NEG, 0=, IF, H DCX, THEN, THEN,        
+    4|  3 ANI, A E MOV,                                               
+    5|  invert? CALL, ( FLIPPER BACK )                                
+    6|  C A MOV, FC ANI, E ORA,                                       
+    7|A C MOV,   ( HL= screen address ) RET,                          
+    8|CODE WRITEP DI,                                                 
+    9|X PUSHX, D POP, EXX, X POPX, B POP, H POP, yadj CALL, XTHL,     
+   10|xadj CALL, XCHG, H POP, ( HL= Y DE= X )                         
+   11|SLEZR2A CALL, X INXX, X INXX, 0 X E LDX, X INXX, 0 X D LDX,     
+   12|X INXX, write CALL, EXX,                                        
+   13|D PUSH, X POPX, NEXT                                            
+   14|DECIMAL -->                                                     
+   15|                                                                
+
+
+
+
+

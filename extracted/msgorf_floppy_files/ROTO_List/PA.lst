@@ -1,0 +1,51 @@
+
+File Size: 2048.000000 Bytes    2.000000 Blocks  0-1.000000
+
+
+Last Block = 1
+
+
+
+FILE = PA
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( GAME PARAMETERS !!!! )                                        
+    1|XC? NOT IFTRUE ." CROSS COMPILER TURNED OFF!!!!!" IFEND         
+    2|ASM .REL ( START SAVING BYTES )                                 
+    3|XC? C= SCON ( SCORING ON FLAG )                                 
+    4|SCON NOT IFTRUE ." SCORING IS OFF DUMMY" IFEND                  
+    5|4 C= PRTBM ( PLAYER-REVEALER-HOSTAGE MAX TIME BASE )            
+    6|8 C= INILT                                                      
+    7|8 C= JMLZ ( LEAP ZONE ) 256 C= PSLW                             
+    8|16 C= H-P-D ( HOSTAGE TO PLAYER DISTANCE )                      
+    9|12 C= H-H-D ( HOSTAGE TO HOSTAGE DISTANCE )                     
+   10|9 C= M-L-S ( MINIMUM LEADER SPACING )                           
+   11|127 C= MAXASSM ( MAX ASSIMILATION DISTANCE )                    
+   12|-->                                                             
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( MORE PARAMETERS )                                             
+    1|11 C= NCOLS 6 C= NROWS                                          
+    2|NCOLS NROWS * C= NNODES                                         
+    3|5 C= START-COL                                                  
+    4|82 C= RP-Y 82 C= RQ-Y 0 C= ST-X 52 C= ST-Y                      
+    5|15 C= DC-T 40 C= HM-T                                           
+    6|91 C= SC-Y 30 C= RX-T 15 C= HR-T                                
+    7|( MESH PARMS )                                                  
+    8|320 NCOLS / C= COLSIZE 178 NROWS / C= ROWSIZE                   
+    9|NROWS 1- DUP C= START-ROW                                       
+   10|COLSIZE 21 - C= COLDEV ROWSIZE 21 - C= ROWDEV                   
+   11|                                                                
+   12|-->                                                             
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+
+
+
+

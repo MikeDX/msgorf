@@ -1,0 +1,70 @@
+
+File Size: 3072.000000 Bytes    3.000000 Blocks  0-2.000000
+
+
+Last Block = 2
+
+
+
+FILE = RP
+BLOCK =   0
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( TASK TO REVEAL PARTIAL PASSAGEWAY )                           
+    1|BV= ACTREVS                                                     
+    2|HEX                                                             
+    3|: PATH:REVEAL ;TASK: DI                                         
+    4|ESTPOS DEPART:NODE INITIAL#LEAP DISTANCE V!                     
+    5|200 DELTADIST V!                                                
+    6|REVEALPAT ANIM!                                                 
+    7|OR-ON 2 TIMEBMAX!                                               
+    8|1STWRITE DVECT-ON                                               
+    9|PUSH:CCR NOWD VB@ TEST:DRAWN IF 0C XPAND!-ON ELSE               
+   10|8 XPAND!-ON MAXREVDIST MAXDIST VB! THEN                         
+   11|GO DI                                                           
+   12|ACTREVS 1-B! ;                                                  
+   13|DECIMAL -->                                                     
+   14|                                                                
+   15|                                                                
+
+BLOCK =   1
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( STUFF TO REDRAW PATHS )                                       
+    1|: REDRAW:PATHS                                                  
+    2|0 RVVS RVVL FILL                                                
+    3|8 0 DO PUSH:CCR I TEST:REL                                      
+    4|IF PUSH:CCR I INDEX:VECTOR NOWR OVB!                            
+    5|I INDEX:VECTOR NOWC OVB!                                        
+    6|I I INDEX:VECTOR NOWD OVB!                                      
+    7|PUSH:CCR I TEST:DRAWN IF I 4 < ELSE 1 THEN                      
+    8|IF ACTREVS 1+B!                                                 
+    9|I INDEX:VECTOR PATH:REVEAL DI                                   
+   10|THEN THEN LOOP ;   -->                                          
+   11|                                                                
+   12|                                                                
+   13|                                                                
+   14|                                                                
+   15|                                                                
+
+BLOCK =   2
+     +1234567890123456789012345678901234567890123456789012345678901234
+    0|( REVEAL CHAMBERS )                                             
+    1|HEX                                                             
+    2|: CHAMBER:REVEAL ;TASK: DI ACTREVS BZERO                        
+    3|0 NOWC VB! BEGIN 0 NOWR VB! BEGIN                               
+    4|PUSH:CCR TEST:GROTTO:DRAWN IF                                   
+    5|ESTPOS DVECT-ON                                                 
+    6|REDRAW:PATHS                                                    
+    7|GROTTOPAT ANIM! 1STWRITE 0C XPAND! XPAND-ON OR-ON               
+    8|1 TIMER!-ON GO                                                  
+    9|BEGIN 1 TIMER!-ON WAIT DI ACTREVS B@ 0= END                     
+   10|1 TIMER!-ON WAIT                                                
+   11|THEN NOWR VB@ 1+ DUP NOWR VB! NROWS = END                       
+   12|NOWC VB@ 1+ DUP NOWC VB! NCOLS = END ;                          
+   13|: RDRAW MYPUP CL REVV CHAMBER:REVEAL BREAK TT ;                 
+   14|DECIMAL -->                                                     
+   15|                                                                
+
+
+
+
+
