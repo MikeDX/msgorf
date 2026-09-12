@@ -13,20 +13,20 @@ Source: [GORF — Matthew Garrett](https://www.professionalmagic.com/gorf) (coll
 - One image reportedly needs reread: label **Ms Gorf – GORF4A** (Dysan #802067) — our `MSGORF/` set.
 - Geometry note on the page: 5¼″ media imaged with IceBox-like **8″ geometry** (2 heads × 77 tracks × 2 × 1024 ≈ 308K).
 
-## Linked TERSE / IceBox PDFs (on that site)
+## Linked TERSE / IceBox PDFs (Jamie → Matthew Garrett)
 
-Relative to `https://www.professionalmagic.com`:
+Hosted at `https://www.professionalmagic.com/s/…`. Local copies + notes: **`docs/references/jamie_fenton_via_garrett/`**.
 
-| Link text | Path |
-|-----------|------|
-| TERSE VOCAB | `/s/TERSE_VOCAB.pdf` |
-| TERSE MISC 6 | `/s/MISC6.pdf` |
-| ICE5 | `/s/ICE5.pdf` |
-| GAS MONITOR | `/s/GAS_MONITOR4.pdf` |
-| EDIT VOCAB | `/s/EDIT_VOCAB2.pdf` |
-| ASSEMBLER | `/s/ASSEMBLER3.pdf` |
+| Link text | File | Notes |
+|-----------|------|-------|
+| TERSE VOCAB | `TERSE_VOCAB.pdf` | TERSE Standard Glossary 9/21/81 |
+| TERSE MISC 6 | `MISC6.pdf` | Actually **ICE Monitor Commands** (new vs our Bitsavers set) |
+| ICE5 | `ICE5.pdf` | DNA ICE hardware |
+| GAS MONITOR | `GAS_MONITOR4.pdf` | GAS Monitor 2.33 |
+| EDIT VOCAB | `EDIT_VOCAB2.pdf` | EDIT 81 Glossary |
+| ASSEMBLER | `ASSEMBLER3.pdf` | **Mislabelled** — EDIT 81 content, not assembler; use `terse/Z80_Asm.pdf` |
 
-Several overlap Bitsavers / `docs/references/` (`TERSE_VOCAB.pdf`, `ICE5.pdf`, `GAS_MONITOR4.pdf`, `EDIT_VOCAB2.pdf`). Prefer local hashed copies in `docs/references/SOURCES.md` when present.
+Overlapping Bitsavers scans (different filesize/hash): `docs/references/icebox/`.
 
 ## What this does *not* authorize
 

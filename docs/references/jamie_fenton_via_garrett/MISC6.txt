@@ -1,0 +1,564 @@
+           t
+                                  ICE MON]TOR COMMA}IDS
+
+
+                                     KEY TO THE CODE
+
+
+A11 eharacters may be entered in upper or lower case.
+Rubout and backarrcn^r delete a character.
+Control-X cancels the 1ine.
+/l means a hex nwnber.
+(.,.) implies a choice.
+[ .. . ] lmplies optional parameters.
+
+
+                                   MONITOR COMMAICIS
+
+
+The monitor pronpt is a percent sign (%).
+Active keys at Lhe % are:
+     Control-C Boots CPIM after reset.
+     A         Sets 0-1FFFH and 4000H-4FFFH external, all
+               internal memory is write protected.
+     C         Sets 4000H-7FFF1-1,CO0O-CFFFH,E0O0-EFFFH external,
+               all internal memory is write protected.
+     D         Enters debug mode.
+
+                                    DEBUG COMMANDS
+
+
+
+The debug pranpt is a minus sign (-),
+Active keys at the - are:
+     A                ASCII ON/OFF
+                      S^ritches ASCII character display in modify memory
+                      on/off.
+     B[ (M, P) ( R,W)# ]<Cn> Breakpoint
+                   M = lbmory
+                      P = Port
+                      R = Read
+                      W = Write
+     Example: If you want to break on memory read at l8H, type
+              at the pronpt: BMR38(carriage return).
+              If you want to turn off the breakpoints type:
+                  B(earriage return).
+                  Note: Step sets the breakpolnt to the current
+                  lnstruction.
+     DI#i#l l<cR>
+                      Dunp frcm lt to tt memory locations.
+     Flt rll r#<cR>
+                      FilI memory frcrn tt Lo {l with #.
+     G[<SPACE>#]<Cn>
+                      GoatPCor#
+     r[ ( E, D, <CR>) ]
+                      Set lnterupts enabled, dlsabled or dlsplay
+                      thelr status.
+                                                                               I
+
+DNA ICEBOX                                                            Page 2
+SOFTWARE DOCUMENTATION
+                                      *
+
+
+
+
+     I(#<CR> Modify memory
+             Displays AAAA: DD
+             Where AAAA is the hex address and DD is the hex data.
+             Then it waits for input of form:
+             [#](<cR>,^,<LF>)
+             Entering a nunber modifies the location.
+             (CR) advances to the next loeation
+             ^ (up arror,;) backs up one loeadion,
+             (Line Feed) exits to the debug prcmpt.
+             P Modify Port
+                       Functlons exactly the same as modify memory.
+             Q Quit - Heturns to the monitor
+             R( A, B, CrD, E, H, L, BC, HL, IX, rY,SP, PC)
+                          Modify register
+                          Displays VV or VW the value of the register
+                          which can be modified by typing in a new value.
+             S            Step
+                          Step set,s the breakpolnt to the current
+                          instruction then executes it, returns and
+                          displays the contents of the registers.
+             X            Examine registers
+                          Displays current eontents of the registers.
+                                                                        \
+
+
+
+
+                    BNF granuner definition of TERSE
+
+
+
+(nuneric literal) ::= (ASCfI digit) (nmeric literal)1fuu1I)
+(va1ue) : := <nunerie literal)l(value on stack)l(constant name)
+(name) : := (ASCII character) (name)l(nu11)
+(verb cluster) ! != (veFb>l(if statement)l(do statement)l
+                   (begin statement)l(value) (verb eluster)l(nu11)
+(boolean value) ::= <zero value)l(non-zero value)
+(eIse statement) ::= ELSE (verb eluster> THEN
+(if statemenb) : : = (boolean value) IF (verb cluster) THEN   i
+                  (e1se statement)
+(+loop statement) ::= (vaIue) +LOOP
+(do statement) ::= (limit valueXstart value) D0 (verb cluster> LOOPI
+                  (+loop statement)
+(while statement) ::= WHILE (verb eluster) REPEAT
+(begin statement) ::: BEGIN (verb cluster) (boolean value)ENDI
+                     (while statement)
+(: name) ::= <name) (code name) ::=(name)
+(:definition) ::= : <:name) (verb cluster) ;
+(eode definition) ::= CODE (code name) (assembler op-codes) NDff
+(program) ri= (:name)
+(variable name) ::= (name)
+(variable definition) : := (value) VARIABLEIBVARIABLE (variable name)
+(constant name) ::= (name)
+(constant definitlon) ::= (value) CONSTANT (constant name)
+(array name) ::= <name
+(array deflnitlon) ::= (value) ARRAYIBARRY (array name)
+(verb) ! i= (:name)l(eode name)l(variable name)l(constant name)!
+           (array name)l(table name)
+     BNF                                                             Page 2
+t*
+     (storage statement) ::= (vaIue) B, l,
+     (storage eluster) ::= (storage statement)- (storage cluster)1ftu1I)
+     (tabIe name) ::= (name)
+     (table definition) : : =   TABLE iBTABLE IDATA   (tabIe   name> (storage
+     cluster)
+     (nu11) :i= the empty set
+
+
+
+
+L
+                                    PATTERN BOAP,D
+
+
+
+
+PORTS(in load order)
+    7A - Status
+    Bits: 0 - 0 = linear to area
+              1 = 3re3 to linear
+           1-0=noexpand
+               1 = expand
+           2-0-useconstantdata
+              i = us€ pattern data
+           3-0=nofl-ush
+               1 = flush (do not use with expand)
+           u-n-         nn flin
+               I
+                   t-   flrrly in
+
+          5-0=f1oP
+               1 = no flop
+           6 - unused
+          7 - unused
+    *78 - linear address low
+    x79 - linear address high
+
+    78 - area address 1ow
+    7C - area address high
+
+    78 - X:nod (port is used twice)
+         for plop = (80 - wldth) see next port for deflnition
+                     of width.
+         for flip = (-80 - width)
+         for flop = (80 + width)
+         for flop + flip = (-80 + wldth)
+    7D - width = (Xsize - 1) or
+            if expand then (Xsize x 2) - 1, lf       flush add   1
+
+
+
+    *78-height=(Ysize-1)
+        this port fires the operation
+
+* Only those ports need to be repeated if another pattern
+   of the same width ls to be started where the previous
+   pattern left off.
+                             DEBUG 81 Glossary
+                                  09/ 21 /81
+
+
+     The interactive debugger provides a means for examining the
+processing of TERSE eompiled programs in a detailed fashion, either by
+stepping through a program or setting breakpoints in a program stream.
+     Certain functions have made use of the particular implementation
+of TERSE on the Z-80. Perhaps the most important of these is that NEXT
+is implemented as a PCIY ( irrrp to adr in IY register ) which is the
+address of bhe inner interpreler. l,Jhen in debug step mode, this
+address is replaced by code in the debugger. In other
+impl-ementations, this could be gotten around by temporarilly
+overuriting the inner interpreter with a iump.
+     The olher useful function of DEBLtGging pael';age is the UNC0Mpil-er,
+whrch allorn,s verbs to be listed out l^rit.h Lhe adress of t'heir cornponen'u
+verbs, a function which is quite easily irnpiementeC i:y virt,ue of the
+simple structure of compiled TERSE code.
+     Note also that when executing TERSE code in breakpolnt mode, the
+debuggers inner interpreler is the one being used, whicn has a modest
+overhead involved in doing the address eomparisons, so code will run
+quite a bit ( about 1/4 speed ) slower.
+    As a reminder, the following regisiers are ulilized in the Z-80
+TERSE implemenlation:
+   oa                Inner interpreLer pointer"
+   IY                Address of NEXT, the inner inlerpreter.
+   IX                Return stack pointer.
+   SP                Parameter stack pointer.
+
+
+
+
+               To begin DEBUGging a TERSE verb, see STEP.
+TERSE DEBUGG]NG PACKAGE                                        Page 2
+
+
+
+
+$BC                              --- p
+         Return the address of a variable containing the eurrent
+         interpreter pointer used by bhe debugger.
+$BRK                             --- p
+         Return fhe address of a variable whieh when set to 1, means a
+         breakpoint is set; thus a STEP or an S will proceed until
+         the address contained in BPNT is encountered.
+I                                I nnnn --- n
+         Return the begin of code adr of verb NNNN. ( Part of systegr
+         verbs )
+                                    p
+         Return the addres of the Break Mode Variable. It will
+         eontain either:
+              0 - Stop execution when a breakpoint is encountered.
+              1 - Print status information on encountering a
+                  breakpoint and conlinue executicn.
+BP}iT                           --- p
+         Return the address of a variable containing the address where
+         the breakpoint is set.
+BRK                             n ---
+         Set a breakpoint at the specified address.
+CLRBRK
+         Clear a previously set breakpoint.
+vL v                           --- p
+         Return the address of   the Display Mode Variab1e. It will
+         eontain either:
+              0 - No display after the verb is executed.
+              1 - Display only the verb being executed.
+              2 - Display the parmater stack, the verb about to be
+                  executed, and the top of the return stack ( I ) .
+                  This is the default value.
+              DISPLAY FORMAT: I Parameter Staek ] VeRe= nnnn I I= n ]
+
+PS
+         Returns the value of   the parameter stack pointer ( same as
+         SPE ).
+
+PSD
+         List the contents of the ENTIRE parameter stack.
+0
+         Execute the entirety of the verb about to be executed,
+         Note: 0 places the breakpoint pointer al the adr 2 + the
+         inlerpreLer poinler. Verbs that use the 2nd word as data or a
+         jrxnp address ( IF ELSE CASE LIT ) will not work. No actual
+         change in the memory locatlon is made ( PROl,l programs can be
+         debugged this way ), but note that the verb ls aclually being
+         stepped one instruction aL a time when in Q or breakpoinL
+         mode sc thaL it will be slower.
+TERSE DEBUGGING PACKAGE                                       Page l
+
+
+
+
+RS
+         Returns the value of the return stack pointer.
+RSD
+         List the contenls of the ENTIRE return staek.
+S
+         Execute one instruction ( one pass throught the inner
+         interpreter ). fhe program is actually being stepped an
+         instruction at a Lime when in Q or breakpoint mode.
+)u1                              --- p
+         Return the address of the Step Count Variable which is set to
+         the number of verbs to be execut,ed before controf returns to
+         the user.
+STEP                             STEP nnnn
+         Prepare to debug verb NNNN. The verbs about to be executed
+         will be printed,
+         Example' t TESTPROG 1+ BRK
+         Set a breakpoinl at the first instruction of TESTPROG ( note
+         skipping the header byte ).
+UNCOM
+         Uncompile ( tist    ) tfre verb compiled at adr n.
+VERB                             n ---
+         Display the name of the verb whose code start adr is n. Very
+         handy !
+
+
+                          END 0F DEBUG 81 Glossary
+i'
+
+
+
+
+                                  GAS Port Assignments
+                                         9/21/81
+
+
+               This is a description of the various ports used by the GAS
+          system. Each port nrrml,er is a hex value and for each bit that is not
+          specified, then Lhat bit is unused.
+
+
+
+     \-
+
+
+
+
+     .
+GAS Port Assignments                                       Page 2
+
+                              GAS Input Port Assignments
+
+
+10                    Gun Handle //1 Swilches
+      Bi t0           Up
+      Bi t1           Down
+      Bi +)           Lef t.
+      Bi r-2          Right
+      Bi r-[          Tri ooor
+
+11                    Gun Handle //2 Swilches
+      Bit 0           Up
+      Bit       1     Down
+      Bi L2           Lefl
+      BJ +2           Ri oht
+      H1    t,4       Tri ooor
+
+12                    Gun Handle il3 Switches                       I
+      nl
+      I]I L 0         Up                                            I
+      Di L
+      DL        1     Down
+      Bi t ?          T ^:i
+                      I-:a    L
+
+      Bi t 3          Ri gr-rt
+      Bi t 4          Tri coer
+
+1?                    Gun Flandle /14 Swit.hces
+      Bir 0           Up
+      Bit       1     Down
+      BiL 2           Lefl
+      Bir  3          Ri cht
+      Di l
+      L)-L t,   ?lr   Tri ooor
+
+14                    Froni Panel Svrilches
+      Bit 0           S'";itche s 0
+      Bir       1
+                      Q.r.ri tnhae   i
+      tri T)
+      Lj1             Si^ritches 2
+      D1 t?
+      r!:
+                      Switches 3
+      Bi t4           Swilches 4
+      tsi L5          Swilches 5
+      Pr    L6        Switches 6
+            L7        Switches 7
+
+15                    Front Panel Switehes
+         t0           Swibehes B
+      Bi t1           Switches 9
+      Bi L2           Switches 10
+      Bi L3           Switches 1         1
+
+      Bi L4           Switches 12
+      Bi r5           Switches 13
+      Bi r6           Swiiches i4
+      Bi L7           Swit,ches 15
+
+16->1B                l'Jo+, Used
+
+1C                    Gun Handle //1 Knob
+,iD
+                      Gun Handie /12 Knob
+GAS Port AssignmenLs                                                        Page J
+
+1tr                           Gun Handle /i3 Knob
+
+ lr                           Gun Handle li4 Knob
+
+IU                            Dart Channel A Data
+tt                  {8{ r Dart Channel B Data
+                          I
+
+22                        L Dart Channel A Status            A)
+
+
+
+                                                           f(, nter
+                              Dart Channel B Status
+24                            951 1 APU Data
+
+L)                            951 1 APU Status
+
+26->28                        Not Used -- IJOTE: No input should be done!
+?a                            l{r scel laneous
+      L)-L L,   U             !as set l, T=r'o i'r t: i:
+      pif       1
+                              Lrg)'ri Pen Si:rtches
+      Bit 2                   Bit Pad Strobe StaLus
+,)^
+L!L                           Bit Pad Strobe Status ReseL
+LD                            Bit Pad Strobe Status Reset
+ZV                            PERSCI Floppy Disk Data
+
+2D                            PERSCI Floppy Disk Sfatus
+
+IL                            D;+  D^J n^+^
+                              DLi. I<AU Ud\Jd
+
+lr                            Bit Pad Status
+    GAS Port Assignments                                             Page 4
+
+
+                           GAS Output Port Assignment
+
+
+
+
+    00                 Color RegisLer 0
+    0i                 Color Register      1
+
+
+
+    U1                 Color Register 2
+    03                 Color Register 3
+    04                 Color Register 4
+    nq                 Color Register 5
+    06                 Color Register 6
+    AT                 Color Regrster 7
+                       Lor,,,i Fiigh Resolut icn
+
+    no                 HorizonLal Color Boundary, Background Cofor
+    OA                 Vertical Blank Register
+
+U   OB                 Col-or Block Transfer
+                       M=oi n Rooi eton
+
+    OD                 Interrupt Feedback Regist,er
+    OE                 fnteri upt Enable and l"lode
+    OF                 Interrupt Line
+    IU                 l\4aster 0scillator
+
+    11                 Tone A Frequency
+    1'                 Tone B Frequency
+
+    r-}                Tone C Frequency
+
+    i4                 Vibrato Register
+    t)                 Tone C Vol-rme, Noise Modulation Control
+
+    16                 Tone A VolLme, Tone B Volume
+
+    17                 Noise Volume Register
+    1P                 Sound Block Transfer
+
+    1g                 Expand Register
+
+    20                 Dart, Channel A Data
+        GAS Port Assignments                                             Page 5
+
+
+        21                 Dart Channel B Data
+        22                 Dart Channel A Command
+        23                 Dart Channel B Command
+        24                 951 1 APU Data
+
+        25                 951 1 APU Command
+
+        26                 Front Panel LEDs
+             Bit 0         LED O
+             Bi t1         LED 1
+             B1 L2         LED 2
+             Bi +2         ItrN
+                           LW)
+                                2
+             Ri +[         LED 4
+             D1 L5         LTD 5
+             hf
+
+
+             Bi r6         LED 6
+             Bi +7         LED 7
+
+        27                 Fronr- Panel LEDs
+             rtr L
+             I],1 L   0    LED B
+             Bi t 1        Lmg
+             trl t 2       LED iO
+             Bi L 3        LED 11
+             Bi t 4        LED 12
+             B1 L
+                  L
+                      )
+                      tr   Lm 13
+             Bi 6 +        LED 14
+             Bi t 7   I    LED 15
+
+        aa                 Casselte Tape Motor Controfs
+             Bit 0         Input Cassette Motor
+             Bit i         O.:Lput Cassette Motor
+
+                           Cassette Tape Data Out
+                           Individual Bit,s are liot Used; Each ouLput
+                           Instruction causes the logic staLe of the
+    t                      flip-flop to change.
+        IA                 Reset Bit Pad Strobe StaLus
+        .D                 reset Bit Pad Strobe Status
+                           PERSCI Floppy Disk Data
+
+        2D                 PERSCI Flopppy Disk Command
+
+        2E->CB             Not Used
+
+
+1
+     GAS Porl Assignment,s                                          Page 6
+
+
+
+
+     LL                  II'emorY MaPPing                             {               Dla)
+           Page 1 - 4000-7FFF
+          Bit 0-3      0 -- Screen RAM
+                         1 -- RAM firsl Board
+                                                                 a\.             . -rt-/
+
+
+                         2-i5 RAI.,I one of the other boards    tite             docl
+            Page 0 -- O-3FFFH                                  ItL
+                                                               i.     (,-.
+          Bit4          O-.EPROM
+                         1 ..      RAM                               rd?*             (
+          Bit5           0--Read/Write
+                         1 -- l,Jrite Prolected
+            Page 2 -- 8000-BFFF
+          Bit6           0--EPROI1                                                        aOf O
+                         1I __     Dnll                                          1l
+          Bit 7
+                                   lLf,l'l
+                                                                             0
+                         0 -- Read /WrtLe
+                         i -- 'drile Protected
+
+
+                                 End Of GAS Porl Assignments
+
+
+\_
+

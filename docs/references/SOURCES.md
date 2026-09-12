@@ -29,6 +29,7 @@ Important extra (not in Nutting_Assoc bits root):
 | `mame/icebox.cpp` | 14660 | `a181e3576d48d6b1a5fd39688e6828a487babb52a147b11d5812463fee8564de` |
 | Narrative / recovery notes (not primary Nutting PDFs) | | |
 | https://www.professionalmagic.com/gorf | — | See `docs/references/professionalmagic-gorf.md` |
+| Jamie manuals via Garrett (`docs/references/jamie_fenton_via_garrett/`) | | See that folder’s `SHA256SUMS.txt` / `README.md` |
 | `terse/Addin_Mar1979.pdf` | 6060779 | `0f499a985c64cbbf0aa6db1f03a0db4070c15e51bfa5065131fca9bdd85f3505` |
 | `terse/Caltech_Forth.pdf` | 664071 | `b84d40bcb8f5082a4cddfc9ea22a0984018d0c18be3951ab45a53dd24776d5d2` |
 | `terse/Discussion_with_Rickey_Spiece.txt` | 11635 | `1e1864ff4d290814b87a36335ec16c864f78a332280cd38d72515b7b98ddd554` |
