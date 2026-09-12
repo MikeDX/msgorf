@@ -7,6 +7,7 @@ work/*.tmp
 work/bitsavers_compare/
 work/gorf_index.html
 work/gorf_links.txt
+work/video_refs/
 docs/references/cache/
 
 *.o
