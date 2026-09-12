@@ -5,6 +5,7 @@ Local copies and notes. Hashes: [`SOURCES.md`](SOURCES.md).
 | Path | Description |
 |------|-------------|
 | [`professionalmagic-gorf.md`](professionalmagic-gorf.md) | Summary of https://www.professionalmagic.com/gorf |
+| [`jamie-fenton-1982-video.md`](jamie-fenton-1982-video.md) | Bubble Burst YT clip timestamps + frame wishlist |
 | [`garrett_ms_gorf_gallery/`](garrett_ms_gorf_gallery/) | Gameplay stills + wiki captures from Garrett’s page |
 | [`jamie_fenton_via_garrett/`](jamie_fenton_via_garrett/) | Jamie → Garrett TERSE/Ice PDFs (mirrored) |
 | [`mame/icebox.cpp`](mame/icebox.cpp) | MAME IceBox skeleton driver |

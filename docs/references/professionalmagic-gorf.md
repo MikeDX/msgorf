@@ -50,6 +50,10 @@ Squarespace grid (`ms gorf 1` … `ms gorf 6`). Local mirror: [`garrett_ms_gorf_
 - **Direct gameplay stills:** `ms_gorf_1`, `ms_gorf_6`, `ms_gorf_2` (and related root `msgorf_screenshot.jpg`)
 - **Wiki phone captures** that also show game frames: `ms_gorf_3`, `ms_gorf_4`, `ms_gorf_5`
 
+## Related video (not hosted on that page)
+
+[Before the Bubble Burst — Jamie Fenton, 1982](https://youtu.be/AretGtg4GHQ) — Ms. Gorf demo roughly **6:03–7:59**. Lab notes + snapshot wishlist: [`jamie-fenton-1982-video.md`](jamie-fenton-1982-video.md).
+
 ## What this does *not* authorize
 
 - Inventing missions, dual-stick play, speech, or a “Gorf II” redesign (the page’s speculative sequel section is opinion, not Ms. Gorf source).
