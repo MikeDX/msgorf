@@ -6,15 +6,18 @@
  * See docs/findings/display.md (Ms. Gorf late board still unproven; Gorf cabinet was portrait).
  */
 (function () {
-  // Landscape Astrocade hi-res (gameplay video is horizontal)
+  // Landscape Astrocade hi-res — 1 buffer pixel = 1 game pixel
   const W = 320;
   const H = 204;
-  const SCALE = 3;
+  /** CSS-only neatest-neighbour enlarge (does not affect sim). */
+  const VIEW_SCALE = 3;
 
   const canvas = document.getElementById("c");
-  const ctx = canvas.getContext("2d");
-  canvas.width = W * SCALE;
-  canvas.height = H * SCALE;
+  const ctx = canvas.getContext("2d", { alpha: false });
+  canvas.width = W;
+  canvas.height = H;
+  canvas.style.width = W * VIEW_SCALE + "px";
+  canvas.style.height = H * VIEW_SCALE + "px";
   ctx.imageSmoothingEnabled = false;
 
   const assets = window.MSGORF_ASSETS;
@@ -120,12 +123,18 @@
     const s = sprites[name];
     if (!s) return;
     const flip = opts && opts.flip;
+    const px = x | 0;
+    const py = y | 0;
     ctx.save();
-    ctx.translate(x, y);
+    ctx.translate(px, py);
     if (flip) ctx.scale(-1, 1);
     // Ship / most sprites: never rotate — always “up” as stored on disk
     ctx.drawImage(s, -s.width / 2, -s.height / 2);
     ctx.restore();
+  }
+
+  function ipart(v) {
+    return v | 0;
   }
 
   // --- game state (GUESS rules) ---
@@ -134,15 +143,21 @@
   let shipsLeft = 3; // SBi / SBASE count
   let t = 0;
   let fireCd = 0;
-  let spawnCd = 0;
   const player = { x: W * 0.5, y: H * 0.5, visible: false };
   /** @type {{x:number,y:number,vx:number,vy:number,life:number}[]} */
   let bullets = [];
-  /** @type {{x:number,y:number,vx:number,vy:number,kind:string,hp:number,r:number}[]} */
+  /** @type {{x:number,y:number,vx:number,vy:number,kind:string,hp:number,r:number,cool:number}[]} */
   let foes = [];
   /** @type {{x:number,y:number,kind:string,hp:number}[]} */
   let fx = [];
   let clone = { x: W * 0.62, y: H * 0.42, frame: 0, visible: false };
+  /** Pending clone exits: enter one yellow port → two exit the other. */
+  /** @type {{t:number,exit:string,kind:string}[]} */
+  let cloneJobs = [];
+  const BULLET_MUZZLE = 12;
+  const CLONE_PROCESS_T = 0.35;
+  const CLONE_EXIT_SPEED = 55;
+  const CLONE_COOL = 0.75;
 
   /** Level-start galaxy — intro only. Footage GUESS:
    * 17 inward shells × 16 stars, start ~10 o'clock, anticlockwise;
@@ -237,16 +252,17 @@
     spawnGorf(x, y);
   }
 
-  function spawnGorf(x, y) {
-    const v = randVel();
+  function spawnGorf(x, y, vel) {
+    const v = vel || randVel();
     foes.push({
-      x,
-      y,
+      x: ipart(x),
+      y: ipart(y),
       vx: v.vx,
       vy: v.vy,
       kind: "GORF-PAT",
       hp: 1,
       r: GORF_R,
+      cool: 0,
     });
   }
 
@@ -257,9 +273,9 @@
     bullets = [];
     foes = [];
     fx = [];
+    cloneJobs = [];
     player.visible = false;
     clone.visible = false;
-    spawnCd = 2.0;
     for (let i = 0; i < 4; i++) spawnGorfAtEdge(i);
     galaxy.phase = "in";
     galaxy.age = 0;
@@ -271,11 +287,11 @@
 
   function revealPlayerAndClone() {
     player.visible = true;
-    player.x = W * 0.5;
-    player.y = H * 0.5;
+    player.x = ipart(W * 0.5);
+    player.y = ipart(H * 0.5);
     clone.visible = true;
-    clone.x = W * 0.5 + 28;
-    clone.y = H * 0.5 - 10;
+    clone.x = ipart(W * 0.5 + 28);
+    clone.y = ipart(H * 0.5 - 10);
     clone.frame = 0;
   }
 
@@ -403,6 +419,87 @@
     b.vy += (avn - bvn) * ny;
   }
 
+  function currentCloneFrame() {
+    return CLONE_CYCLE[Math.floor(clone.frame) % CLONE_CYCLE.length];
+  }
+
+  /** Yellow left/right entrances in world space (CLN* edge strips). */
+  function clonePorts() {
+    const cf = currentCloneFrame();
+    const s = sprites[cf.name];
+    const hw = s.width / 2;
+    const hh = s.height / 2;
+    const pw = 5;
+    const y0 = clone.y - hh * 0.35;
+    const y1 = clone.y + hh * 0.5;
+    return {
+      left: {
+        x0: clone.x - hw,
+        x1: clone.x - hw + pw,
+        y0,
+        y1,
+        exit: "right",
+      },
+      right: {
+        x0: clone.x + hw - pw,
+        x1: clone.x + hw,
+        y0,
+        y1,
+        exit: "left",
+      },
+    };
+  }
+
+  function overlapsPort(f, port) {
+    return (
+      f.x + f.r > port.x0 &&
+      f.x - f.r < port.x1 &&
+      f.y + f.r > port.y0 &&
+      f.y - f.r < port.y1
+    );
+  }
+
+  function emitClones(exitSide, kind) {
+    const ports = clonePorts();
+    const port = exitSide === "left" ? ports.left : ports.right;
+    const midX = ipart((port.x0 + port.x1) / 2);
+    const midY = ipart((port.y0 + port.y1) / 2);
+    const dir = exitSide === "left" ? -1 : 1;
+    const sp = CLONE_EXIT_SPEED;
+    for (const dy of [-6, 6]) {
+      spawnGorf(midX + dir * 6, midY + dy, { vx: dir * sp, vy: dy * 2 });
+      foes[foes.length - 1].cool = CLONE_COOL;
+      foes[foes.length - 1].kind = kind;
+    }
+  }
+
+  function processCloneMachine(dt) {
+    if (!clone.visible) return;
+
+    clone.frame = (clone.frame + dt * 2.4) % CLONE_CYCLE.length;
+    clone.x = ipart(clone.x + Math.sin(t * 0.55) * 10 * dt);
+    clone.y = ipart(clone.y + Math.cos(t * 0.4) * 8 * dt);
+    clone.x = Math.max(40, Math.min(W - 40, clone.x));
+    clone.y = Math.max(50, Math.min(H - 50, clone.y));
+
+    const ports = clonePorts();
+    for (const f of foes) {
+      if (f.hp <= 0 || f.cool > 0) continue;
+      let hit = null;
+      if (overlapsPort(f, ports.left)) hit = ports.left;
+      else if (overlapsPort(f, ports.right)) hit = ports.right;
+      if (!hit) continue;
+      // absorb — will emerge as two from the opposite yellow entrance
+      f.hp = 0;
+      cloneJobs.push({ t: CLONE_PROCESS_T, exit: hit.exit, kind: f.kind });
+    }
+
+    for (const job of cloneJobs) job.t -= dt;
+    const ready = cloneJobs.filter((j) => j.t <= 0);
+    cloneJobs = cloneJobs.filter((j) => j.t > 0);
+    for (const job of ready) emitClones(job.exit, job.kind);
+  }
+
   function updatePlay(dt) {
     t += dt;
     if (!player.visible) return;
@@ -416,8 +513,10 @@
     if (keys["s"] || keys["arrowdown"]) dy += 1;
     if (dx || dy) {
       const n = Math.hypot(dx, dy) || 1;
-      player.x += (dx / n) * speed * dt;
-      player.y += (dy / n) * speed * dt;
+      // integer pixel steps on the 320×204 grid
+      const step = Math.max(1, Math.round(speed * dt));
+      player.x = ipart(player.x + (dx / n) * step);
+      player.y = ipart(player.y + (dy / n) * step);
     }
     player.x = Math.max(12, Math.min(W - 12, player.x));
     player.y = Math.max(28, Math.min(H - 12, player.y));
@@ -429,41 +528,33 @@
     if ((mouse.down || keys[" "] || keys["k"]) && fireCd <= 0) {
       fireCd = 0.12;
       const sp = 160;
+      const c = Math.cos(aim);
+      const s = Math.sin(aim);
       bullets.push({
-        x: player.x,
-        y: player.y,
-        vx: Math.cos(aim) * sp,
-        vy: Math.sin(aim) * sp,
+        x: ipart(player.x + c * BULLET_MUZZLE),
+        y: ipart(player.y + s * BULLET_MUZZLE),
+        vx: c * sp,
+        vy: s * sp,
         life: 0.9,
       });
     }
 
     bullets = bullets.filter((b) => {
-      b.x += b.vx * dt;
-      b.y += b.vy * dt;
+      b.x = ipart(b.x + b.vx * dt);
+      b.y = ipart(b.y + b.vy * dt);
       b.life -= dt;
       return b.life > 0 && b.x > -10 && b.x < W + 10 && b.y > -10 && b.y < H + 10;
     });
 
-    // Clone machine: animate + drift; not destroyable; spawns gorfs at edges
-    if (clone.visible) {
-      clone.frame = (clone.frame + dt * 2.4) % CLONE_CYCLE.length;
-      clone.x += Math.sin(t * 0.55) * 10 * dt;
-      clone.y += Math.cos(t * 0.4) * 8 * dt;
-      clone.x = Math.max(40, Math.min(W - 40, clone.x));
-      clone.y = Math.max(50, Math.min(H - 50, clone.y));
-
-      spawnCd -= dt;
-      if (spawnCd <= 0) {
-        spawnCd = 2.2 + Math.random() * 1.5;
-        spawnGorfAtEdge();
-      }
-    }
+    processCloneMachine(dt);
 
     for (const f of foes) {
-      f.x += f.vx * dt;
-      f.y += f.vy * dt;
+      if (f.cool > 0) f.cool -= dt;
+      f.x = ipart(f.x + f.vx * dt);
+      f.y = ipart(f.y + f.vy * dt);
       bounceWalls(f);
+      f.x = ipart(f.x);
+      f.y = ipart(f.y);
     }
     for (let i = 0; i < foes.length; i++) {
       for (let j = i + 1; j < foes.length; j++) bouncePair(foes[i], foes[j]);
@@ -540,9 +631,13 @@
     for (const b of bullets) {
       const len = 5;
       const ang = Math.atan2(b.vy, b.vx);
+      const x0 = ipart(b.x - Math.cos(ang) * len);
+      const y0 = ipart(b.y - Math.sin(ang) * len);
+      const x1 = ipart(b.x + Math.cos(ang) * len);
+      const y1 = ipart(b.y + Math.sin(ang) * len);
       ctx.beginPath();
-      ctx.moveTo(b.x - Math.cos(ang) * len, b.y - Math.sin(ang) * len);
-      ctx.lineTo(b.x + Math.cos(ang) * len, b.y + Math.sin(ang) * len);
+      ctx.moveTo(x0 + 0.5, y0 + 0.5);
+      ctx.lineTo(x1 + 0.5, y1 + 0.5);
       ctx.stroke();
     }
 
@@ -563,7 +658,7 @@
   function frame(now) {
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
-    ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     if (mode === "select") drawSelect();
     else if (mode === "intro") {
       updateIntro(dt);

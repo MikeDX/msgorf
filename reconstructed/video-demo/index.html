@@ -38,10 +38,9 @@
       }
       canvas {
         image-rendering: pixelated;
+        image-rendering: crisp-edges;
         background: #000;
         box-shadow: 0 0 0 1px #333, 0 12px 40px rgba(0, 0, 0, 0.5);
-        max-width: 100%;
-        height: auto;
       }
       .help {
         max-width: 42rem;
@@ -66,9 +65,9 @@
       Not a faithful compile. Not <code>XC.LOGIC</code>. See
       <a href="README.md">README</a>.
     </p>
-    <canvas id="c" width="960" height="612" aria-label="Ms Gorf guess demo"></canvas>
+    <canvas id="c" width="320" height="204" aria-label="Ms Gorf guess demo"></canvas>
     <p class="help">
-      Playfield <strong>320×204</strong> (Astrocade hi-res landscape — footage is horizontal).
+      Native playfield <strong>320×204</strong> (1 buffer pixel = 1 game pixel; CSS nearest-neighbour enlarge only).
       <strong>Select:</strong> <kbd>1</kbd>/<kbd>2</kbd> ·
       <strong>Move:</strong> WASD · <strong>Aim/fire:</strong> mouse (ship stays upright) ·
       Clip: <code>work/video_refs/gameplay.mp4</code>
