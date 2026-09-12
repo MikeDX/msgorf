@@ -1,0 +1,18 @@
+{ BLOCK 0155 } class=pattern
+
+OTHER MISTAKES YOU MAY MAKE ARE RUNNING OUT OF MEMORY SPACE     
+OR OVERFLOWING THE DISK DIRECTORY. IF YOU RUN OUT OF SPACE      
+TALK TO JAY ABOUT IT. IF THE DISK DIRECTORY OVERFLOWS           
+IT IS RECOMMENDED THAT RELATED OBJECTS BE COMBINED INTO A       
+SINGLE FILE. FOR EXAMPLE RATHER THAT HAVING 4 FILES             
+EACH CONTAINING ONE PATTERN THEY COULD BE MERGED INTO A         
+SINGLE FILE CONTAINING FOUR PATTERN BLOCKS. THIS WILL ALSO      
+SAVE CONSIDERABLE TIME WHEN LOADING.                            
+                                                                
+                                                                
+                                                                
+GOOD LUCK, Jay Fenton 5/18/83                                   
+                                                                
+                                                                
+                                                                
+                                                                

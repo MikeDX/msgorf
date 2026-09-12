@@ -1,0 +1,18 @@
+{ BLOCK 0080 } class=colon_defs
+
+.C.....p......*......<ANIMATION.....p. ........ANIMATION>.......
+ .....,..AT!...)...*...F..NULPATi.<....W..P1i.<....g..P2i.<....s
+..SBi.<.......P1Ui.<.......P2Ui.<.......BANGAi.<.......BANGPi.<.
+......CLNi.<.......GORFi.<.......LAZONi.<.......KAMIi.<.......SM
+INEi.<.......SHLDi.<.......MITEi.<.......TRIONi.<....&..DEBi.<..
+..5..HKi.<....B..GBi.<....N..GRDi.<....Z..NULPAT.v....g..PLY1-P.
+v....v..PLY2-P.v.K.....SBASE.v.......P1UP.v.......P2UP.v.......F
+BEXP1.v.......FBEXP2.v.......FBEXP3.v.Y.....FBEXP4.v.......FBEXP
+5.v._.....FBEXP6.v.......BANGA.v..B....BANGP.v..B.$..CLN0.v.S..2
+..CLN32.v.:..?..CLN64.v.s..M..CLONETBL.v.6B.[..GORF-PAT.v.z..l..
+LAZON.v....}..COMC5B.v.......COMC5A.v.......COMC5.v.9.....COMC6.
+v.d.....SPINV.v.QB....SMINE0.v.......SMINE1.v.......SMINE.v.cB..
+..SHLD-P.v.......MITE-P.v.%.....TRION-P.v.M.....DEB-P.v.t..-..HK
+-P.v....;..GB-P.v....H..GRD-P.v.....FS.PATAVE...................
+................................................................
+................................................................

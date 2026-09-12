@@ -1,0 +1,18 @@
+{ BLOCK 0174 } class=text
+
+( Load the Binary from a Xcompile Game File )                   
+HEX BFD7  DP ! C004 C= XFRFLG C005 C= XFRADR                    
+SUBR RESET DI, C007  JMP, NOP, NOP, NOP,                        
+BEGIN, BEGIN, XFRFLG LDA, A ANA, 0<>, END,                      
+XFRADR LDED,                                                    
+0C400 H LXI, 400 B LXI, LDIR, A XRA, XFRFLG STA,                
+D A MOV, 48 CPI, 0=, END, 0FF A MVI, 0FC OUT, 0FD OUT,          
+0A A MVI, 0FE OUT, 3 A MVI, 0FF OUT,                            
+BEGIN, 0E1 IN, 2 ANI, 0<>, END, 0 JMP,                          
+-->                                                             
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                

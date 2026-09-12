@@ -1,0 +1,8 @@
+gorf_atf.pdf
+gorf_galax_cpy1.pdf
+gorf_galax_cpy2.pdf
+gorf_go.pdf
+gorf_inv.pdf
+gorf_os.pdf
+Gorf_wo_speech.pdf
+GORFOS.txt

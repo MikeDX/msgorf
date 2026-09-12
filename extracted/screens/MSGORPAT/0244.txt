@@ -1,0 +1,18 @@
+{ BLOCK 0244 } class=text
+
+( EXPLOSION ANIM TABLE FOR PLAYER )                             
+<ANIM-TBL BANGP                                                 
+FBEXP1 8                                                        
+FBEXP4 8                                                        
+FBEXP2 8                                                        
+FBEXP3 8                                                        
+FBEXP5 8                                                        
+FBEXP6 8                                                        
+NULPAT 120 TBL>                                                 
+;S                                                              
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                

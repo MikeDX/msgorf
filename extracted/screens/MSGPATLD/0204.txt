@@ -1,0 +1,18 @@
+{ BLOCK 0204 } class=pattern
+
+( ANOTHER FIREBASE EXPLOSION PATTERN )                          
+PATTERN FBEXP2 8 B, 9 B, 4 B, 17 B,                             
+HEX 19 B, 2A B, 3B B, DECIMAL QUADPAT                           
+0001 B, 0000 B, 0000 B, 0000 B,                                 
+0000 B, 1000 B, 0000 B, 0000 B,                                 
+0000 B, 1110 B, 0000 B, 0000 B,                                 
+0000 B, 0110 B, 0010 B, 0000 B,                                 
+0000 B, 0111 B, 1110 B, 0000 B,                                 
+0000 B, 0131 B, 1110 B, 0110 B,                                 
+0000 B, 1133 B, 3111 B, 1111 B,                                 
+0000 B, 1133 B, 3333 B, 3311 B,                                 
+3001 B, 1333 B, 3333 B, 3310 B,                                 
+0111 B, 1333 B, 3333 B, 3110 B,                                 
+0111 B, 3333 B, 3333 B, 3110 B,                                 
+0011 B, 3333 B, 3333 B, 3311 B,                                 
+0011 B, 3311 B, 3331 B, 3310 B, -->                             

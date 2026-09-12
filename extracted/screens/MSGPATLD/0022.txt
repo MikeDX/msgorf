@@ -1,0 +1,18 @@
+{ BLOCK 0022 } class=colon_defs
+
+.....A...G.PUSH,.kE....B...H.POP,.kE....B...H.XTHL,.....A..+H.SP
+HL,.....A..;H.IN,....&C..KH.OUT,....&C..YH.EI,.....A..hH.DI,....
+.A..vH.RST,.....B...H.LHLD,...*.C...H.SHLD,...".C...H.LDA,...:.C
+...H.STA,...2.C...H.JMP,.....C...H.JC,.....C...H.JNC,.....C...H.
+JZ,.....C...H.JNZ,.....C...I.JPE,.....C...I.JPO,.....C..)I.JM,..
+...C..8I.JP,.....C..FI.CALL,.....C..TI.CC,.....C..dI.CNC,.....C.
+.rI.CZ,.....C...I.CNZ,.....C...I.CPE,.....C...I.CPO,.....C...I.C
+M,.....C...I.CP,.....C...I.RET,.....A...I.RC,.....A...I.RNC,....
+.A...I.RZ,.....A...J.RNZ,.....A...J.RPE,.....A..!J.RPO,.....A..0
+J.RM,.....A..?J.RP,.....A..MJ.ZXY... B....R..A..[J.LDX,....D....
+EaJ.B..FR..A.A..pJ.STX,.....D...E{.{.aJC...pR..A.A...J.MVIX,.DEa
+J..6.A.A.A...J.LXIX,.DEaJ..!.C...J.ADDX,.DEaJ....A.A...J.INXX,.D
+EaJ..#.A...J.DCXX,.DEaJ..+.A...K.RLCX,.DEaJ....A.A....A...K.RALX
+,.DEaJ....A.A....A..9K.RRCX,.DEaJ....A.A....A..TK.RARX,.DEaJ....
+A.A....A..oK.SLAX,.DEaJ....A.A..&.A...K.SRAX,.DEaJ....A.A....A..
+.K.SRLX,.DEaJ....A.A..>.A...K.PUSHX,.DEaJ....A...K.POPX,.DEaJ...

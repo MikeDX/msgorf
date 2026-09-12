@@ -1,0 +1,18 @@
+{ BLOCK 0170 } class=text
+
+( ANIM-TBL THECCZ )                                             
+<ANIM-TBL SPINV                                                 
+COMC5 8                                                         
+COMC5A 8                                                        
+COMC5B 8                                                        
+COMC6 8                                                         
+TBL>                                                            
+-->                                                             
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                

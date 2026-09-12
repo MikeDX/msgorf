@@ -1,0 +1,18 @@
+{ BLOCK 0030 } class=colon_defs
+
+.31SAVEFerse 1.0 July 82ap..-n...|......ap...la..........|...2..
+.........n.......n.|.....Q.....|.a.....|.F...s.".........;h.....
+.n.|...)a..u........search.;h....\.......ap..-n...|......ap...la
+..........|...2...........n.......n.|.....Q.....|.a.....|.F.....
+".........;h......n.|...)a..u.....;hp...G.la....C..,....?.....@)
+a...a.....BYETtyp!!R........2...W......e.....8TO5......k.k.k.G..
+         G..        ICE  ->  GAS TRANSFERk.k.G..                
+         GASk.k.G..RECVFILE nnnn  Receives file nnnn from the IC
+Ek.k.G.7RECVDISK nnnn  Here, file nnnn is a LOAD block and eachk
+.G.5               file in the LOAD block is received onek.G..  
+             at a time.k.G.2            *  The ICE side must hav
+e an identicalk.G..               block to do a SENDDISK nnnn on
+.k.k.G.5The best way to create a RECEIVE block is to have thek.G
+.6ICE send over its SEND block and to then do a RECVDISKk.G.#on 
+the file that was just received.k.k.G.2REMEMBER:  This only work
+s for ASCII files and youk.G.'           must start this side fi

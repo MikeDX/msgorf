@@ -1,0 +1,18 @@
+{ BLOCK 0250 } class=text
+
+P1UP P1Ui AT!                                                   
+P2UP P2Ui AT!                                                   
+-->                                                             
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                

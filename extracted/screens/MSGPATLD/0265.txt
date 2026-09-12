@@ -1,0 +1,18 @@
+{ BLOCK 0265 } class=text
+
+ 0 D BIT, 0<>, IF, ( 3 ) ( anim ) 0 VANIMINX Y MVIX,            
+  3 D BIT, 0<>, IF, ( 4 ) ( animmag ) VMAGIC Y A LDX,           
+  03F ANI, M ORA, A VMAGIC Y STX, ( magic from the table )      
+  H INX, M A MOV, ( timer ) H DCX,                              
+ ELSE, ( 4 ) M A MOV, THEN, ( 4 )                               
+  A VANIMTIMER Y STX, ( set timer ) THEN, ( 3 )                 
+  1 D BIT, ( rot? )                                             
+ 0<>, IF, ( 3 ) ( rot )   E VROTINXSHF Y STX, ( rot shift )     
+  1 VANIMTIMER Y MVIX, ( set timer to go off ) THEN, ( 3 )      
+  H VPRATBLH Y STX, L VPRATBL Y STX, ( store table )            
+ ELSE, ( 1 ) ( pattern )                                        
+  H VPATH Y STX, L VPAT Y STX,                                  
+   ( A= logicstat2 with no anim ) 0 VLOGICSTAT2 Y MVIX,         
+ THEN, ( 1 ) Y POPX, NEXT                                       
+STK> -->                                                        
+                                                                

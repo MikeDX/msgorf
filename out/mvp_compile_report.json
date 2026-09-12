@@ -1,0 +1,31 @@
+{
+  "label": "demo",
+  "ok": true,
+  "errors": [],
+  "xc_bases": {
+    "ROMSTART": 16384,
+    "PT_HERE": 16896,
+    "DP": 32832,
+    "RSTACK": 62464,
+    "PSTACK": 61440,
+    "RAMSTART": 63488
+  },
+  "words": [
+    {
+      "name": "INC",
+      "code_hex": "12ff"
+    },
+    {
+      "name": "ADD2",
+      "code_hex": "1212ff"
+    },
+    {
+      "name": "DROP2",
+      "code_hex": "0202ff"
+    }
+  ],
+  "note": "Host MVP encoding \u2014 not authentic Nutting TERSE bytecode",
+  "output": "out/mvp_object.msgx",
+  "output_sha256": "76a296359b41ea82dbba8a43991e96b8c81aece0ff7743ad1ba60079576e78b7",
+  "output_size": 50
+}

@@ -1,0 +1,18 @@
+{ BLOCK 0192 } class=pattern
+
+( MORE INDEX NUMBERS )                                          
+NC= GORFi ( GORF ANIMATION )                                    
+NC= LAZONi ( LASER SHIP ANIMATION )                             
+NC= KAMIi ( KAMIKAZI ANIMATION )                                
+NC= SMINEi ( SPACE MINE ANIMATION )                             
+NC= SHLDi ( SHIELD DEPLOYER ANIMATION )                         
+NC= MITEi ( SHIELD EATER ANIMATION )                            
+NC= TRIONi ( TRION ANIMATION )                                  
+NC= DEBi ( UFO ANIMATION )                                      
+NC= HKi ( HUNTER-KILLER SATELITE ANIMATION )                    
+NC= GBi ( GROUND BASE PATTERN ANIMATION )                       
+NC= GRDi ( GUARDIAN ANIMATION )                                 
+DROP -->                                                        
+                                                                
+                                                                
+                                                                

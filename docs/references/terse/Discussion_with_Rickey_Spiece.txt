@@ -1,0 +1,402 @@
+Discussion with Rickey Spiece of Dave Nutting Associates
+Compiled by Richard C. Degler, 12/28/2010
+April 2005
+
+
+"A new member of this newsgroup"
+... and replies (with embeded quotes deleted.)
+[These 11 messages are all he commented on.]
+
+
+Message #2078
+Tue Apr 19, 2005 5:50 pm
+"rickeyspiece" <rickeyspiece@...>
+
+
+Hello all, I am new to this newsgroup. I worked on the original
+Bally Arcade back in the 70's at Dave Nutting and Associates. It is
+nice to see all of the interest in our work from back then.
+
+I don't know how much I remember, being that it was 25 years ago I
+last worked on the Bally Arcade, but I might be able to fill in a
+few details.
+
+I noticed that TERSE was mentioned. TERSE is an acronym and it
+stands for Terse Efficient Recursive Stack Engine. And for you real
+observant types, yes the name itself is also recursive. I think it
+was Al McNeil (sp?) that did the original work on the engine itself
+and came up with the name. He was my office-mate at DNA for awhile
+before he went to Stern. All of TERSE was written in house. Once you
+disassemble the engine in Z80 code, pretty much everything else was
+written in TERSE so you would need a TERSE disassembler.
+
+I first started at DNA in 1977 and my first cartridge was
+SeaWolf/Missle and I remember developing that using the wire-wrapped
+boards before the chipset was back from the fabricators. I have fond
+memories of flexing those huge boards to get them to work! I also
+developed Panzer Attack/Red Barron, Grand Prix/Demo Derby,
+Blackjack/Poker/Acey Ducey -- I actually finished the development
+started by Mason, but he didn't shuffle the cards correctly. I used
+Donald Knuths shuffle algorithm which worked just great. I also co-
+authored the Football cartridge with Bob Ogden when he first joined.
+He played football in college and I was a wiz at programming
+cartridges! The other work I did for them was all proto-types that
+never went to market. I think I wrote the proto-types in TERSE and
+the rest was straight Z80 code.
+
+Hello and bye for now.
+
+Rickey Spiece
+
+---
+
+Message #2078
+Tue Apr 19, 2005 5:50 pm
+Russ Perry Jr <slapdash@...>
+
+
+Whoa! Howdy, and welcome to the group!
+
+Have any of those survived the years? There are a lot of people
+who would be interested in preserving these prototypes.
+
+---
+
+Message #2080
+Tue Apr 19, 2005 6:56 pm
+Rickey Spiece <rickeyspiece@...>
+
+
+Russ, the most important proto-type I worked on was a pinball machine
+names Zoltan. It was the very first pinball with a graphical screen
+added. It was a hybrid between a traditional pinball machine (we
+started with the existing Zoltan) and we essentially put the Bally
+Arcade graphics behind the head glass. This was very experimental and
+reasonably cutting edge for the 70's. Only one prototype was made and
+I think it was canibalized for some other work. I absolutely loved
+pinball and still do. I can't say that I ever played a pinball
+machine with graphics added that I really liked. Perhaps I am some
+sort of purist!
+
+My only souvenir from that project was obtaining an original Zoltan
+headglass and also an original Fireball headglass. Which I still have
+and still cherish.
+
+Unfortunately the prototype cartiriges and my Bally Arcade(s) were
+lost sometime when I got divorced 13 years ago. I now wish I had kept
+that stuff. I don't know if my ex kept them or burned them. I didn't
+exactly leave on the best of terms...
+
+---
+
+Message #2081
+Tue Apr 19, 2005 7:02 pm
+Rickey Spiece <rickeyspiece@...>
+
+
+Ooops. I mis-typed. I meant Voltan, not Zoltan.
+[editor note: Zoltan was a "Fortune Teller Arcade Machine" instead.]
+
+---
+
+Message #2082
+Tue Apr 19, 2005 7:16 pm
+Lance F. Squire" <komb@...>
+
+
+Yes, Welcome!
+
+Thanks for stopping by!
+
+SO many questions... ;)
+
+I presume you've seen BallyAlley and/or the Ballyfaq?
+
+More later...
+
+Lance
+
+---
+
+Message #2083
+Tue Apr 19, 2005 7:30 pm
+Rickey Spiece <rickeyspiece@...>
+
+
+Lance, no I have only seen a few entries in the newsgroup. Since I am
+new to this, I am starting at ground zero here.
+
+What should I look at? Or easier on me, what questions can I answer?
+
+Rickey
+
+---
+
+Message #2084
+Tue Apr 19, 2005 9:51 pm
+"Lance F. Squire" <komb@...>
+
+
+Well,
+
+http://www.ballyalley.com a huge repository of information that Adam
+put together with help from me and others.
+
+http://www.alteeve.com/~lance/Ballyfaq.html, My website.
+
+
+As for quastions, I'm mostly interested in unknown
+history/information about the BPA, the keyboard expansion, and more
+recently programming tips/hints for a project I'm working on.
+
+Goto:
+
+Files > AssemblyLanguage Source Code
+
+ScrollTestA.z80
+
+To see what I'm working on...
+
+Files > Cartridge Images
+
+ScrollTestA.bin
+
+Runs on MESS or XMESS. (or an actual Bally if you have a burner...)
+
+
+Adam Atrionfo is much better at the 'interview' type questioning...
+
+Lance
+
+---
+
+Message #2085
+Tue Apr 19, 2005 11:54 pm
+"Tony Miller" <fmillera@...>
+
+Rickey;
+
+Glad to see another ex-DNAer here! I've been trying to remember the
+last name of Lew ..., the guy who wrote the breakout game of the
+original code. Do you remember it?
+
+And Welcome aboard!
+
+Tony Miller
+
+---
+
+Message #2087
+Wed Apr 20, 2005 8:50 am
+Rickey Spiece <rickeyspiece@...>
+
+
+Tony, I do remember him vividly. I can't think of his last name off
+the top of my head. Let me cook on it a while and see if I can
+remember.
+
+Rickey
+
+---
+
+Message #2088
+Wed Apr 20, 2005 12:19 pm
+Russ Perry Jr <slapdash@...>
+
+
+Rickey Spiece <rickeyspiece@...> wrote:
+> Russ, the most important proto-type I worked on was a pinball
+> machine named [V]oltan. It was the very first pinball with a
+> graphical screen added. It was a hybrid between a traditional
+> pinball machine (we started with the existing [V]oltan) and we
+> essentially put the Bally Arcade graphics behind the head glass.
+> This was very experimental and reasonably cutting edge for the
+> 70's. Only one prototype was made and I think it was canibalized
+> for some other work.
+
+Ah, bummer. It would be cool just to have that code -- I assume the
+pin had a full monitor on it then, or was it some kind of smaller
+display?
+
+> I absolutely loved pinball and still do. I can't say that I ever
+> played a pinball machine with graphics added that I really liked.
+> Perhaps I am some sort of purist!
+
+I've always been more of a videogame fan than a pinball fan, but I
+tend to find that sort of thing gimmicky. I still hope to run across
+a Spanish Eyes pin that I played in my youth, at least I'm pretty
+sure that's the right one -- the only thing is the only Spanish Eyes
+art I've found online was sort of "op art"/"modern art" whereas what
+I remember was more realistic paintings of lovely latinas; I don't
+know if it's a false memory of the art (possibly it was table or side
+art, not backdrop art) or the name, or if it was just a rarer
+variation or re-release or something.
+
+> Unfortunately the prototype cartiriges and my Bally Arcade(s) were
+> lost sometime when I got divorced 13 years ago. I now wish I had
+> kept that stuff.
+
+Me too. :-(
+
+Do you at least recall what kind of stuff you were working on and how
+complete it was?
+
+> I don't know if my ex kept them or burned them. I didn't
+> exactly leave on the best of terms...
+
+Oh, sorry to hear that.
+
+---
+
+Message #2089
+Wed Apr 20, 2005 8:28 pm
+"David E. Turner" <cmdr-dave@...>
+
+
+I don't suppose you would have any old documentation on TERSE lying
+around? Or even the compiler on some ancient media? <I often search
+for the Holy Grail in my spare time too! *GRIN*>
+
+I may be the poster who refered to TERSE. I like to do work on the
+commercial side of the Astrocade hardware (for example the Gorf coin-
+op game) which is has a lot of similarities to the Bally Astrocade.
+
+Anyway, I wrote Jamie (Jay) Fenton (programmer of Gorf) about it a
+long while back and she told me of TERSE and that Gorf was programmed
+in the language. She still has the Gorf source and the TERSE manuals,
+but unfortunatly for me, they went into storage when she last moved
+(more or less in storage permantly now I think).
+
+I really would like to get info on TERSE (among other things) for
+historical purposes. I know it is a good bit like Forth and my
+comparisions of some of the disassembled Gorf code to Camel Forth
+source seem to confirm this...
+
+I seem to have rambled on... so let me close and say Welcome to the
+group! :-)
+
+-Commander Dave
+
+---
+
+Message #2090
+Wed Apr 20, 2005 8:47 pm
+Frank Palazzolo <palazzol@...>
+
+
+Hello,
+
+While we're on the subject of Forth and the Bally hardware...
+
+I worked on the emulations of Bally chipset for the MAME and MESS
+emulators. For a long while, no-one had managed to emulate Professor
+Pacman, and there was speculation that the rom images were corrupt.
+At some point, I started to dig into the code, and to my surprise I
+discovered a Forth interpreter in there! :) This explained why a lot
+of the code didn't disassemble, it was mostly Forth byte code.
+
+Ironically, this actually helped me figure out the bank-switching in
+that game. I disassembled some of the interpreter, and found the code
+for an "absolute jump". By searching for this byte sequence, I
+managed to piece together where each ROM was switched into the memory
+map. I still needed other techniques, but eventually it was emulated
+successfully.
+
+Along the way, I looked a bit further and discovered that most of the
+Bally coin-ops were written this way. I could even see the
+interpreter revisions from one coin-op to the next. Jamie [Fenton]
+also confirmed to me that it was TERSE.
+
+Thanks,
+-Frank
+
+P.S. Last month, I managed to add the "Demons and Dragons" prototype
+to that MAME driver as well.
+
+---
+
+Message #2091
+Wed Apr 20, 2005 11:32 pm
+Tony Miller <fmillera@...>
+
+
+Commander;
+
+Try tracking down Alan McNeil, who wrote TERSE (which, as I recall,
+stood for Terse Efficient Reentrant Stack Engine). Last I heard
+(which was many years ago, now) he and his wife Karen had bought a
+ranch in Montana.
+
+Cheers,
+
+Tony Miller
+
+---
+
+Message #2092
+Thu Apr 21, 2005 12:16 am
+Rickey Spiece <rickeyspiece@...>
+
+
+Tony, you are correct that Alan McNeil wrote the original Terse
+engine. However, Terse stands for Terse Efficient Recusrsive Stack
+Engine. As for Alan, I haven't seen him for years but I know that his
+wife went to school and majored in  Western Indian something or
+another. Not to sound stupid, but last I knew them she was working at
+the Museum of Natural History in Chicago. I would not at all be
+surprisied for them to end up in Montana. Also, I remember Alan
+telling me that his father was a Physicist with his summers off and
+he spent many summers in Montana in what I recall was Kalispell near
+Flathead Lake. So, Montana would be a natural for both of them.
+
+I shared an office with Alan and met his wife-to-be back in the 70's.
+They are very nice people!
+
+Rickey
+
+---
+
+Message #2093
+Thu Apr 21, 2005 12:41 am
+Tony Miller <fmillera@...>
+
+
+Rickey;
+
+I remember asking him what it stood for, and he said reentrent.  But
+then again, they say that memory is the second thing you lose. I
+forget what the first is.  Al was actually the 1st guy I stole from
+DNA when we were staffing up URL, followed by Terry Coleman, Jim
+Hemmer and Bill Jahnke.  When we started Xtar, he joined us for a
+while, working on a 3D game, and then decided to move on.  Great guy,
+wish I had kept in touch with him.
+
+Tony
+
+---
+
+Message #2094
+Thu Apr 21, 2005 10:22 am
+Rickey Spiece <rickeyspiece@...>
+
+
+Tony, I think I remember you. Unless, perhaps you are Dave Otto in
+disguise ;-) !!!
+
+Rickey
+
+---
+
+Message #2095
+Fri Apr 22, 2005 4:23 pm
+Tony Miller <fmillera@...>
+
+
+Rickey,  No, I'm not Dave Otto.  But we did name the smiley face in
+Berzerk after him - Evil Otto.
+
+Cheers,
+
+Tony Miller
+
+---

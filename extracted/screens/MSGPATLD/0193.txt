@@ -1,0 +1,18 @@
+{ BLOCK 0193 } class=pattern
+
+( PATTERN INDEX NUMBERS )                                       
+0 SC= NULPATi                                                   
+NC= P1i                                                         
+NC= P2i                                                         
+NC= SBi                                                         
+NC= P1Ui                                                        
+NC= P2Ui                                                        
+NC= BANGAi                                                      
+NC= BANGPi                                                      
+NC= CLNi                                                        
+-->                                                             
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                

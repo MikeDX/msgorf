@@ -1,0 +1,18 @@
+{ BLOCK 0148 } class=text
+
+( MORE MAP ASSIGNMENTS )                                        
+GORF-PAT GORFi AT!                                              
+LAZON LAZONi AT!                                                
+SPINV KAMIi AT!                                                 
+SMINE SMINEi AT!                                                
+SHLD-P SHLDi AT!                                                
+MITE-P MITEi AT!                                                
+TRION-P TRIONi AT!                                              
+DEB-P DEBi AT!                                                  
+HK-P HKi AT!                                                    
+GB-P GBi AT!                                                    
+GRD-P GRDi AT!                                                  
+-->                                                             
+                                                                
+                                                                
+                                                                

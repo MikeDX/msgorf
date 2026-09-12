@@ -1,0 +1,18 @@
+{ BLOCK 0192 } class=text
+
+( MORE INDEX NUMBERS )                                          
+NC= GORFi                                                       
+NC= LAZONi                                                      
+NC= KAMIi                                                       
+NC= SMINEi                                                      
+NC= SHLDi                                                       
+NC= MITEi                                                       
+NC= TRIONi                                                      
+NC= DEBi                                                        
+NC= HKi                                                         
+NC= GBi                                                         
+NC= GRDi                                                        
+DROP -->                                                        
+                                                                
+                                                                
+                                                                

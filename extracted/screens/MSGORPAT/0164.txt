@@ -1,0 +1,18 @@
+{ BLOCK 0164 } class=text
+
+....H                                                           
+CODE ANIM-OFF  ( --- ; turn animation off )                     
+  vaddr LHLD, VLOGICSTAT2 D LXI, D DAD,                         
+  VBANIM-CHK M RES, NEXT                                        
+                                                                
+  HEX 0 C= NORMAL 40 C= FLOP 80 C= FLIP C0 C= FLIP-FLOP         
+CODE PERINX! ( store into the perspective index # )             
+  vaddr LHLD, VPERINX D LXI, D DAD, D POP, E M MOV, NEXT        
+STK> ;S                                                         
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                

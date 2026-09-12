@@ -1,0 +1,18 @@
+{ BLOCK 0151 } class=pattern
+
+AN 'INDEX CONSTANT' IS A SPECIAL NAME THAT JAY'S PROGRAM        
+USES TO REFER TO YOUR ANIMATION. BY UPDATING YOUR 'ANIM-MAP'    
+FILE YOU FORM THE ASSOCIATION BETWEEN YOUR NAME AND JAY'S NAME. 
+THUS YOU CAN CALL YOUR ANIMATIONS AND PATTERNS WHATEVER YOU LIKE
+WITHOUT WORRY ABOUT CONFLICTING WITH JAY'S NAME USAGE.          
+                                                                
+THE FORMAT FOR SPECIFING THIS ASSOCIATION LOOKS LIKE THIS:      
+                                                                
+<your name> <jays name> AT!                                     
+                                                                
+THIS EXAMPLE WOULD DEFINE THE PATTERN CALLED 'GORF-PAT' WITH    
+THE INDEX CONSTANT 'GORFi':                                     
+                                                                
+GORF-PAT GORFi AT!                                              
+                                                                
+-- MORE --                                                      

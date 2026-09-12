@@ -1,0 +1,18 @@
+{ BLOCK 0243 } class=text
+
+( EXPLOSION ANIM TABLE FOR GORFS )                              
+<ANIM-TBL BANGA                                                 
+FBEXP1 2                                                        
+FBEXP4 2                                                        
+FBEXP2 2                                                        
+FBEXP3 2                                                        
+FBEXP5 2                                                        
+FBEXP6 2                                                        
+NULPAT 120 TBL>                                                 
+-->                                                             
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                

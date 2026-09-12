@@ -1,0 +1,18 @@
+{ BLOCK 0152 } class=pattern
+
+THE FILE 'ANIM-MAP' CONTAINS A LIST OF LINES LIKE THE           
+ONE SHOWN IN THE EXAMPLE. IT IS VERY IMPORTANT THAT THE         
+FOLLOWING MISTAKES NOT OCCUR:                                   
+                                                                
+FORGETING TO ADD A LINE IN THE 'ANIM-MAP' FILE WILL CAUSE       
+A UGLY BLOCK TO APPEAR IN THE PLACE OF THE PATTERN YOU WANTED.  
+                                                                
+DUPLICATE LINES REFERING TO THE SAME INDEX CONSTANT WILL CAUSE  
+THE ANIMATION MENTIONED LATER ON TO BE THE ONE USED BY THE      
+PROGRAM.                                                        
+                                                                
+SPELLING MISTAKES WILL CAUSE THE COMPUTER TO PRINT THE MIS-     
+SPELLED WORD FOLLOWED BY A QUESTION MARK. TYPING 'WHERE' WILL   
+PRINT OUT THE LINE CONTAINING THE MISTAKE. TO CORRECT THIS YOU  
+MAY HAVE TO RELOAD FROM THE BEGINING.                           
+-- MORE --                                                      

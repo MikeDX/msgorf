@@ -1,0 +1,18 @@
+{ BLOCK 0009 } class=colon_defs
+
+( BINARY LOAD  AND BOOT )   1 1+ BASE ! 10000 BASE ! ( HEX )    
+( CODE UNMAP  0AF B, 0F8D3 , 0F9D3 , 0FF3E , 0FAD3 , NEXT ( )   
+: UNMAP  0F1 MEMAP!  ;  ( for GAS TERSE )                       
+HERE CONSTANT .eot  ( end of root terse )                       
+0 VARIABLE .o ( #blks .eot-4000 ) 0 VARIABLE .t ( 4000-8000 )   
+0 VARIABLE .h ( 8000-HERE )                                     
+0 VARIABLE .dp  0 VARIABLE .vp  0 VARIABLE .la                  
+.o 03FE - CONSTANT .svars                                       
+: bload ( from-blk to-addr #blks --- next-blk )                 
+  DUP >R 0 DO 2DUP DROP I + BLOCK 2DUP DROP                     
+  I 0400 * + 0400 UNPROT BMOVE PROT LOOP DROP R> + ;            
+: .rvdl  .vp @ VPTR !  .dp @ DP !  .la @ LAST !  ;              
+: boot DISKON  .svars 1 bload  .eot .o @ bload                  
+  04000 .t @ bload  08000 .h @ bload  .rvdl  DROP DISKOFF  ;    
+UNMAP SCR @ 1+ boot 020 ' T 1- UB! DECIMAL                      
+BKSP BKSP ." Xc System 1.0 July 82" ;S                          

@@ -1,0 +1,18 @@
+{ BLOCK 0160 } class=colon_defs
+
+( table verbs cont )                                            
+<STKH                                                           
+{ : TBL> }  ( entries --- )                                     
+ SP@ SPMARK { @ SWAP - 2/ } ( #words stacked )                  
+ ESIZE { B@ 1- / }                                              
+( #entries ) { DUP } CNT { ! DUP } ESIZE { B@ * } DP { +! }     
+ HERE IDX { ! }                                                 
+{  0 DO } ( next entry ) ESIZE { B@ 1- PICK }                   
+   ETYPE { B@ 80 AND IF ( not pattern ) 3 + THEN }              
+-->                                                             
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                

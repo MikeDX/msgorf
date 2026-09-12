@@ -1,0 +1,18 @@
+{ BLOCK 0189 } class=colon_defs
+
+( RECIEVER ROUTINE )                                            
+: RECV E-C NOFILES CR                                           
+309 1 DO                                                        
+BEGIN CSTAT B@ END ( AWAIT XMITED BUFFER )                      
+BLKPTR @ 4.                                                     
+DBUF BLKPTR @ DRIVE+ BUFFER 1024 LDIR ( GRAB FROM BUFFER )      
+0 CSTAT B! ( SET DATA USED )                                    
+UPDATE FLUSH                                                    
+LOOP ;                                                          
+-->                                                             
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                

@@ -1,0 +1,31 @@
+{
+  "MSGORF": {
+    "blocks": 162,
+    "classes": {
+      "text": 153,
+      "pattern": 9
+    }
+  },
+  "MSGORPAT": {
+    "blocks": 308,
+    "classes": {
+      "colon_defs": 45,
+      "binary": 85,
+      "load_chain": 5,
+      "text": 48,
+      "pattern": 109,
+      "empty": 16
+    }
+  },
+  "MSGPATLD": {
+    "blocks": 308,
+    "classes": {
+      "colon_defs": 48,
+      "binary": 78,
+      "load_chain": 4,
+      "text": 95,
+      "pattern": 59,
+      "empty": 24
+    }
+  }
+}

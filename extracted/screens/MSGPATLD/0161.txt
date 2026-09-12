@@ -1,0 +1,18 @@
+{ BLOCK 0161 } class=text
+
+( table verbs cont )                                            
+   IDX { @ 2- } U! ESIZE { B@ MINUS } IDX { +! }                
+   ESIZE { B@ 2 <> IF } IDX { @ } UB!  { THEN }                 
+   ESIZE { B@ 4 = IF } IDX { @ 1+ } UB!  { THEN DROP LOOP }     
+ TTYPE { B@ DUP DUP 81 = SWAP 89 = OR IF ( anim ) 0 }           
+{ SWAP 81 = IF } B, { ELSE } , { THEN } IDX { @ } ,             
+( close loop) { ELSE DROP }     { THEN }                        
+ TTYPE { B@ DUP DUP 81 = SWAP 89 = OR SWAP 84 = OR IF }         
+( anim, anim-mag or per )                                       
+   CNT { @ } IDX { @ 3 - } U! { ( #entries ) THEN }             
+ TTYPE { B@ DUP 82 = SWAP 83 = OR IF ( rot ) }                  
+{ 0 } CNT { @ BEGIN 2/ SWAP 1+ SWAP DUP NOT END DROP            
+  9 SWAP - ( shift amount ) }                                   
+  IDX { @ 3 - } U! { THEN } { ; }                               
+STK> ;S                                                         
+                                                                

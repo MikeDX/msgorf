@@ -1,0 +1,43 @@
+{
+  "title": "XC.PATTERNS / FS.PAT intended object (from MSGORPAT screen 0086)",
+  "source_screen": "extracted/screens/MSGORPAT/0086.txt",
+  "bases": {
+    "ROMSTART": "0x4000",
+    "ATBL": "0x4000",
+    "PT_HERE": "0x4200",
+    "DP": "0x8040",
+    "RSTACK": "0xF400",
+    "PSTACK": "0xF000",
+    "RAMSTART": "0xF800",
+    "OBJECT_FILE": "XC.PATTERNS",
+    "SAVE_NAME": "FS.PAT",
+    "DRIVE": 17
+  },
+  "fload_order": [
+    "CODE-LOAD",
+    "INDEX",
+    "PAT-LOAD",
+    "ANIM-MAP"
+  ],
+  "pattern_asset": {
+    "disk": "MSGORF",
+    "name": "GORF4A",
+    "kind": "QUADPAT",
+    "preview": "extracted/patterns/gorf4a_strip.png"
+  },
+  "corrected_inputs": {
+    "MSGORF.img.corrected": {
+      "sha256": "45124e716593158a4d514513823b71a5ed2b0eed28145cd07965c5929df29f01",
+      "size": 165888
+    },
+    "MSGORPAT.img.corrected": {
+      "sha256": "38705620eeeb74a95256b5226f77c40644b6699443f4c9a199e5e0c78b30d078",
+      "size": 315392
+    },
+    "MSGPATLD.img.corrected": {
+      "sha256": "1ceae25cafbf428f394f3ace0898caa164b20b9cb1b2080e86b3a1c23ffe16bb",
+      "size": 315392
+    }
+  },
+  "blocker": "Full game sources absent; authentic XCFSYSAVE not rehosted yet"
+}

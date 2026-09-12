@@ -1,0 +1,18 @@
+{ BLOCK 0171 } class=pattern
+
+FLOAD PATTERN                                                   
+FLOAD ANIM-VERBS                                                
+FLOAD MEMV                                                      
+-->                                                             
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                

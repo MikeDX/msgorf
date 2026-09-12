@@ -1,0 +1,18 @@
+{ BLOCK 0184 } class=text
+
+( ANIM-TBL THESMINE )                                           
+<ANIM-TBL SMINE                                                 
+SMINE0 6                                                        
+SMINE1 6                                                        
+TBL>                                                            
+-->                                                             
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                

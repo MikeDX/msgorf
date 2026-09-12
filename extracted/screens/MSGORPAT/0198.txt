@@ -1,0 +1,18 @@
+{ BLOCK 0198 } class=pattern
+
+( SMALL FIREBASE PATTERN INDICATING REMAINING SHIPS )           
+PATTERN SBASE 3 B, 4 B, 2 B, 8 B,                               
+HEX 15 B, 26 B, 37 B, DECIMAL QUADPAT                           
+~ 0001 0000 ^                                                   
+~ 0001 0000 ^                                                   
+~ 0033 3000 ^                                                   
+~ 0311 1300 ^                                                   
+~ 2311 1320 ^                                                   
+~ 2231 3220 ^                                                   
+~ 2203 0220 ^                                                   
+~ 2200 0220 ^                                                   
+DECIMAL -->                                                     
+                                                                
+                                                                
+                                                                
+                                                                

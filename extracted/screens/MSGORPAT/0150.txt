@@ -1,0 +1,18 @@
+{ BLOCK 0150 } class=pattern
+
+INSTRUCTIONS FOR MODIFYING PATTERNS                             
+                                                                
+CREATE PATTERNS AND ANIMATION TABLES USING THE ANIMATION TOOLS  
+                                                                
+INSERT 'FLOAD' COMMANDS TO LOAD THIS INFORMATION INTO THE       
+FILE NAMED 'PAT-LOAD' IF THE CHANGES WOULD MAKE EXISTING        
+FILES IN 'PAT-LOAD' OBSELETE, THEN DESTROY THE OBSLETE FILES    
+AND REMOVE THE CORRESPONDING 'FLOAD' COMMANDS.                  
+                                                                
+                                                                
+THE FILE NAMED 'ANIM-MAP' CONTAINS INSTRUCTIONS THAT ASSOCIATE  
+ANIMATION LISTS AND PATTERNS THAT YOU CREATE WITH               
+'INDEX CONSTANTS' DEFINED BY JAY. THE 'INDEX CONSTANTS'         
+ARE LISTED IN THE FILE NAMED 'INDEX' WHICH JAY MAINTAINS.       
+                                                                
+-- MORE --                                                      

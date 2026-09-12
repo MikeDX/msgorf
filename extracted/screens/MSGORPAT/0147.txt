@@ -1,0 +1,18 @@
+{ BLOCK 0147 } class=pattern
+
+( ANIMATION/PATTERN MAP FILE - BELONGS TO KASEY AND JAN )       
+NULPAT NULPATi AT!                                              
+PLY1-P P1i AT!                                                  
+PLY2-P P2i AT!                                                  
+SBASE SBi AT!                                                   
+P1UP P1Ui AT!                                                   
+P2UP P2Ui AT!                                                   
+BANGA BANGAi AT!                                                
+BANGP BANGPi AT!                                                
+CLONETBL CLNi AT!                                               
+-->                                                             
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                

@@ -1,0 +1,18 @@
+{ BLOCK 0158 } class=pattern
+
+( table verbs ) <STKH                                           
+( PATTERN MEMORY GOODIES )                                      
+{ : <ANIMATION } HERE AT-HERE ! PT-HERE @ DP ! { ; }            
+{ : ANIMATION> } HERE PT-HERE ! AT-HERE @ DP ! { ; }            
+{ : AT! } 2* ATBL + U! { ; }                                    
+{ : NC= } 1+ DUP C= { ; } { : SC= } DUP C= { ; }                
+{ : UB@ } ( ADDR ... DATA )                                     
+DP { @ SWAP } DP { ! }                                          
+diskhere { save } SET-OBJ-FILE { BLOCK + B@ SWAP ;S }           
+DP { ! } { ; }                                                  
+0 C= NORMAL                                                     
+040 C= FLOP                                                     
+080 C= FLIP                                                     
+0C0 C= FLIP-FLOP                                                
+STK> -->                                                        
+                                                                

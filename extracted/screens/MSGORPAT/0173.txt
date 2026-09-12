@@ -1,0 +1,18 @@
+{ BLOCK 0173 } class=pattern
+
+( INITIALIZE ANIMATION TABLE WITH POINTERS TO BLOCK PATTERN )   
+PATTERN blkp HEX 0 B, 0 B, 1 B, 4 B, 11 B, 22 B, 33 B,          
+FFFF , FFFF , FFFF , FFFF ,                                     
+DECIMAL                                                         
+( LONG WAIT FOLLOWS )                                           
+192 0 << blkp I AT! >>                                          
+-->                                                             
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                

@@ -1,0 +1,18 @@
+{ BLOCK 0175 } class=colon_defs
+
+( Load the Binary from a Xcompile Game File )                   
+CODE CRASHER A XRA, 0CC OUT, 0 JMP, NEXT                        
+: LLOAD [ EDIT ]                                                
+  FILE  TERSE XFRFLG BZERO                                      
+CR ." TYPE Go At C000 ON THE ICEBOX" CR                         
+  12 00 DO I 400 * XFRADR !                                     
+  I BLOCK C400 400 BMOVE                                        
+  XFRFLG BONE                                                   
+  BEGIN XFRFLG B@ 0= END                                        
+ LOOP CR ." TRANSFER COMPLETE" CRASHER ;                        
+LLOAD XC.LOGIC                                                  
+DECIMAL ;S                                                      
+                                                                
+                                                                
+                                                                
+                                                                

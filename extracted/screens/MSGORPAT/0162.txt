@@ -1,0 +1,18 @@
+{ BLOCK 0162 } class=pattern
+
+....P= } DATA , 0 B, { ; } ( BUILDS INDEXES FOR PATTERNS )      
+( ANIM!-ON ) <STKH                                              
+CODE ANIM! ( table or pattern --- )                             
+  ( if pattern resets anim bits else sets anim bits )           
+ ( if 3rd byte < 80 this is a pattern                           
+   else 1st 3 bytes are status bytes 3rd byte the type )        
+  H POP, Y PUSHX, vaddr LIYD, M E MOV, ( rot shf ??? )          
+  H INX, H INX, M A MOV, 0F ANI,                                
+  7 M BIT,                                                      
+ 0<>, IF, ( 1 ) ( not a pattern ) VBANIM-CHK A SET,             
+  A VLOGICSTAT2 Y STX, ( set anim bits )                        
+  M D MOV, ( D= status ) H INX, ( point at tbl )                
+-->                                                             
+                                                                
+                                                                
+                                                                

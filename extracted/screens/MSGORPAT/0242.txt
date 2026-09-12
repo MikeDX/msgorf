@@ -1,0 +1,18 @@
+{ BLOCK 0242 } class=text
+
+FLOAD GORF-P                                                    
+FLOAD LAZON-P                                                   
+FLOAD KAMI-P                                                    
+FLOAD SMINE-P                                                   
+FLOAD SHLD-P                                                    
+FLOAD MITE-P                                                    
+FLOAD TRION-P                                                   
+FLOAD DEB-P                                                     
+FLOAD HK-P                                                      
+FLOAD GB-P                                                      
+FLOAD GRD-P                                                     
+-->                                                             
+                                                                
+                                                                
+                                                                
+                                                                

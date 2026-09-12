@@ -1,0 +1,18 @@
+{ BLOCK 0149 } class=text
+
+..........RMNDEX TABLE )                                        
+FLOAD ANIM-MAP                                                  
+-->                                                             
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                

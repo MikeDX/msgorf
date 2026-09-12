@@ -1,0 +1,18 @@
+{ BLOCK 0262 } class=pattern
+
+( MERGE CROSS COMPILE DATA INTO LOGIC AND VIDEO OBJECT )        
+HEX 0A000 C= TBUF DECIMAL                                       
+CODE LDIR EXX, B POP, D POP, H POP, LDIR, EXX, NEXT             
+: STUF TBUF SWAP 1024 LDIR UPDATE FLUSH ;                       
+FILE XC.PATTERNS 0 BLOCK TBUF 1024 LDIR                         
+15 <DRIVE 15 DRIVE FILE TFILE 0 BLOCK DUMP H. DRIVE>            
+;S                                                              
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                

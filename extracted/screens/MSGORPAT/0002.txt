@@ -1,0 +1,18 @@
+{ BLOCK 0002 } class=colon_defs
+
+!............BYE.........MON:.......\=...abp...V.&..okabp...T.1.
+.err?...S.>..ABORT*V..J..OKABORT*T..V..EXECUTE.d..SP@!..9...o..R
+P@....|..d-f-abptr...Q....s-b-ptr...O....s-e-abptr...M....e-s-c!
+..9.[O....R.y.*M.....<e-s-c!..9.[O....R.y.*M.....rs-b-ptr...K...
+.*O...R....R..Return stack full...*K...R.A..R..Return stack empt
+y....all-checks......B..RET-CHECKS.....U..HERE*r....g..DP+!...#.
+..t..B,...n........p.o.......p.n.n.........4......,.......O.....
+...smark...I.*I...sI.*I........<FRAME..#!....R......0<FRAME*I...
+sI......1<FRAME........2<FRAME........3<FRAME......{I.."I..9...#
+..FRAME>..#..?..0FRAME>.....M..1FRAME>.....\..2FRAME>.....k..3FR
+AME>.....*I.....z..PARAM..#.....3PARAM........1LOCAL........2LOC
+AL........3LOCAL........1PARAM.........2PARAM......*I..^#V......
+PARAM@..#.....3PARAM@........1LOCAL@........2LOCAL@.....)..3LOCA
+L@.....8..1PARAM@......G..2PARAM@......W..SPACES?....?....@.. ..
+....H........... @.g..BIT-CALC..}.<...<...<......o&.....^.......
+...BIT@...|.B......BIT!.......a...Q.|.a...B.R.Q..........<-L..{.

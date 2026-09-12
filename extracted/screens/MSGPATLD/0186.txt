@@ -1,0 +1,18 @@
+{ BLOCK 0186 } class=colon_defs
+
+( SENDER ROUTINE )                                              
+HEX C000 C= BLKPTR C002 C= CSTAT C004 C= DBUF DECIMAL           
+CODE LDIR EXX, B POP, D POP, H POP, LDIR, EXX, NEXT             
+: 4. FLD B@ 4 FLD ! SWAP . FLD ! ;                              
+EDIT DEFINITIONS                                                
+: SENDER E-C NOFILES 0 BLKPTR ! 0 CSTAT B! CR                   
+309 1 DO                                                        
+BEGIN CSTAT B@ 0= END ( AWAIT CLEAR BUFFER )                    
+I DRIVE+ BLOCK DBUF 1024 LDIR ( SHOVEL TO INTERCHANGE BUFFER )  
+I BLKPTR ! ( SET BLOCK POINTER )                                
+1 CSTAT B! ( SET DATA READY )                                   
+I 4.                                                            
+LOOP ;                                                          
+-->                                                             
+                                                                
+                                                                

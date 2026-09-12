@@ -1,0 +1,14 @@
+{
+  "action": "assemble_rom_stub",
+  "blocked": true,
+  "gate_doc": "docs/findings/source-completeness.md",
+  "message": "Full Ms. Gorf ROM assembly blocked: source set is pattern/tooling only. See out/ROM_STATUS.md and docs/findings/source-completeness.md.",
+  "available_artifacts": [
+    "out/README.md",
+    "out/ROM_STATUS.md",
+    "out/assemble_report.json",
+    "out/mvp_compile_report.json",
+    "out/mvp_object.msgx",
+    "out/pattern_object_manifest.json"
+  ]
+}

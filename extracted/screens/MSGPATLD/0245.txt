@@ -1,0 +1,18 @@
+{ BLOCK 0245 } class=text
+
+( CLONE ROTATION TABLE )                                        
+<ANIMATION                                                      
+<ROT-TBL CLONETBL                                               
+CLN0 NORMAL                                                     
+CLN32 FLOP                                                      
+CLN64 FLOP                                                      
+CLN32 FLIP-FLOP                                                 
+CLN0 FLIP                                                       
+CLN32 FLIP                                                      
+CLN64 NORMAL                                                    
+CLN32 NORMAL                                                    
+TBL>                                                            
+ANIMATION>                                                      
+CLONETBL CLNi AT!                                               
+-->                                                             
+                                                                

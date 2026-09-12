@@ -1,0 +1,18 @@
+{ BLOCK 0159 } class=colon_defs
+
+( table verbs ) <STKH                                           
+{ V= SPMARK } {  BV= ETYPE }  { BV= ESIZE } ( 2, or 3 bytes )   
+{ V= IDX } { V= CNT } {  BV= TTYPE } {   V= #APATS }            
+{ : <TBL }  ( esize etype tbltype [name] --- ) <ANIMATION       
+ DATA { 0 } , { DUP } B, TTYPE { B! } ETYPE { B! }              
+  ESIZE { B! } SP@ SPMARK { ! } {  -1 } #APATS { ! } { ; }      
+( type bottom 3 bits match vlogicstat2 bits )                   
+{ : <ANIM-TBL }         ( [name] --- )  3  00 81 <TBL { ; }     
+{ : <ANIM-MAG-TBL }     ( [name] --- )  4  00 89 <TBL { ; }     
+{ : <ROT-TBL }          ( [name] --- )  3  00 82 <TBL { ; }     
+{ : <ROT-ANIM-TBL }     ( [name] --- )  3  81 83 <TBL { ; }     
+{ : <PER-TBL }          ( [name] --- )  2  00 84 <TBL { ; }     
+{ : <PER-ANIM-TBL }     ( [name] --- )  2  81 85 <TBL { ; }     
+{ : <PER-ROT-TBL }      ( [name] --- )  2  82 86 <TBL { ; }     
+{ : <PER-ROT-ANIM-TBL } ( [name] --- )  2  83 87 <TBL { ; }     
+STK> -->                                                        

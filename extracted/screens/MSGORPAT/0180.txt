@@ -1,0 +1,18 @@
+{ BLOCK 0180 } class=pattern
+
+( PATTERN MEMORY GOODIES )                                      
+HEX                                                             
+( { : <ANIMATION } HERE AT-HERE ! PT-HERE @ DP ! { ; } )        
+( { : ANIMATION> } HERE PT-HERE ! AT-HERE @ DP ! { ; } )        
+{ : AT! } 2* ATBL + U! { ; }                                    
+DECIMAL                                                         
+-->                                                             
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                

@@ -1,0 +1,18 @@
+{ BLOCK 0264 } class=pattern
+
+( ANIM!-ON ) <STKH                                              
+CODE ANIM! ( table or pattern --- )                             
+  ( if pattern resets anim bits else sets anim bits )           
+ ( if 3rd byte < 80 this is a pattern                           
+   else 1st 3 bytes are status bytes 3rd byte the type )        
+( GO INDIRECT ) D POP, 04000 H LXI, D DAD, D DAD,               
+M E MOV, H INX, M D MOV, XCHG,                                  
+(   H POP, ) Y PUSHX, vaddr LIYD,                               
+7 H BIT, 0=, IF, ( 1 -- IF NOT A PATTERN )                      
+M E MOV, ( rot shf ??? )                                        
+  H INX, H INX, M A MOV, 0F ANI,                                
+ VBANIM-CHK A SET,                                              
+  A VLOGICSTAT2 Y STX, ( set anim bits )                        
+  M D MOV, ( D= status ) H INX, ( point at tbl )                
+-->                                                             
+                                                                

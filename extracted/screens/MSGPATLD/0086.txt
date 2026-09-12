@@ -1,0 +1,18 @@
+{ BLOCK 0086 } class=pattern
+
+( LOAD BLK FOR CROSS-COMPILING ) DECIMAL                        
+FSLD FS.XC                                                      
+xcsys xc ASM .OPS                                               
+MORE-BUFFERS ( allocate 2 more disk buffers )                   
+OBJECT-FILE XC.PATTERNS                                         
+HEX 4000 ROMSTART !  0F000 PSTACK !                             
+   0F800 RAMSTART !  0F400 RSTACK !                             
+XCBEG DECIMAL xcsys xc ASM .OPS                                 
+{ V= PT-HERE } HEX 04200 PT-HERE !                              
+4000 C= ATBL                                                    
+8000 DP ! DECIMAL                                               
+FLOAD CODE-LOAD                                                 
+FLOAD PAT-LOAD                                                  
+EX DED DESTROY FS.PAT xcsys XCFSYSAVE FS.PAT                    
+DECIMAL ;S                                                      
+                                                                

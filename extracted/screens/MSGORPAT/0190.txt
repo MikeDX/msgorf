@@ -1,0 +1,18 @@
+{ BLOCK 0190 } class=colon_defs
+
+( GAS MULTI DISK TRANSCIEVERS )                                 
+: GS CR SWAP 1+ SWAP DO                                         
+." INSTALL DISK # " I 4. ."  INTO ICEBOX THEN TYPE A CHAR"      
+GETC CR I DRIVE SENDER                                          
+CR ." TRANSFER COMPLETE" CR LOOP ;                              
+: GR CR SWAP 1+ SWAP DO                                         
+." INSTALL DISK # " I 4. ."  INTO ICEBOX " CR                   
+." TYPE A CHAR AFTER ICEBOX IS CUED TO GO"                      
+GETC CR I DRIVE RECV                                            
+CR ." TRANSFER COMPLETE" CR LOOP ;                              
+-->                                                             
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                

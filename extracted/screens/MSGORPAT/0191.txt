@@ -1,0 +1,18 @@
+{ BLOCK 0191 } class=colon_defs
+
+( ICE MULTI DISK ROUTINES )                                     
+: IS CR SWAP 1+ SWAP DO                                         
+." INSTALL DISK # " I 4. ."  INTO ICEBOX THEN TYPE A CHAR"      
+GETC CR SENDER                                                  
+CR ." TRANSFER COMPLETE" CR LOOP ;                              
+: IR CR SWAP 1+ SWAP DO                                         
+." INSTALL DISK # " I 4. ."  INTO ICEBOX " CR                   
+." TYPE A CHAR AFTER GAS WAS CUED TO GO"                        
+GETC CR RECV                                                    
+CR ." TRANSFER COMPLETE" CR LOOP ;                              
+TERSE DEFINITIONS                                               
+-->                                                             
+                                                                
+                                                                
+                                                                
+                                                                
