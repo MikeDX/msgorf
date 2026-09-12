@@ -19,6 +19,8 @@
 
 **Local research copy (gitignored):** `work/video_refs/mediaburn_12827_fenton_followup2_480p.mp4` — 640×480 H.264 progressive (~189 MB). See `work/video_refs/README.md`.
 
+**Chopped gameplay (gitignored):** `work/video_refs/gameplay.mp4` (~163 s fullscreen). Drives the labeled remake in [`reconstructed/video-demo/`](../../reconstructed/video-demo/).
+
 **Licensing:** Media Burn requires a license to *use* archive video in a project (`info@mediaburn.org`). Keep the full reel under `work/`; do not publish it on GitHub. Still grabs for private motion notes are research-oriented; ask Media Burn before redistributing frames widely.
 
 ### Probe notes (480p file wall time)

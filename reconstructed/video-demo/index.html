@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Ms. Gorf — GUESS video demo (not XC.LOGIC)</title>
+    <style>
+      :root {
+        --bg: #0a0a0c;
+        --ink: #c8c4b8;
+        --warn: #e8a030;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(ellipse at 50% 20%, #1a1814 0%, var(--bg) 55%);
+        color: var(--ink);
+        font: 15px/1.45 "IBM Plex Sans", "Segoe UI", sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1.25rem;
+        gap: 0.75rem;
+      }
+      h1 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+      .banner {
+        color: var(--warn);
+        max-width: 42rem;
+        text-align: center;
+        font-size: 0.9rem;
+      }
+      canvas {
+        image-rendering: pixelated;
+        background: #000;
+        box-shadow: 0 0 0 1px #333, 0 12px 40px rgba(0, 0, 0, 0.5);
+        max-width: 100%;
+        height: auto;
+      }
+      .help {
+        max-width: 42rem;
+        font-size: 0.85rem;
+        opacity: 0.85;
+      }
+      code {
+        font-size: 0.85em;
+      }
+      .err {
+        color: #f66;
+      }
+      a {
+        color: #8ab4ff;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Ms. Gorf — video remake sketch</h1>
+    <p class="banner">
+      <strong>GUESS</strong> — disk pattern art + motion/HUD/bullets estimated from 1982 footage.
+      Not a faithful compile. Not <code>XC.LOGIC</code>. See
+      <a href="README.md">README</a>.
+    </p>
+    <canvas id="c" width="960" height="720" aria-label="Ms Gorf guess demo"></canvas>
+    <p class="help">
+      <strong>Select:</strong> press <kbd>1</kbd> or <kbd>2</kbd> ·
+      <strong>Move:</strong> WASD / arrows · <strong>Aim/fire:</strong> mouse + click (or Space/K) ·
+      Source clip: <code>work/video_refs/gameplay.mp4</code>
+    </p>
+    <script src="../../play/assets.js"></script>
+    <script src="font_guess_embed.js"></script>
+    <script src="demo.js"></script>
+  </body>
+</html>
