@@ -16,7 +16,7 @@ Sprites / animations via `play/assets.json`: PLY*, GORF-PAT, CLONE frames, LAZON
 | Thin shot streaks | `BULLETS` stub only (`p-i` CFA unknown); not pattern art | Short line segments along velocity |
 | Ships remaining | INDEX `SBi` → `SBASE` | Blit `SBASE` icons after P1Ui |
 | P1 up flash | INDEX `P1Ui` → `P1UP` / `NULPAT` | Flash `P1UP` near `$` score |
-| Spiral / warp field | Procedural paint | **Intro only:** 15 shells × 16 yellow stars, appear outer→inner (each shell +CCW), bang, peel outer→inner |
+| Spiral / warp field | Procedural paint | **Intro only:** 17×16 stars from ~10 o’clock CCW (~7/frame, OR blit), 3 overrun shells through centre, peel outer→inner |
 | Playfield size | Footage is **horizontal** | **320×204** Astrocade hi-res landscape (GUESS) |
 | Dual-stick feel | Wooden prototype in video | WASD move + mouse aim; **ship art stays upright** |
 | Clone anim | `CLN0/32/64` | Cycle `1 → 2 → 3 → 2(hflip)` |
