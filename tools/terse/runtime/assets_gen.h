@@ -7,7 +7,14 @@ typedef struct {
   const char *name;
   uint16_t w, h;
   const uint8_t *pix;
+  uint8_t pal[4][3]; /* color 0..3 RGB from PATTERN header decode */
 } terse_asset_t;
+
+typedef struct {
+  const char *name;
+  int count;
+  const terse_asset_t *const *frames;
+} terse_anim_t;
 
 extern const uint8_t pat_GORF_PAT[156];
 extern const terse_asset_t asset_GORF_PAT;
@@ -19,8 +26,62 @@ extern const uint8_t pat_LAZON[208];
 extern const terse_asset_t asset_LAZON;
 extern const uint8_t pat_SBASE[64];
 extern const terse_asset_t asset_SBASE;
+extern const uint8_t pat_CLN0[896];
+extern const terse_asset_t asset_CLN0;
+extern const uint8_t pat_CLN32[1224];
+extern const terse_asset_t asset_CLN32;
+extern const uint8_t pat_CLN64[1024];
+extern const terse_asset_t asset_CLN64;
+extern const uint8_t pat_COMC5[144];
+extern const terse_asset_t asset_COMC5;
+extern const uint8_t pat_COMC5A[144];
+extern const terse_asset_t asset_COMC5A;
+extern const uint8_t pat_COMC5B[144];
+extern const terse_asset_t asset_COMC5B;
+extern const uint8_t pat_COMC6[144];
+extern const terse_asset_t asset_COMC6;
+extern const uint8_t pat_SMINE0[208];
+extern const terse_asset_t asset_SMINE0;
+extern const uint8_t pat_SMINE1[52];
+extern const terse_asset_t asset_SMINE1;
+extern const uint8_t pat_FBEXP5[460];
+extern const terse_asset_t asset_FBEXP5;
+extern const uint8_t pat_FBEXP6[460];
+extern const terse_asset_t asset_FBEXP6;
+extern const uint8_t pat_SHLD_P[256];
+extern const terse_asset_t asset_SHLD_P;
+extern const uint8_t pat_MITE_P[132];
+extern const terse_asset_t asset_MITE_P;
+extern const uint8_t pat_TRION_P[128];
+extern const terse_asset_t asset_TRION_P;
+extern const uint8_t pat_DEB_P[112];
+extern const terse_asset_t asset_DEB_P;
+extern const uint8_t pat_HK_P[120];
+extern const terse_asset_t asset_HK_P;
+extern const uint8_t pat_GB_P[120];
+extern const terse_asset_t asset_GB_P;
+extern const uint8_t pat_GRD_P[120];
+extern const terse_asset_t asset_GRD_P;
+extern const uint8_t pat_P1UP[96];
+extern const terse_asset_t asset_P1UP;
+extern const uint8_t pat_P2UP[96];
+extern const terse_asset_t asset_P2UP;
+extern const uint8_t pat_NULPAT[1];
+extern const terse_asset_t asset_NULPAT;
+extern const terse_asset_t *const anim_CLONETBL_frames[3];
+extern const terse_anim_t anim_CLONETBL;
+extern const terse_asset_t *const anim_SPINV_frames[4];
+extern const terse_anim_t anim_SPINV;
+extern const terse_asset_t *const anim_SMINE_frames[2];
+extern const terse_anim_t anim_SMINE;
+extern const terse_asset_t *const anim_BANGA_frames[2];
+extern const terse_anim_t anim_BANGA;
+extern const terse_asset_t *const anim_BANGP_frames[2];
+extern const terse_anim_t anim_BANGP;
 
-#define TERSE_ASSET_COUNT 5
+#define TERSE_ASSET_COUNT 26
 extern const terse_asset_t *const terse_assets[TERSE_ASSET_COUNT];
+#define TERSE_ANIM_COUNT 5
+extern const terse_anim_t *const terse_anims[TERSE_ANIM_COUNT];
 
 #endif

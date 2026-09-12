@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""Pack authentic patterns from play/assets.json into C arrays for the SDL runtime.
-
-Primary source is assets.json (same export as the pattern lab). Optionally
-cross-checks GORF-PAT against tools.terse.parse on MSGORPAT GORF-P.
-"""
+"""Pack patterns (+ palettes, animation groups) from play/assets.json for SDL."""
 from __future__ import annotations
 
 import json
@@ -17,16 +13,46 @@ GORF_P = ROOT / "extracted" / "msgorf_floppy_files" / "MSGORPAT_Disk" / "GORF-P"
 OUT_H = Path(__file__).resolve().parent / "assets_gen.h"
 OUT_C = Path(__file__).resolve().parent / "assets_gen.c"
 
-# Patterns required for harness demo (names as stored in assets.json)
-NEED = ["GORF-PAT", "PLY1-P", "PLY2-P", "LAZON", "SBASE"]
+# Include animation frames + common singles
+NEED_EXTRA = [
+    "GORF-PAT",
+    "PLY1-P",
+    "PLY2-P",
+    "LAZON",
+    "SBASE",
+    "CLN0",
+    "CLN32",
+    "CLN64",
+    "COMC5",
+    "COMC5A",
+    "COMC5B",
+    "COMC6",
+    "SMINE0",
+    "SMINE1",
+    "FBEXP5",
+    "FBEXP6",
+    "SHLD-P",
+    "MITE-P",
+    "TRION-P",
+    "DEB-P",
+    "HK-P",
+    "GB-P",
+    "GRD-P",
+    "P1UP",
+    "P2UP",
+    "NULPAT",
+]
 
 
 def main() -> None:
     data = json.loads(ASSETS.read_text())
     patterns = data["patterns"]
-    missing = [n for n in NEED if n not in patterns]
-    if missing:
-        raise SystemExit(f"missing patterns in assets.json: {missing}")
+    animations = data.get("animations", {})
+    need = [n for n in NEED_EXTRA if n in patterns]
+    for frames in animations.values():
+        for f in frames:
+            if f in patterns and f not in need:
+                need.append(f)
 
     if GORF_P.exists():
         from tools.terse.parse import parse_file
@@ -46,7 +72,14 @@ def main() -> None:
         "  const char *name;",
         "  uint16_t w, h;",
         "  const uint8_t *pix;",
+        "  uint8_t pal[4][3]; /* color 0..3 RGB from PATTERN header decode */",
         "} terse_asset_t;",
+        "",
+        "typedef struct {",
+        "  const char *name;",
+        "  int count;",
+        "  const terse_asset_t *const *frames;",
+        "} terse_anim_t;",
         "",
     ]
     c_lines = [
@@ -55,8 +88,8 @@ def main() -> None:
         "",
     ]
 
-    externs = []
-    for name in NEED:
+    idents = []
+    for name in need:
         p = patterns[name]
         w, h = p["w"], p["h"]
         rows = p["rows"]
@@ -64,35 +97,75 @@ def main() -> None:
         for row in rows:
             for ch in row.ljust(w, "0")[:w]:
                 pix.append(int(ch))
+        pal = p.get("palette_rgb") or [[0, 0, 0], [80, 80, 80], [160, 160, 160], [240, 240, 240]]
         ident = name.replace("-", "_")
         arr = f"pat_{ident}"
         h_lines.append(f"extern const uint8_t {arr}[{w * h}];")
         h_lines.append(f"extern const terse_asset_t asset_{ident};")
-        externs.append(ident)
+        idents.append(ident)
         c_lines.append(f"const uint8_t {arr}[{w * h}] = {{")
         for i in range(0, len(pix), 16):
             chunk = ", ".join(str(x) for x in pix[i : i + 16])
             c_lines.append(f"  {chunk},")
         c_lines.append("};")
+        pal_c = ", ".join(
+            "{" + ", ".join(str(int(c)) for c in pal[i]) + "}" for i in range(4)
+        )
         c_lines.append(
-            f'const terse_asset_t asset_{ident} = {{ "{name}", {w}, {h}, {arr} }};'
+            f'const terse_asset_t asset_{ident} = {{ "{name}", {w}, {h}, {arr}, {{ {pal_c} }} }};'
+        )
+        c_lines.append("")
+
+    # Animation tables
+    anim_idents = []
+    for aname, frames in animations.items():
+        present = [f for f in frames if f.replace("-", "_") in idents or f in need]
+        # map to idents
+        frame_idents = []
+        for f in frames:
+            fi = f.replace("-", "_")
+            if fi in idents:
+                frame_idents.append(fi)
+        if len(frame_idents) < 2:
+            continue
+        aid = aname.replace("-", "_")
+        anim_idents.append((aid, aname, frame_idents))
+        h_lines.append(f"extern const terse_asset_t *const anim_{aid}_frames[{len(frame_idents)}];")
+        h_lines.append(f"extern const terse_anim_t anim_{aid};")
+        c_lines.append(
+            f"const terse_asset_t *const anim_{aid}_frames[{len(frame_idents)}] = {{"
+        )
+        for fi in frame_idents:
+            c_lines.append(f"  &asset_{fi},")
+        c_lines.append("};")
+        c_lines.append(
+            f'const terse_anim_t anim_{aid} = {{ "{aname}", {len(frame_idents)}, anim_{aid}_frames }};'
         )
         c_lines.append("")
 
     h_lines.append("")
-    h_lines.append(f"#define TERSE_ASSET_COUNT {len(externs)}")
+    h_lines.append(f"#define TERSE_ASSET_COUNT {len(idents)}")
     h_lines.append("extern const terse_asset_t *const terse_assets[TERSE_ASSET_COUNT];")
+    h_lines.append(f"#define TERSE_ANIM_COUNT {len(anim_idents)}")
+    h_lines.append("extern const terse_anim_t *const terse_anims[TERSE_ANIM_COUNT];")
     h_lines.append("")
     h_lines.append("#endif")
 
     c_lines.append("const terse_asset_t *const terse_assets[TERSE_ASSET_COUNT] = {")
-    for ident in externs:
+    for ident in idents:
         c_lines.append(f"  &asset_{ident},")
+    c_lines.append("};")
+    c_lines.append("")
+    c_lines.append("const terse_anim_t *const terse_anims[TERSE_ANIM_COUNT] = {")
+    for aid, _aname, _fi in anim_idents:
+        c_lines.append(f"  &anim_{aid},")
     c_lines.append("};")
 
     OUT_H.write_text("\n".join(h_lines) + "\n")
     OUT_C.write_text("\n".join(c_lines) + "\n")
-    print(f"wrote {OUT_H.name} {OUT_C.name} ({len(externs)} patterns)")
+    print(
+        f"wrote {OUT_H.name} {OUT_C.name} ({len(idents)} patterns, {len(anim_idents)} anims)"
+    )
 
 
 if __name__ == "__main__":

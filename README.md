@@ -57,11 +57,12 @@ Docs map: [`docs/README.md`](docs/README.md)
 # Corrected images (if regenerating)
 python3 tools/normalize_img.py
 
-# Browser pattern lab (source pixels only)
+# Pattern lab (browse-only)
 python3 tools/export_play_assets.py
 open play/index.html          # or any static file server
+# Cycles CLONE / KAMI / SMINE / BANG frames; shared BYBR palette
 
-# SDL atlas of XC-decoded sprites (validator, not gameplay)
+# SDL atlas of animated patterns (validator, not gameplay)
 make -C tools/terse/runtime run
 
 # Host IR + tests
