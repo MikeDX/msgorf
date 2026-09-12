@@ -2,7 +2,11 @@
 
 Research lab for recovering and (eventually) compiling Midway / Dave Nutting Associates’ unfinished arcade sequel **Ms. Gorf** (Jamie Fenton, ~1982–83).
 
-**North star:** produce a compiled arcade ROM (or the closest faithful binary the surviving sources allow) for the intended dual-Z80 / Astrocade-derived hardware.
+**North star:** produce a **compiled arcade ROM** (preferred).
+
+**First step:** a **web port** that uses real disk patterns + INDEX roster (`play/index.html`) — a fidelity ladder toward the ROM, not a random shmup. See `docs/findings/goals.md`.
+
+Preferred end state: a compiled arcade ROM (or the closest faithful binary) for the dual-Z80 / Astrocade-derived hardware.
 
 ## Current status
 
@@ -17,7 +21,7 @@ Research lab for recovering and (eventually) compiling Midway / Dave Nutting Ass
 | 6 Hardware model | Done |
 | 7 Assemble ROM | Stub done — full ROM blocked (see `out/ROM_STATUS.md`) |
 
-**Next action:** play `play/index.html` (authentic sprites + stub loop). Then harden harness / expand enemies. `XC.LOGIC` is a compiled game binary name — see `docs/findings/xc-logic.md`.
+**Next action:** play the INDEX-based port in `play/index.html`. Keep climbing fidelity toward a compiled ROM (`docs/findings/goals.md`).
 
 ## Original disks (do not modify)
 

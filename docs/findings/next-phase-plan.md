@@ -1,21 +1,18 @@
-# Next phase plan — stop waiting, ship a game
+# Next phase plan
 
-**Attitude:** One programmer, Z80, Forth dialect, off-the-shelf IceBox + Astrocade video. We already have her art pipeline and enemy roster. The missing piece is application source (`XC.LOGIC` is the *compiled game file* you `BINLOAD`/`LLOAD`, not another pattern disk).
+**Primary goal:** compiled ROM.  
+**First step:** web port that is honestly a port (see `goals.md`).
 
-## Pragmatic path (ordered)
+## Now → next
 
-1. **Treat patterns as solved** — use Tim’s sources + `XC.PATTERNS` + PNG previews.
-2. **Treat `XC.LOGIC` as “rewrite the game loop”** — Jamie’s logic isn’t in the archive; rebuild a minimal loop that uses authentic sprites/INDEX ids.
-3. **Harness** — Python (or HTML) framebuffer that blits 2-bit patterns with write-overlay collision (Jamie’s rule).
-4. **Minigame v0** — player ship + Gorf bots + bullets; dual-stick later.
-5. **Optional fidelity climb** — map harness blit to VGER verbs; ingest more of Gorf/Roto as Rosetta; only then chase CFA-accurate TERSE.
+1. ~~Web v0 with one sprite~~ → **Web port with full INDEX cast** (`play/index.html`)
+2. Tighten behaviors against CGE footage / INDEX comments; mark guesses
+3. Python/Z80 harness loads `out/msgorf_patterns_at_4000.bin` and blits like the web collision buffer
+4. Reconstruct `XC.LOGIC`-shaped loop in TERSE or C that the harness runs
+5. Emit ROM image; only then chase IceBox-accurate TERSE bytecode
 
-## Non-goals for this push
+## Discipline
 
-- Perfect MAME driver
-- Authentic ARC-TERSE bytecode emission
-- Waiting on museum redumps before playable
-
-## Done when
-
-Arrow keys move ship, space shoots, at least one `GORF-PAT` enemy moves and can be destroyed, collision uses overlay rule, all documented.
+- Every enemy type in the port must map to an INDEX id
+- No decorative sprites that aren’t on the disks
+- ROM work is never blocked by “make the web prettier”

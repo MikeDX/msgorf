@@ -2,103 +2,139 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Ms. Gorf — reconstruction v0</title>
+<title>Ms. Gorf — web port (fidelity ladder)</title>
 <style>
-  :root { --bg:#0a0e14; --fg:#c8d0d8; --acc:#e8a54b; }
-  html,body { margin:0; height:100%; background:radial-gradient(ellipse at 30% 20%, #152033, var(--bg)); color:var(--fg);
-    font-family:"IBM Plex Mono", ui-monospace, monospace; }
-  main { max-width: 920px; margin: 0 auto; padding: 24px 16px 48px; }
-  h1 { font-family: "Space Grotesk", "Futura", sans-serif; font-weight:700; letter-spacing:.04em;
-    font-size: clamp(1.8rem, 4vw, 2.6rem); margin:0 0 .25rem; color:#f2f5f8; }
-  .sub { opacity:.75; margin-bottom:1.25rem; max-width:42rem; line-height:1.45; }
-  .stage { position:relative; display:inline-block; border:1px solid #2a3544; box-shadow:0 20px 60px rgba(0,0,0,.45); }
-  canvas { display:block; background:#000; image-rendering: pixelated; width:640px; height:480px; max-width:100%; }
-  .hud { display:flex; gap:1.5rem; margin-top:.75rem; font-size:.9rem; }
+  :root { --bg:#0b1020; --fg:#d5dbe6; --acc:#f0b429; --dim:#8b95a8; }
+  * { box-sizing: border-box; }
+  html,body { margin:0; min-height:100%; background:
+    linear-gradient(165deg, #121a2e 0%, #0b1020 45%, #151008 100%);
+    color:var(--fg); font-family:"IBM Plex Sans", "Segoe UI", sans-serif; }
+  main { max-width:980px; margin:0 auto; padding:28px 18px 56px; }
+  .brand { font-family:"Space Grotesk","Futura",sans-serif; font-size:clamp(2rem,5vw,3rem);
+    font-weight:700; letter-spacing:.06em; margin:0; color:#fff; }
+  .eyebrow { color:var(--acc); font-size:.75rem; letter-spacing:.18em; text-transform:uppercase; margin:0 0 .4rem; }
+  .sub { color:var(--dim); max-width:40rem; line-height:1.5; margin:.6rem 0 1.2rem; }
+  .layout { display:grid; grid-template-columns: 1fr 220px; gap:1.25rem; align-items:start; }
+  @media (max-width:820px) { .layout { grid-template-columns:1fr; } }
+  .stage { border:1px solid #2c3a52; background:#000; box-shadow:0 24px 80px rgba(0,0,0,.5); }
+  canvas { display:block; width:100%; height:auto; image-rendering:pixelated; }
+  .hud { display:flex; flex-wrap:wrap; gap:1rem 1.5rem; margin-top:.7rem; font-family:"IBM Plex Mono",monospace; font-size:.85rem; }
   .hud b { color:var(--acc); }
-  kbd { background:#1b2430; border:1px solid #334; padding:.1rem .35rem; border-radius:3px; }
-  .note { margin-top:1.25rem; font-size:.8rem; opacity:.65; line-height:1.4; }
+  aside { font-size:.82rem; color:var(--dim); line-height:1.45; }
+  aside h2 { color:#fff; font-size:.75rem; letter-spacing:.14em; text-transform:uppercase; margin:0 0 .6rem; }
+  aside ol { margin:0; padding-left:1.1rem; }
+  aside li { margin:.35rem 0; }
+  .tag { display:inline-block; border:1px solid #3a4a66; padding:.05rem .4rem; border-radius:3px; font-size:.7rem; color:var(--acc); }
+  kbd { font-family:"IBM Plex Mono",monospace; background:#1a2336; border:1px solid #33415c; padding:.05rem .3rem; border-radius:3px; }
 </style>
 </head>
 <body>
 <main>
-  <h1>MS. GORF</h1>
-  <p class="sub">Reconstruction v0 — authentic Nutting pattern pixels (GORF-PAT, PLY1-P), modern game loop.
-  Write-overlay collision: plotting onto a non-zero pixel counts as a hit (Jamie’s rule, simplified).</p>
-  <div class="stage"><canvas id="c" width="320" height="240"></canvas></div>
-  <div class="hud">
-    <div>Score <b id="score">0</b></div>
-    <div>Lives <b id="lives">3</b></div>
-    <div>Status <b id="status">PLAY</b></div>
+  <p class="eyebrow">Ms. Gorf · web port scaffold</p>
+  <h1 class="brand">MS. GORF</h1>
+  <p class="sub">North star is a <strong style="color:#fff">compiled ROM</strong>. This browser build is step one of a
+  <em>port</em>: authentic INDEX roster + pattern pixels from Jamie’s disks, modern loop + write-overlay collision.
+  Not a random shooter with borrowed sprites — same cast Jay indexed for the unfinished arcade game.</p>
+  <div class="layout">
+    <div>
+      <div class="stage"><canvas id="c" width="320" height="240"></canvas></div>
+      <div class="hud">
+        <div>Score <b id="score">0</b></div>
+        <div>Ships <b id="lives">3</b></div>
+        <div>Wave <b id="wave">1</b></div>
+        <div><span class="tag" id="status">PLAY</span></div>
+      </div>
+      <p class="sub" style="margin-top:.8rem;font-size:.8rem">
+        Move <kbd>WASD</kbd>/<kbd>arrows</kbd> · Fire <kbd>Space</kbd> · Reset <kbd>R</kbd>
+      </p>
+    </div>
+    <aside>
+      <h2>Fidelity ladder</h2>
+      <ol>
+        <li><strong style="color:#cde">Now:</strong> web port using disk patterns + INDEX ids</li>
+        <li>Harness matches VGER blit / overlay collision</li>
+        <li>Logic closer to XC.LOGIC behavior</li>
+        <li><strong style="color:#cde">Goal:</strong> compiled arcade ROM image</li>
+      </ol>
+      <h2 style="margin-top:1.2rem">On-screen cast</h2>
+      <div id="cast" style="font-family:IBM Plex Mono,monospace;font-size:.72rem"></div>
+    </aside>
   </div>
-  <p class="note">Move <kbd>WASD</kbd> / arrows · Fire <kbd>Space</kbd> · Reset <kbd>R</kbd><br/>
-  Not the missing XC.LOGIC binary — a stand-in loop so the art can live. Patterns from MSGORPAT extract.</p>
 </main>
 <script>
-const RAW = {"gorf": {"name": "GORF-PAT", "w": 12, "h": 13, "rows": ["100033000100", "010333301000", "003333330000", "033333333000", "031133113000", "332133213300", "332133213300", "333333333300", "333211233300", "333112133300", "023333332000", "020333302000", "220000022000"]}, "player": {"name": "PLY1-P", "w": 16, "h": 15, "rows": ["0000000300000000", "0000003130000000", "0000031113000000", "0000333333300000", "0033331113333000", "2223311111332220", "2223311011332220", "2223110011132220", "2223111011132220", "2223111011132220", "2223110001132220", "2223311111332220", "2220331113302220", "2220033333002220", "2220002220002220"]}};
-
+const ASSETS = {"palette_note": "2-bit Astrocade-ish preview palette; not hardware LUT", "index": {"NULPATi": "NULL PATTERN", "P1i": "PLAYER ONE'S SHIP", "P2i": "PLAYER TWO'S SHIP", "SBi": "SMALL BASE FOR SHIPS REMAINING DISPLAY", "P1Ui": "PLAYER 1 UP INDICATOR -- FLASHES NEAR SCORE", "P2Ui": "PLAYER 2 UP INDICATOR -- FLASHES NEAR SCORE", "BANGAi": "EXPLOSION ANIMATION FOR GORF DESTROYED", "BANGPi": "EXPLOSION ANIMATION FOR PLAYER DESTROYED", "CLNi": "CLONE MACHINE ANIMATION", "GORFi": "GORF ANIMATION", "LAZONi": "LASER SHIP ANIMATION", "KAMIi": "KAMIKAZI ANIMATION", "SMINEi": "SPACE MINE ANIMATION", "SHLDi": "SHIELD DEPLOYER ANIMATION", "MITEi": "SHIELD EATER ANIMATION", "TRIONi": "TRION ANIMATION", "DEBi": "UFO ANIMATION", "HKi": "HUNTER-KILLER SATELITE ANIMATION", "GBi": "GROUND BASE PATTERN ANIMATION", "GRDi": "GUARDIAN ANIMATION"}, "anim_map": {"NULPATi": "NULPAT", "P1i": "PLY1-P", "P2i": "PLY2-P", "SBi": "SBASE", "P1Ui": "P1UP", "P2Ui": "P2UP", "BANGAi": "BANGA", "BANGPi": "BANGP", "CLNi": "CLONETBL", "GORFi": "GORF-PAT", "LAZONi": "LAZON", "KAMIi": "SPINV", "SMINEi": "SMINE", "SHLDi": "SHLD-P", "MITEi": "MITE-P", "TRIONi": "TRION-P", "DEBi": "DEB-P", "HKi": "HK-P", "GBi": "GB-P", "GRDi": "GRD-P"}, "patterns": {"SHLD-P": {"name": "SHLD-P", "w": 16, "h": 16, "rows": ["0000111111110000", "0000111111110000", "0000333333330000", "0000033333300000", "1130003333000311", "1133002222003311", "1133322222233311", "1133322222233311", "1133322222233311", "1133322222233311", "1133002222003311", "1130003333000311", "0000033333300000", "0000333333330000", "0000111111110000", "0000111111110000"]}, "HK-P": {"name": "HK-P", "w": 12, "h": 10, "rows": ["000333300000", "001222210000", "011111111000", "321222212300", "321222212300", "321222212300", "321222212300", "011111111000", "001222210000", "000333300000"]}, "GB-P": {"name": "GB-P", "w": 12, "h": 10, "rows": ["000031300000", "000313130000", "003131313000", "011111111100", "222222222220", "222222222220", "221111112220", "231111113220", "221111113320", "333222233330"]}, "SMINE0": {"name": "SMINE0", "w": 16, "h": 13, "rows": ["0000002000000000", "0000002000000000", "0000002000000000", "0000222220000000", "0002222222000000", "0002211122000000", "2222211122222000", "0002211122000000", "0002222222000000", "0000222220000000", "0000002000000000", "0000002000000000", "0000002000000000"]}, "SMINE1": {"name": "SMINE1", "w": 4, "h": 13, "rows": ["0200", "0200", "0200", "0200", "0200", "0100", "0100", "0100", "0200", "0200", "0200", "0200", "0200"]}, "GORF-PAT": {"name": "GORF-PAT", "w": 12, "h": 13, "rows": ["100033000100", "010333301000", "003333330000", "033333333000", "031133113000", "332133213300", "332133213300", "333333333300", "333211233300", "333112133300", "023333332000", "020333302000", "220000022000"]}, "DEB-P": {"name": "DEB-P", "w": 16, "h": 7, "rows": ["0001111111110000", "0021212121212000", "0111111111111100", "3333333333333330", "3333333333333330", "0002222222220000", "0000222222200000"]}, "COMC5B": {"name": "COMC5B", "w": 16, "h": 9, "rows": ["0002200002200000", "0000020020000000", "0222002200222000", "2222012210222200", "3222223322222300", "3000022220000300", "0330000000003000", "0303000000330000", "0000000003003000"]}, "COMC5A": {"name": "COMC5A", "w": 16, "h": 9, "rows": ["0002200002200000", "0000020020000000", "0222002200222000", "2222002200222200", "3222223322222300", "3000022220000300", "0300000000033000", "0033000000303000", "0300300000000000"]}, "COMC5": {"name": "COMC5", "w": 16, "h": 9, "rows": ["0002200002200000", "0000020020000000", "0222102210222000", "2222222222222200", "3222223322222300", "3000022220000300", "0300000000033000", "0033000000303000", "0300300000000000"]}, "COMC6": {"name": "COMC6", "w": 16, "h": 9, "rows": ["0002200002200000", "0000020020000000", "0222002200222000", "2222002200222200", "3222223322222300", "3000022220000300", "0330000000003000", "0303000000330000", "0000000003003000"]}, "PLY1-P": {"name": "PLY1-P", "w": 16, "h": 15, "rows": ["0000000300000000", "0000003130000000", "0000031113000000", "0000333333300000", "0033331113333000", "2223311111332220", "2223311011332220", "2223110011132220", "2223111011132220", "2223111011132220", "2223110001132220", "2223311111332220", "2220331113302220", "2220033333002220", "2220002220002220"]}, "PLY2-P": {"name": "PLY2-P", "w": 16, "h": 15, "rows": ["0000000300000000", "0000003130000000", "0000031113000000", "0000333333300000", "0033331113333000", "2223311111332220", "2223310001332220", "2223111101132220", "2223111001132220", "2223110111132220", "2223110001132220", "2223311111332220", "2220331113302220", "2220033333002220", "2220002220002220"]}, "SBASE": {"name": "SBASE", "w": 8, "h": 8, "rows": ["00010000", "00010000", "00333000", "03111300", "23111320", "22313220", "22030220", "22000220"]}, "TRION-P": {"name": "TRION-P", "w": 16, "h": 8, "rows": ["0000000100000000", "0000001110000000", "0000011111000000", "0000111111100000", "0001122122110000", "0011123123111000", "0111111111111100", "1111111111111110"]}, "LAZON": {"name": "LAZON", "w": 16, "h": 13, "rows": ["0000002000000000", "0000002000000000", "0200033300020000", "0020333330200000", "0003333333000000", "0033133313300000", "2233033303322000", "0033333333300000", "0003333333000000", "0020333330200000", "0200033300020000", "0000002000000000", "0000002000000000"]}, "MITE-P": {"name": "MITE-P", "w": 12, "h": 11, "rows": ["000100100000", "011000011000", "110000001100", "110022001100", "011222211000", "012322321000", "002222220000", "002222220000", "032222223000", "300222200300", "000022000000"]}, "GRD-P": {"name": "GRD-P", "w": 12, "h": 10, "rows": ["000111000000", "001333100000", "011333110000", "011111110000", "111111111000", "212121212000", "111111111000", "111111111000", "111111111000", "022222220000"]}, "CLN0": {"name": "CLN0", "w": 32, "h": 28, "rows": ["00000003333333333333333000000000", "00000033333333333333333300000000", "00000333333333333333333330000000", "00003333333333333333333333000000", "00033333333333333333333333300000", "00333333333333333333333333330000", "13333333333333333333333333333110", "13333333333333223333333333333110", "13333333333332222333333333333110", "13333333333322222233333333333110", "13333333333222222223333333333110", "13333333332222222222333333333110", "13333333322222222222233333333110", "13333333222222222222223333333110", "13333333222222222222223333333110", "13333333322222222222233333333110", "13333333332222222222333333333110", "13333333333222222223333333333110", "13333333333322222233333333333110", "13333333333332222333333333333110", "13333333333333223333333333333110", "13333333333333333333333333333110", "00333333333333333333333333330000", "00033333333333333333333333300000", "00003333333333333333333333000000", "00000333333333333333333330000000", "00000033333333333333333300000000", "00000003333333333333333000000000"]}, "CLN32": {"name": "CLN32", "w": 36, "h": 34, "rows": ["000000000111000000000000000000000000", "000000001113333333333333000000000000", "000000011333333333333333300000000000", "000000011333333333333333300000000000", "000001113333333333333333330000000000", "000011133333333333333333333300000000", "000011133333333333333333333300000000", "001113333333333333333333333330000000", "011133333333333333333333333333300000", "113333333333333333333333333333330000", "113333333333333333333333333333330000", "033333333332222222222222333333333000", "033333333332222222222222333333333000", "033333333332222222222222333333333000", "033333333332222222222222333333333000", "033333333332222222222222333333333000", "033333333332222222222222333333333000", "033333333332222222222222333333333000", "033333333332222222222222333333333000", "033333333332222222222222333333333000", "033333333332222222222222333333333000", "033333333332222222222222333333333000", "003333333333333333333333333333331110", "003333333333333333333333333333331110", "000033333333333333333333333333311000", "000003333333333333333333333331110000", "000000033333333333333333333311100000", "000000033333333333333333333311100000", "000000003333333333333333331110000000", "000000000333333333333333311100000000", "000000000333333333333333311100000000", "000000000003333333333333110000000000", "000000000000000000000011100000000000", "000000000000000000000000000000000000"]}, "CLN64": {"name": "CLN64", "w": 32, "h": 32, "rows": ["00000011111111111111110000000000", "00000011111111111111110000000000", "00000033333333333333330000000000", "00000333333333333333333000000000", "00003333333333333333333300000000", "00033333333333333333333330000000", "00333333333333333333333333000000", "03333333333333333333333333300000", "33333333333333333333333333330000", "33333333333332233333333333330000", "33333333333322223333333333330000", "33333333333222222333333333330000", "33333333332222222233333333330000", "33333333322222222223333333330000", "33333333222222222222333333330000", "33333332222222222222233333330000", "33333332222222222222233333330000", "33333333222222222222333333330000", "33333333322222222223333333330000", "33333333332222222233333333330000", "33333333333222222333333333330000", "33333333333322223333333333330000", "33333333333332233333333333330000", "33333333333333333333333333330000", "03333333333333333333333333300000", "00333333333333333333333333000000", "00033333333333333333333330000000", "00003333333333333333333300000000", "00000333333333333333333000000000", "00000033333333333333330000000000", "00000011111111111111110000000000", "00000011111111111111110000000000"]}, "FBEXP1": {"name": "FBEXP1", "w": 144, "h": 1, "rows": ["000030000010300033030000033333330030003333333330003331331333333311111330333111111330033333111330003303333300103000333001000000333000000000030000"]}, "FBEXP2": {"name": "FBEXP2", "w": 272, "h": 1, "rows": ["00010000000000000000100000000000000011100000000000000110001000000000011111100000000001311110011000001133311111110000113333333311300113333333331001111333333331100111333333333110001133333333331100113311333133100000111111111110001101100110101100100000000010001100000000001000"]}, "FBEXP3": {"name": "FBEXP3", "w": 552, "h": 1, "rows": ["000000002000000000000000000000021200000000000000000022211120000000000000000211111112002200000000002331333311221220000000021133333331133112000000002113333333333111200000000233333333333311120000000023333333333331112000000211333333333333311200002113333333333333112000021133333333333331120000221133333333333311200000021111333333331111200000002133333333333122000000000233233333333200000000000032313333333200000000000021333333333222000000000211133133333111200000000021111123131112000000000002111202111120000000000000212000211200000000000000020000022000000000"]}, "FBEXP4": {"name": "FBEXP4", "w": 440, "h": 1, "rows": ["20000000002000000000020000000200000000020020000020000000002000020000200000000200000022022201100020000000022313321102000000002233333321100002000002313333331000200000022313333111220000000023133331200000000022231333312200000002233133333312000000223133333332200000022331133333120000000002231133311220000000022233333133220000002002322233332000000200022002233222000020000000002222022000000000000020000002000000000002000000002000000000200000000002"]}, "FBEXP5": {"name": "FBEXP5", "w": 20, "h": 23, "rows": ["00000000001000030000", "00000300100110000300", "00002030020000200000", "00000000000100000000", "03002100200030000200", "00300200000200000033", "03000020022000300300", "00000000030000000003", "00333002220001100011", "00033001200011000122", "00332201220110101022", "33000221201111001110", "33300022200111101100", "00302000022221000000", "00331110002010201100", "03000110020010000100", "00010003003000100030", "00000100000000001000", "02000000001000000000", "00010030000000300010", "00000000002000000000", "00000010000001003000", "00000000010200300000"]}, "FBEXP6": {"name": "FBEXP6", "w": 20, "h": 23, "rows": ["00000000300000000000", "00000020000003000000", "00000000030000000010", "00010000000002000000", "00000000000000000000", "00020010003100010200", "00020000100000000000", "00000300000100200000", "01000000000020000000", "00010002000000010300", "30000000002000000003", "00200200000000300010", "00000001020200002000", "20301000000003030000", "00010000020000030001", "10000010000301000020", "00000000100000000000", "00300300000000000200", "00000000000000000000", "00003010000010000200", "00000100020000030000", "00000003001000000000", "00000001002010000000"]}, "NULPAT": {"name": "NULPAT", "w": 1, "h": 1, "rows": ["0"]}}, "roster": [{"id": "NULPATi", "desc": "NULL PATTERN", "anim_map": "NULPAT", "pattern": "NULPAT", "has_pixels": true, "w": 1, "h": 1}, {"id": "P1i", "desc": "PLAYER ONE'S SHIP", "anim_map": "PLY1-P", "pattern": "PLY1-P", "has_pixels": true, "w": 16, "h": 15}, {"id": "P2i", "desc": "PLAYER TWO'S SHIP", "anim_map": "PLY2-P", "pattern": "PLY2-P", "has_pixels": true, "w": 16, "h": 15}, {"id": "SBi", "desc": "SMALL BASE FOR SHIPS REMAINING DISPLAY", "anim_map": "SBASE", "pattern": "SBASE", "has_pixels": true, "w": 8, "h": 8}, {"id": "P1Ui", "desc": "PLAYER 1 UP INDICATOR -- FLASHES NEAR SCORE", "anim_map": "P1UP", "pattern": "SBASE", "has_pixels": true, "w": 8, "h": 8}, {"id": "P2Ui", "desc": "PLAYER 2 UP INDICATOR -- FLASHES NEAR SCORE", "anim_map": "P2UP", "pattern": "SBASE", "has_pixels": true, "w": 8, "h": 8}, {"id": "BANGAi", "desc": "EXPLOSION ANIMATION FOR GORF DESTROYED", "anim_map": "BANGA", "pattern": "FBEXP4", "has_pixels": true, "w": 440, "h": 1}, {"id": "BANGPi", "desc": "EXPLOSION ANIMATION FOR PLAYER DESTROYED", "anim_map": "BANGP", "pattern": "FBEXP1", "has_pixels": true, "w": 144, "h": 1}, {"id": "CLNi", "desc": "CLONE MACHINE ANIMATION", "anim_map": "CLONETBL", "pattern": "CLN0", "has_pixels": true, "w": 32, "h": 28}, {"id": "GORFi", "desc": "GORF ANIMATION", "anim_map": "GORF-PAT", "pattern": "GORF-PAT", "has_pixels": true, "w": 12, "h": 13}, {"id": "LAZONi", "desc": "LASER SHIP ANIMATION", "anim_map": "LAZON", "pattern": "LAZON", "has_pixels": true, "w": 16, "h": 13}, {"id": "KAMIi", "desc": "KAMIKAZI ANIMATION", "anim_map": "SPINV", "pattern": "COMC5", "has_pixels": true, "w": 16, "h": 9}, {"id": "SMINEi", "desc": "SPACE MINE ANIMATION", "anim_map": "SMINE", "pattern": "SMINE0", "has_pixels": true, "w": 16, "h": 13}, {"id": "SHLDi", "desc": "SHIELD DEPLOYER ANIMATION", "anim_map": "SHLD-P", "pattern": "SHLD-P", "has_pixels": true, "w": 16, "h": 16}, {"id": "MITEi", "desc": "SHIELD EATER ANIMATION", "anim_map": "MITE-P", "pattern": "MITE-P", "has_pixels": true, "w": 12, "h": 11}, {"id": "TRIONi", "desc": "TRION ANIMATION", "anim_map": "TRION-P", "pattern": "TRION-P", "has_pixels": true, "w": 16, "h": 8}, {"id": "DEBi", "desc": "UFO ANIMATION", "anim_map": "DEB-P", "pattern": "DEB-P", "has_pixels": true, "w": 16, "h": 7}, {"id": "HKi", "desc": "HUNTER-KILLER SATELITE ANIMATION", "anim_map": "HK-P", "pattern": "HK-P", "has_pixels": true, "w": 12, "h": 10}, {"id": "GBi", "desc": "GROUND BASE PATTERN ANIMATION", "anim_map": "GB-P", "pattern": "GB-P", "has_pixels": true, "w": 12, "h": 10}, {"id": "GRDi", "desc": "GUARDIAN ANIMATION", "anim_map": "GRD-P", "pattern": "GRD-P", "has_pixels": true, "w": 12, "h": 10}]};
+const BEHAVIOR = {"GORFi": {"kind": "gorf", "hp": 1, "score": 100, "move": "drift"}, "LAZONi": {"kind": "lazon", "hp": 1, "score": 150, "move": "strafe"}, "KAMIi": {"kind": "kami", "hp": 1, "score": 200, "move": "dive"}, "SMINEi": {"kind": "mine", "hp": 1, "score": 125, "move": "slow"}, "SHLDi": {"kind": "shield", "hp": 2, "score": 175, "move": "drift"}, "MITEi": {"kind": "mite", "hp": 1, "score": 150, "move": "chase"}, "TRIONi": {"kind": "trion", "hp": 1, "score": 175, "move": "strafe"}, "DEBi": {"kind": "ufo", "hp": 1, "score": 200, "move": "zigzag"}, "HKi": {"kind": "hk", "hp": 2, "score": 250, "move": "chase"}, "GBi": {"kind": "base", "hp": 3, "score": 300, "move": "static"}, "GRDi": {"kind": "guardian", "hp": 2, "score": 225, "move": "strafe"}, "CLNi": {"kind": "clone", "hp": 4, "score": 500, "move": "static"}};
 const PAL = [[0,0,0,0],[40,90,220,255],[230,50,40,255],[245,245,245,255]];
 
-function bake(sprite) {
-  if (!sprite) return null;
-  const {w,h,rows} = sprite;
-  const img = new ImageData(w, h);
+function bake(name) {
+  const spr = ASSETS.patterns[name];
+  if (!spr) return null;
+  const {w,h,rows} = spr;
+  const img = new ImageData(w,h);
   for (let y=0;y<h;y++) for (let x=0;x<w;x++) {
     const v = +(rows[y][x]||'0');
-    const i = (y*w+x)*4;
-    const p = PAL[v];
+    const i=(y*w+x)*4, p=PAL[v];
     img.data[i]=p[0]; img.data[i+1]=p[1]; img.data[i+2]=p[2]; img.data[i+3]=p[3];
   }
-  // crop solid black margins lightly? keep as-is
-  const c = document.createElement('canvas');
-  c.width=w; c.height=h;
+  const c=document.createElement('canvas'); c.width=w; c.height=h;
   c.getContext('2d').putImageData(img,0,0);
-  return {canvas:c, w, h, rows};
+  return {canvas:c, w, h, rows, name};
 }
 
-const playerSpr = bake(RAW.player);
-const gorfSpr = bake(RAW.gorf);
+const sprites = {};
+for (const r of ASSETS.roster) {
+  if (r.pattern && ASSETS.patterns[r.pattern]) sprites[r.id] = bake(r.pattern);
+}
 
-const canvas = document.getElementById('c');
-const ctx = canvas.getContext('2d');
-ctx.imageSmoothingEnabled = false;
+const castEl = document.getElementById('cast');
+castEl.innerHTML = ASSETS.roster.filter(r=>r.has_pixels && BEHAVIOR[r.id]).map(r =>
+  `<div>${r.id} · ${r.desc.split(' ')[0]}</div>`).join('');
 
-const W=320, H=240;
-const keys = {};
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+ctx.imageSmoothingEnabled=false;
+const W=320,H=240;
+const keys={};
 addEventListener('keydown', e => { keys[e.key]=true; if([' ','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) e.preventDefault(); });
 addEventListener('keyup', e => { keys[e.key]=false; });
 
-let score=0, lives=3, status='PLAY';
+let score=0, lives=3, wave=1, status='PLAY';
 const scoreEl=document.getElementById('score');
 const livesEl=document.getElementById('lives');
+const waveEl=document.getElementById('wave');
 const statusEl=document.getElementById('status');
+function hud(){ scoreEl.textContent=score; livesEl.textContent=lives; waveEl.textContent=wave; statusEl.textContent=status; }
 
-function hud(){ scoreEl.textContent=score; livesEl.textContent=lives; statusEl.textContent=status; }
-
-// Collision buffer: 0 empty, else owner id
-const col = new Uint16Array(W*H);
+const col=new Uint16Array(W*H);
 let nextId=1;
+const state={ player:{x:152,y:200,cooldown:0,id:0}, bullets:[], enemies:[], particles:[] };
 
-const state = {
-  player: {x:160, y:200, cooldown:0, id:0},
-  bullets: [],
-  enemies: [],
-  particles: [],
-};
+// Wave recipes: authentic INDEX ids only (GUESS composition, not from XC.LOGIC)
+const WAVES = [
+  ['GORFi','GORFi','GORFi','GORFi','GORFi','GORFi'],
+  ['GORFi','GORFi','LAZONi','LAZONi','DEBi','DEBi'],
+  ['KAMIi','KAMIi','SMINEi','SMINEi','GORFi','GORFi','GORFi'],
+  ['SHLDi','MITEi','TRIONi','HKi','GORFi','LAZONi'],
+  ['GBi','GRDi','CLNi','GORFi','GORFi','KAMIi','DEBi'],
+];
 
 function spawnWave() {
-  for (let i=0;i<8;i++) {
+  const recipe = WAVES[(wave-1) % WAVES.length];
+  recipe.forEach((id,i) => {
+    const beh = BEHAVIOR[id] || {hp:1,score:100,move:'drift'};
+    const spr = sprites[id];
     state.enemies.push({
-      x: 30+i*35, y: 30+(i%2)*16,
-      vx: (i%2?1:-1)*0.4, vy:0.05,
-      id:0, hp:1, t:i*10
+      id:0, type:id, x:24+(i%6)*48, y:20+Math.floor(i/6)*28 + (i%2)*6,
+      vx:(i%2?1:-1)*(0.35+wave*0.05), vy: beh.move==='dive' ? 0.55 : (beh.move==='static'?0:0.04+wave*0.01),
+      hp:beh.hp, score:beh.score, move:beh.move, t:i*7, spr
     });
-  }
+  });
 }
 
 function reset() {
-  score=0; lives=3; status='PLAY';
+  score=0; lives=3; wave=1; status='PLAY';
   state.bullets=[]; state.enemies=[]; state.particles=[];
-  state.player={x:160,y:200,cooldown:0,id:0};
+  state.player={x:152,y:200,cooldown:0,id:0};
   spawnWave(); hud();
 }
 reset();
@@ -106,33 +142,35 @@ reset();
 function clearCol(){ col.fill(0); }
 
 function blit(spr, x, y, id) {
-  if (!spr) return;
+  if (!spr) return {hit:false};
   const px=x|0, py=y|0;
   ctx.drawImage(spr.canvas, px, py);
-  // stamp collision for non-zero pixels
   for (let j=0;j<spr.h;j++) {
     const yy=py+j; if (yy<0||yy>=H) continue;
     const row=spr.rows[j];
     for (let i=0;i<spr.w;i++) {
       const xx=px+i; if (xx<0||xx>=W) continue;
-      const v=+row[i];
-      if (!v) continue;
+      const v=+row[i]; if (!v) continue;
       const idx=yy*W+xx;
       const prev=col[idx];
-      if (prev && prev !== id) {
-        // write-cycle collision
-        return {hit:true, other:prev, x:xx, y:yy};
-      }
+      if (prev && prev!==id) return {hit:true, other:prev, x:xx, y:yy};
       col[idx]=id;
     }
   }
   return {hit:false};
 }
 
-function boom(x,y) {
-  for (let i=0;i<12;i++) state.particles.push({
-    x,y, vx:(Math.random()-0.5)*3, vy:(Math.random()-0.5)*3, life:20+Math.random()*10
+function boom(x,y,n=10) {
+  for (let i=0;i<n;i++) state.particles.push({
+    x,y,vx:(Math.random()-.5)*3.5, vy:(Math.random()-.5)*3.5, life:18+Math.random()*14
   });
+}
+
+// HUD ships remaining using SBi pattern
+function drawShips() {
+  const sb = sprites.SBi;
+  if (!sb) return;
+  for (let i=0;i<lives;i++) ctx.drawImage(sb.canvas, 8+i*(sb.w+2), H-sb.h-4);
 }
 
 let last=performance.now();
@@ -141,79 +179,93 @@ function frame(now) {
   ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
   clearCol();
 
+  if (keys['r']||keys['R']) { keys['r']=keys['R']=false; reset(); }
+
   if (status==='PLAY') {
-    const p=state.player;
-    const sp=1.6;
+    const p=state.player; const sp=1.7;
     if (keys['ArrowLeft']||keys['a']||keys['A']) p.x-=sp;
     if (keys['ArrowRight']||keys['d']||keys['D']) p.x+=sp;
     if (keys['ArrowUp']||keys['w']||keys['W']) p.y-=sp;
     if (keys['ArrowDown']||keys['s']||keys['S']) p.y+=sp;
-    p.x=Math.max(8, Math.min(W-24, p.x));
-    p.y=Math.max(8, Math.min(H-24, p.y));
+    const pw = sprites.P1i ? sprites.P1i.w : 16;
+    const ph = sprites.P1i ? sprites.P1i.h : 16;
+    p.x=Math.max(4, Math.min(W-pw-4, p.x));
+    p.y=Math.max(4, Math.min(H-ph-12, p.y));
     if (p.cooldown>0) p.cooldown-=dt;
     if ((keys[' ']||keys['Spacebar']) && p.cooldown<=0) {
-      state.bullets.push({x:p.x+(playerSpr?playerSpr.w/2:4), y:p.y, vy:-3.2, id:0});
-      p.cooldown=140;
+      state.bullets.push({x:p.x+pw/2, y:p.y, vy:-3.4, id:0});
+      p.cooldown=120;
     }
   }
-  if (keys['r']||keys['R']) { keys['r']=keys['R']=false; reset(); }
 
-  // assign ids each frame
   nextId=1;
-  state.player.id = nextId++;
-  for (const b of state.bullets) b.id = nextId++;
-  for (const e of state.enemies) e.id = nextId++;
+  state.player.id=nextId++;
+  for (const b of state.bullets) b.id=nextId++;
+  for (const e of state.enemies) e.id=nextId++;
 
-  // update enemies
   for (const e of state.enemies) {
-    e.t++; e.x += e.vx; e.y += e.vy;
-    if (e.x<10||e.x>W-20) e.vx*=-1;
-    if (e.y>H-40) e.y=20;
+    e.t++;
+    if (e.move==='strafe' || e.move==='drift' || e.move==='slow') {
+      e.x += e.vx * (e.move==='slow'?0.5:1);
+      e.y += e.vy;
+      if (e.x<8||e.x>W-24) e.vx*=-1;
+    } else if (e.move==='zigzag') {
+      e.x += Math.sin(e.t/12)*1.2; e.y += e.vy;
+    } else if (e.move==='dive') {
+      e.y += e.vy; e.x += Math.sin(e.t/8)*0.8;
+      if (e.y>H) { e.y=-10; e.x=Math.random()*(W-30)+10; }
+    } else if (e.move==='chase' && status==='PLAY') {
+      const p=state.player;
+      e.x += Math.sign(p.x-e.x)*0.55;
+      e.y += Math.sign(p.y-e.y)*0.35;
+    }
+    if (e.y>H-30 && e.move!=='static' && e.move!=='dive') e.y=16;
   }
 
-  // bullets
-  state.bullets = state.bullets.filter(b => { b.y+=b.vy; return b.y>-8 && b.y<H+8; });
+  state.bullets = state.bullets.filter(b => { b.y+=b.vy; return b.y>-10 && b.y<H+10; });
 
-  // draw order: enemies, player, bullets
-  const deadE=new Set(); const deadB=new Set();
-  for (const e of state.enemies) {
-    const r = blit(gorfSpr, e.x, e.y, e.id);
-    // no self
-  }
-  if (status==='PLAY' && playerSpr) {
-    const r = blit(playerSpr, state.player.x, state.player.y, state.player.id);
+  const deadE=new Set(), deadB=new Set();
+  for (const e of state.enemies) blit(e.spr || sprites[e.type], e.x, e.y, e.id);
+
+  if (status==='PLAY' && sprites.P1i) {
+    const r = blit(sprites.P1i, state.player.x, state.player.y, state.player.id);
     if (r.hit) {
-      // hit by enemy stamped earlier
-      lives--; boom(state.player.x, state.player.y); hud();
-      if (lives<=0) status='GAME OVER'; else { state.player.x=160; state.player.y=200; }
+      lives--; boom(state.player.x, state.player.y, 16); hud();
+      if (lives<=0) status='GAME OVER';
+      else { state.player.x=152; state.player.y=200; }
     }
   }
-  state.bullets.forEach((b,bi) => {
-    // 2x2 white bullet
+
+  for (const b of state.bullets) {
     ctx.fillStyle='#fff'; ctx.fillRect(b.x|0, b.y|0, 2, 3);
     for (let j=0;j<3;j++) for (let i=0;i<2;i++) {
       const xx=(b.x|0)+i, yy=(b.y|0)+j;
       if (xx<0||yy<0||xx>=W||yy>=H) continue;
-      const idx=yy*W+xx; const prev=col[idx];
-      if (prev && prev !== b.id && prev !== state.player.id) {
-        // find enemy
-        for (const e of state.enemies) if (e.id===prev) { deadE.add(e); score+=100; boom(e.x,e.y); }
+      const idx=yy*W+xx, prev=col[idx];
+      if (prev && prev!==b.id && prev!==state.player.id) {
+        for (const e of state.enemies) if (e.id===prev) {
+          e.hp--;
+          if (e.hp<=0) { deadE.add(e); score+=e.score; boom(e.x, e.y); }
+          else boom(e.x+4, e.y+4, 4);
+        }
         deadB.add(b); hud();
       } else col[idx]=b.id;
     }
-  });
+  }
   state.enemies = state.enemies.filter(e => !deadE.has(e));
   state.bullets = state.bullets.filter(b => !deadB.has(b));
-  if (state.enemies.length===0 && status==='PLAY') { score+=500; spawnWave(); hud(); }
+  if (state.enemies.length===0 && status==='PLAY') {
+    score+=500; wave++; spawnWave(); hud();
+  }
 
-  // particles
   state.particles = state.particles.filter(p => {
     p.x+=p.vx; p.y+=p.vy; p.life--;
-    ctx.fillStyle=`rgba(230,80,40,${p.life/30})`;
+    ctx.fillStyle=`rgba(230,80,40,${Math.max(0,p.life/28)})`;
     ctx.fillRect(p.x|0,p.y|0,2,2);
     return p.life>0;
   });
 
+  drawShips();
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
