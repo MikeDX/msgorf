@@ -8,9 +8,17 @@ Unfinished Midway / Dave Nutting Associates arcade sequel to **Gorf** (Jamie Fen
 | Pattern art + `XC.PATTERNS` decode | **Done** |
 | Browser pattern lab (`play/`) | **Done** — browse-only, no invented gameplay |
 | Python TERSE parse → host IR → C/SDL validator | **Runnable** for patterns / blit / collision ABI |
-| Full playable Ms. Gorf | Needs missing media (see below) |
+| Full playable Ms. Gorf (from original logic) | Needs missing media (see below) |
+| **GUESS** playable sketch (video-derived) | **Live** — [msgorf.mikedx.co.uk](https://msgorf.mikedx.co.uk) (desktop / mobile) |
 
 **Faithfulness rule:** if it is not on the disks (or a clearly labeled reconstruction), it does not go in `play/` or pretend to be the arcade game.
+
+### Playable GUESS remake
+
+While `XC.LOGIC` is missing, there is a **clearly labeled guesswork** sketch — disk patterns + rules inferred from prototype video, **not** the original TERSE game:
+
+- **Play (desktop / mobile):** [https://msgorf.mikedx.co.uk](https://msgorf.mikedx.co.uk)
+- **Source:** [`reconstructed/sdl-demo/`](reconstructed/sdl-demo/)
 
 ---
 
@@ -42,6 +50,7 @@ Contact path for existing workers: [Matthew Garrett — GORF page](https://www.p
 | Simple XC pattern decode | Done | [`docs/findings/xc-patterns-format.md`](docs/findings/xc-patterns-format.md) |
 | Host IR + BULLETS stubs | Done | `python3 -m tools.terse.compile_host --bullets` |
 | SDL2 pattern validator | Done | `make -C tools/terse/runtime run` (**not** a game) |
+| GUESS playable sketch (web) | Live | [msgorf.mikedx.co.uk](https://msgorf.mikedx.co.uk) · [`reconstructed/sdl-demo/`](reconstructed/sdl-demo/) |
 | Jamie TERSE/Ice manuals | Mirrored | [`docs/references/jamie_fenton_via_garrett/`](docs/references/jamie_fenton_via_garrett/) |
 | Game logic / `XC.LOGIC` | **Missing** | [`docs/findings/xc-logic.md`](docs/findings/xc-logic.md) |
 
@@ -163,7 +172,7 @@ Upstream zip: [Bitsavers `MSGORF.zip`](https://bitsavers.org/bits/Nutting_Assoc/
 | `tools/` | Normalize, extract, export, `tools/terse/` compiler + SDL runtime |
 | `out/` | ROM fragment, FLOAD reports, host IR |
 | `work/` | Corrected images, Ice unpack, scratch (included for collaborators; see `.gitignore`) |
-| `reconstructed/` | **Labeled guesses only** — not disk source |
+| `reconstructed/` | **Labeled guesses only** — playable sketch: [`sdl-demo/`](reconstructed/sdl-demo/) → [msgorf.mikedx.co.uk](https://msgorf.mikedx.co.uk) |
 | `docs/references/` | Manuals, MAME IceBox stub, Garrett notes |
 
 ---
