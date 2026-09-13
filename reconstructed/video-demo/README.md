@@ -25,3 +25,15 @@ Sprites / animations via `play/assets.json`: PLY*, GORF-PAT, CLONE frames, LAZON
 | Clone spawn | Yellow L/R strips on CLN* | Enemy enters one port → two of that kind exit the other (gorfs first) |
 
 See also: [`../findings/reconstruction-stubs.md`](../../docs/findings/reconstruction-stubs.md), [`../../docs/references/jamie-fenton-1982-video.md`](../../docs/references/jamie-fenton-1982-video.md).
+
+## Deploy (msgorf.mikedx.co.uk)
+
+`assets.js` lives in this folder (copy of `../../play/assets.js`) so a plain rsync works:
+
+```bash
+rsync -avz "/Users/mike/Documents/Ms GORF/reconstructed/video-demo/" mike@192.168.68.105:~/msgorf/ \
+  --exclude docker-compose.yml --exclude nginx
+ssh mike@192.168.68.105 'chmod 755 ~/msgorf'
+```
+
+After regenerating play assets: `cp ../../play/assets.js ./assets.js` (from this directory).
