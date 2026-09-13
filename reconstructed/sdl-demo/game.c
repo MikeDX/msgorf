@@ -16,6 +16,7 @@
 
 #define MAX_FOES 64
 #define MAX_BULLETS 48
+#define MAX_EBULLETS 24
 #define MAX_FX 16
 #define MAX_CLONE_JOBS 16
 #define MAX_GALAXY_STARS 512
@@ -30,6 +31,15 @@
 #define FIRE_COOLDOWN (1.f / FIRE_ROUNDS_PER_SEC)
 #define PLAYER_DEATH_LINGER 2.5f /* continue play after ship destroyed */
 #define INTRO_BLACK_T 0.45f      /* black beat before field + galaxy */
+/* GUESS: L2+ gorf return fire — first shot 1–3s after play, then ~5–6s. */
+#define GORF_FIRE_FIRST_MIN 1.f
+#define GORF_FIRE_FIRST_MAX 3.f
+#define GORF_FIRE_PERIOD_MIN 5.f
+#define GORF_FIRE_PERIOD_MAX 6.f
+/* ~4 px/frame @ 60Hz present rate (GUESS from footage). */
+#define GORF_SHOT_SPEED (4.f * 60.f)
+#define GORF_SHOT_HIT_R 3.f
+#define SMINE_SPAWN_T 6.f /* L2+: one SMINE once, ~6s into play */
 #define CLONE_PROCESS_T 0.35f
 #define CLONE_EXIT_SPEED 55.f
 #define CLONE_COOL 0.75f
@@ -142,7 +152,11 @@ static float player_x, player_y;
 static int player_vis;
 static float death_linger; /* >0: ship gone, world still runs */
 static int respawn_gorf_count;
-static int wave_gorf_count; /* gorfs at wave start; +2 each clear */
+static int level_num;       /* 1-based wave */
+static int wave_gorf_count; /* gorfs at this level's start */
+static float gorf_fire_cd;  /* countdown to next enemy volley (L2+) */
+static float play_age;      /* time in PLAY this wave (player live) */
+static int smine_armed;     /* L2+: pending one SMINE spawn; cleared on death */
 static float intro_black; /* >0: full black before frozen field + galaxy */
 static float clone_x, clone_y, clone_frame;
 static float clone_home_x, clone_home_y;
@@ -154,6 +168,8 @@ static float burst_spawn_acc;
 
 static bullet_t bullets[MAX_BULLETS];
 static int n_bullets;
+static bullet_t ebullets[MAX_EBULLETS];
+static int n_ebullets;
 static foe_t foes[MAX_FOES];
 static int n_foes;
 static fx_t fx[MAX_FX];
@@ -379,6 +395,29 @@ static void spawn_gorf_at_edge(int side) {
   spawn_gorf(x, y, vx, vy, "GORF_PAT", 0);
 }
 
+static void spawn_smine_at_edge(void) {
+  float x, y, vx, vy;
+  const float margin = 18.f;
+  int side = rand() % 4;
+  if (side == 0) {
+    x = margin + frand() * (FB_W - margin * 2);
+    y = margin + 22 + frand() * 20;
+  } else if (side == 1) {
+    x = margin + frand() * (FB_W - margin * 2);
+    y = FB_H - margin - frand() * 24;
+  } else if (side == 2) {
+    x = margin + frand() * 24;
+    y = margin + 28 + frand() * (FB_H - margin * 2 - 28);
+  } else {
+    x = FB_W - margin - frand() * 24;
+    y = margin + 28 + frand() * (FB_H - margin * 2 - 28);
+  }
+  rand_vel(&vx, &vy);
+  spawn_gorf(x, y, vx, vy, "SMINE0", 0);
+}
+
+static int foe_is_gorf(const foe_t *f) { return name_eq(f->kind, "GORF_PAT"); }
+
 static void place_clone_at_home(void) {
   clone_vis = 1;
   clone_home_x = CLONE_HOME_X;
@@ -398,12 +437,15 @@ static void reveal_player_center(void) {
  * Used after clear-burst, player death, and fresh start. */
 static void start_wave_intro(int gorf_count) {
   n_bullets = 0;
+  n_ebullets = 0;
   n_fx = 0;
   n_clone_jobs = 0;
   n_foes = 0;
   burst.active = 0;
   burst.age = 0;
   death_linger = 0;
+  play_age = 0;
+  gorf_fire_cd = 999.f; /* armed when intro ends → PLAY */
 
   if (gorf_count < 1) gorf_count = 4;
   if (gorf_count > MAX_FOES) gorf_count = MAX_FOES;
@@ -424,7 +466,16 @@ static void start_wave_intro(int gorf_count) {
   G->mode = MODE_INTRO;
 }
 
-static void start_respawn_intro(void) { start_wave_intro(respawn_gorf_count); }
+static int gorfs_for_level(int level) {
+  if (level <= 1) return 4;
+  /* L2 = 8; later levels +2 each (L3=10, …). */
+  return 8 + (level - 2) * 2;
+}
+
+static void start_respawn_intro(void) {
+  smine_armed = 0; /* SMINE does not return after death / wave restart */
+  start_wave_intro(respawn_gorf_count);
+}
 
 static void spawn_bang(float x, float y) {
   if (n_fx >= MAX_FX) return;
@@ -440,8 +491,12 @@ static void player_destroyed(void) {
   spawn_bang(player_x, player_y);
   player_vis = 0;
   n_bullets = 0;
+  n_ebullets = 0;
   death_linger = PLAYER_DEATH_LINGER;
-  respawn_gorf_count = n_foes;
+  /* Remaining gorfs only — SMINEs do not carry into respawn count. */
+  respawn_gorf_count = 0;
+  for (int i = 0; i < n_foes; i++)
+    if (foe_is_gorf(&foes[i])) respawn_gorf_count++;
   if (respawn_gorf_count < 1) respawn_gorf_count = 1;
   sound_play_playerdie();
 }
@@ -455,12 +510,15 @@ static void start_clear_burst(void) {
   n_clone_jobs = 0;
   n_burst_rays = 0;
   burst_spawn_acc = 0;
+  n_ebullets = 0;
   sound_play_clonedestroy();
 }
 
 static void end_clear_burst(void) {
-  wave_gorf_count += 2;
+  level_num += 1;
+  wave_gorf_count = gorfs_for_level(level_num);
   if (wave_gorf_count > MAX_FOES) wave_gorf_count = MAX_FOES;
+  smine_armed = (level_num >= 2) ? 1 : 0;
   start_wave_intro(wave_gorf_count);
 }
 
@@ -472,7 +530,9 @@ static void begin_level(game_t *g) {
   ships_left = 3;
   fire_cd = 0;
   t_accum = 0;
-  wave_gorf_count = 4;
+  level_num = 1;
+  wave_gorf_count = gorfs_for_level(level_num);
+  smine_armed = 0;
   start_wave_intro(wave_gorf_count);
 }
 
@@ -863,6 +923,9 @@ static void update_intro(float dt) {
     if (galaxy_shells_peeled >= total) {
       galaxy_phase = 2;
       reveal_player_center();
+      play_age = 0;
+      /* Brief quiet, then first L2+ shot in 1–3s. */
+      gorf_fire_cd = GORF_FIRE_FIRST_MIN + frand() * (GORF_FIRE_FIRST_MAX - GORF_FIRE_FIRST_MIN);
       G->mode = MODE_PLAY;
     }
   }
@@ -1042,6 +1105,47 @@ static void update_play(game_t *g, float dt) {
     bounce_walls(&foes[i]);
     keep_gorf_speed(&foes[i]);
   }
+
+  /* L2+: first shot 1–3s after play starts, then ~5–6s; only gorfs shoot. */
+  if (level_num >= 2 && !burst.active && player_vis && death_linger <= 0.f) {
+    play_age += dt;
+    if (smine_armed && play_age >= SMINE_SPAWN_T) {
+      spawn_smine_at_edge();
+      smine_armed = 0;
+    }
+    gorf_fire_cd -= dt;
+    if (gorf_fire_cd <= 0.f && n_ebullets < MAX_EBULLETS && n_foes > 0) {
+      gorf_fire_cd = GORF_FIRE_PERIOD_MIN + frand() * (GORF_FIRE_PERIOD_MAX - GORF_FIRE_PERIOD_MIN);
+      int gorf_idx[MAX_FOES];
+      int n_g = 0;
+      for (int i = 0; i < n_foes; i++)
+        if (foe_is_gorf(&foes[i])) gorf_idx[n_g++] = i;
+      if (n_g > 0) {
+        foe_t *shooter = &foes[gorf_idx[rand() % n_g]];
+        float dx = player_x - shooter->x;
+        float dy = player_y - shooter->y;
+        float len = hypotf(dx, dy);
+        if (len < 1.f) len = 1.f;
+        bullet_t *eb = &ebullets[n_ebullets++];
+        eb->x = shooter->x;
+        eb->y = shooter->y;
+        eb->vx = (dx / len) * GORF_SHOT_SPEED;
+        eb->vy = (dy / len) * GORF_SHOT_SPEED;
+        eb->life = 1.f;
+      }
+    }
+  }
+
+  int we = 0;
+  for (int i = 0; i < n_ebullets; i++) {
+    bullet_t *b = &ebullets[i];
+    b->x += b->vx * dt;
+    b->y += b->vy * dt;
+    if (b->life > 0 && b->x >= -4 && b->x < FB_W + 4 && b->y >= -4 && b->y < FB_H + 4)
+      ebullets[we++] = *b;
+  }
+  n_ebullets = we;
+
   for (int bi = 0; bi < n_bullets; bi++) {
     bullet_t *b = &bullets[bi];
     for (int fi = 0; fi < n_foes; fi++) {
@@ -1081,6 +1185,31 @@ static void update_play(game_t *g, float dt) {
         break;
       }
     }
+    if (player_vis) {
+      for (int i = 0; i < n_ebullets; i++) {
+        bullet_t *b = &ebullets[i];
+        if (hypotf(b->x - player_x, b->y - player_y) < GORF_SHOT_HIT_R + 6.f) {
+          player_destroyed();
+          break;
+        }
+      }
+    }
+  }
+}
+
+static void draw_gorf_shot(uint8_t *rgb, int cx, int cy) {
+  /* GUESS: ~4×4 box with corners removed (round-ish blob). */
+  static const char mask[4][4] = {
+      {0, 1, 1, 0},
+      {1, 1, 1, 1},
+      {1, 1, 1, 1},
+      {0, 1, 1, 0},
+  };
+  for (int dy = 0; dy < 4; dy++) {
+    for (int dx = 0; dx < 4; dx++) {
+      if (!mask[dy][dx]) continue;
+      put_px(rgb, cx - 2 + dx, cy - 2 + dy, 255, 220, 90);
+    }
   }
 }
 
@@ -1107,6 +1236,8 @@ static void draw_world(uint8_t *rgb, int with_galaxy) {
     int y1 = pix(b->y + sinf(ang) * len);
     draw_line(rgb, x0, y0, x1, y1, 240, 220, 180);
   }
+  for (int i = 0; i < n_ebullets; i++)
+    draw_gorf_shot(rgb, pix(ebullets[i].x), pix(ebullets[i].y));
   draw_hud(rgb);
 }
 
