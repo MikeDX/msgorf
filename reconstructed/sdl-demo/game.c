@@ -142,6 +142,7 @@ static float player_x, player_y;
 static int player_vis;
 static float death_linger; /* >0: ship gone, world still runs */
 static int respawn_gorf_count;
+static int wave_gorf_count; /* gorfs at wave start; +2 each clear */
 static float intro_black; /* >0: full black before frozen field + galaxy */
 static float clone_x, clone_y, clone_frame;
 static float clone_home_x, clone_home_y;
@@ -458,8 +459,9 @@ static void start_clear_burst(void) {
 }
 
 static void end_clear_burst(void) {
-  /* Explosion done → same wave intro as death / start (new set of 4). */
-  start_wave_intro(4);
+  wave_gorf_count += 2;
+  if (wave_gorf_count > MAX_FOES) wave_gorf_count = MAX_FOES;
+  start_wave_intro(wave_gorf_count);
 }
 
 static void begin_level(game_t *g) {
@@ -470,7 +472,8 @@ static void begin_level(game_t *g) {
   ships_left = 3;
   fire_cd = 0;
   t_accum = 0;
-  start_wave_intro(4);
+  wave_gorf_count = 4;
+  start_wave_intro(wave_gorf_count);
 }
 
 static void enter_select(game_t *g) {
