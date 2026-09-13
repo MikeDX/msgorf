@@ -44,7 +44,8 @@ Cloner in the same window: mostly **vertical** travel (~80 px span), ~**29 p
 ## Simulator implications (GUESS)
 
 1. Keep **constant-speed coast + wall bounce**; speed band ~**40–55 px/s**.
-2. Steer / bias velocity toward the **nearer yellow CLN port** when the cloner is visible (enter-to-clone behaviour).
+2. Steer / absorb only at the **yellow** CLN ports for the current rotation index; **emit from the
+   opposite** yellow port (`CLN0` L↔R, `CLN64` T↔B, `CLN32` NW↔SE, flipped `CLN32` NE↔SW).
 3. Do **not** implement odd/even update gating unless a 60 Hz-field analysis later proves it.
 4. Physics float + **floor on blit** stays; visible steps of ~1–2 buffer px per video frame are expected.
 

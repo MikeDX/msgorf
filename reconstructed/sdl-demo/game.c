@@ -36,6 +36,15 @@
 #define CLONE_PHASE_Y 2.1879f
 #define CLONE_HOME_X 160.f
 #define CLONE_HOME_Y 100.f
+/* GUESS: clear-burst — docs/findings/clone-burst-explosion.md (f00590–f00685). */
+#define BURST_DUR 2.9f
+#define BURST_FLASH_PERIOD (13.f / 30.f)
+#define BURST_FLASH_DUTY (7.f / 13.f)
+#define BURST_RAYS 28
+#define BURST_DASH_ON 3
+#define BURST_DASH_GAP 3
+#define BURST_GROW_PX_PER_SEC 95.f
+#define PLAYFIELD_TOP 18 /* HUD strip stays black during BG flash */
 
 #define GALAXY_ARMS 16
 #define GALAXY_SHELLS_IN 17
@@ -74,9 +83,22 @@ typedef struct {
 
 typedef struct {
   float t;
-  int exit_right; /* 0 left, 1 right */
+  int exit_port; /* 0 or 1 — opposite yellow port index */
   const char *kind;
 } clone_job_t;
+
+typedef struct {
+  int active;
+  float age;
+  float x, y;
+} burst_t;
+
+/* GUESS: dashed rays that lengthen from the centre each frame (footage). */
+typedef struct {
+  float ang;
+  float born; /* burst.age when this ray starts growing */
+  float spd;  /* px/s tip advance */
+} burst_ray_t;
 
 typedef struct {
   float x, y;
@@ -88,12 +110,15 @@ typedef struct {
   int flip;
 } clone_frame_t;
 
+/* Rotation index i → yellow port axis from pattern art:
+ * 0 CLN32 flip: NE↔SW diagonal; 1 CLN64: top↔bottom; 2 CLN32: NW↔SE; 3 CLN0: left↔right. */
 static const clone_frame_t CLONE_CYCLE[] = {
     {"CLN32", 1},
     {"CLN64", 0},
     {"CLN32", 0},
     {"CLN0", 0},
 };
+#define CLONE_CYCLE_N ((int)(sizeof CLONE_CYCLE / sizeof CLONE_CYCLE[0]))
 
 static game_t *G;
 static float score;
@@ -105,6 +130,8 @@ static int player_vis;
 static float clone_x, clone_y, clone_frame;
 static float clone_home_x, clone_home_y;
 static int clone_vis;
+static burst_t burst;
+static burst_ray_t burst_rays[BURST_RAYS];
 
 static bullet_t bullets[MAX_BULLETS];
 static int n_bullets;
@@ -333,14 +360,6 @@ static void spawn_gorf_at_edge(int side) {
   spawn_gorf(x, y, vx, vy, "GORF_PAT", 0);
 }
 
-static void spawn_burst(float x, float y) {
-  if (n_fx >= MAX_FX) return;
-  fx[n_fx].x = x;
-  fx[n_fx].y = y;
-  fx[n_fx].hp = 0.45f;
-  n_fx++;
-}
-
 static void reveal_player_and_clone(void) {
   player_vis = 1;
   player_x = FB_W * 0.5f;
@@ -354,6 +373,49 @@ static void reveal_player_and_clone(void) {
   clone_frame = 0;
 }
 
+static void spawn_bang(float x, float y) {
+  if (n_fx >= MAX_FX) return;
+  fx[n_fx].x = x;
+  fx[n_fx].y = y;
+  fx[n_fx].hp = 0.45f;
+  n_fx++;
+}
+
+static void start_clear_burst(void) {
+  if (burst.active || !clone_vis) return;
+  burst.active = 1;
+  burst.age = 0;
+  burst.x = clone_x;
+  burst.y = clone_y;
+  n_clone_jobs = 0;
+  for (int i = 0; i < BURST_RAYS; i++) {
+    /* Spread angles; slight jitter + staggered start so tips aren't locked. */
+    burst_rays[i].ang =
+        (float)(M_PI * 2.0) * ((float)i / (float)BURST_RAYS) + (frand() - 0.5f) * 0.12f;
+    burst_rays[i].born = frand() * 0.45f;
+    burst_rays[i].spd = BURST_GROW_PX_PER_SEC * (0.75f + frand() * 0.5f);
+  }
+}
+
+static void end_clear_burst(void) {
+  burst.active = 0;
+  burst.age = 0;
+  n_clone_jobs = 0;
+  n_bullets = 0;
+  n_fx = 0;
+  n_foes = 0;
+  clone_vis = 0;
+  player_vis = 0;
+  /* Screen clear (HUD only) → same concentric-ring intro as level start. */
+  for (int i = 0; i < 4; i++) spawn_gorf_at_edge(i);
+  galaxy_phase = 0;
+  galaxy_age = 0;
+  galaxy_peel_age = 0;
+  galaxy_stars_drawn = 0;
+  galaxy_shells_peeled = 0;
+  G->mode = MODE_INTRO;
+}
+
 static void begin_level(game_t *g) {
   (void)g;
   score = 0;
@@ -361,6 +423,8 @@ static void begin_level(game_t *g) {
   n_bullets = n_foes = n_fx = n_clone_jobs = 0;
   player_vis = 0;
   clone_vis = 0;
+  burst.active = 0;
+  burst.age = 0;
   fire_cd = 0;
   t_accum = 0;
   for (int i = 0; i < 4; i++) spawn_gorf_at_edge(i);
@@ -460,52 +524,115 @@ static void bounce_pair(foe_t *a, foe_t *b) {
 }
 
 static const clone_frame_t *current_clone_frame(void) {
-  int i = ((int)clone_frame) % (int)(sizeof CLONE_CYCLE / sizeof CLONE_CYCLE[0]);
+  int i = ((int)clone_frame) % CLONE_CYCLE_N;
   if (i < 0) i = 0;
   return &CLONE_CYCLE[i];
 }
 
+static int clone_rot_index(void) {
+  int i = ((int)clone_frame) % CLONE_CYCLE_N;
+  return i < 0 ? 0 : i;
+}
+
 typedef struct {
   float x0, x1, y0, y1;
-  int exit_right;
+  float ex, ey; /* emit direction from this port */
 } port_t;
 
-static void clone_ports(port_t *left, port_t *right) {
+/* Yellow port pair from CLN* art + rotation index (enter either yellow; exit opposite). */
+static void clone_yellow_ports(port_t ports[2]) {
   const clone_frame_t *cf = current_clone_frame();
   const terse_asset_t *a = find_asset(cf->name);
   int w = a ? a->w : 32;
   int h = a ? a->h : 32;
   float hw = w * 0.5f, hh = h * 0.5f;
-  float pw = 5.f;
-  float y0 = clone_y - hh * 0.35f;
-  float y1 = clone_y + hh * 0.5f;
-  left->x0 = clone_x - hw;
-  left->x1 = clone_x - hw + pw;
-  left->y0 = y0;
-  left->y1 = y1;
-  left->exit_right = 1;
-  right->x0 = clone_x + hw - pw;
-  right->x1 = clone_x + hw;
-  right->y0 = y0;
-  right->y1 = y1;
-  right->exit_right = 0;
+  float pw = 6.f;
+  float cx = clone_x, cy = clone_y;
+  int rot = clone_rot_index();
+
+  memset(ports, 0, sizeof(port_t) * 2);
+  if (rot == 3) {
+    /* CLN0: yellow left ↔ right */
+    ports[0].x0 = cx - hw;
+    ports[0].x1 = cx - hw + pw;
+    ports[0].y0 = cy - hh * 0.35f;
+    ports[0].y1 = cy + hh * 0.5f;
+    ports[0].ex = -1.f;
+    ports[0].ey = 0.f;
+    ports[1].x0 = cx + hw - pw;
+    ports[1].x1 = cx + hw;
+    ports[1].y0 = cy - hh * 0.35f;
+    ports[1].y1 = cy + hh * 0.5f;
+    ports[1].ex = 1.f;
+    ports[1].ey = 0.f;
+  } else if (rot == 1) {
+    /* CLN64: yellow top ↔ bottom */
+    ports[0].x0 = cx - hw * 0.35f;
+    ports[0].x1 = cx + hw * 0.35f;
+    ports[0].y0 = cy - hh;
+    ports[0].y1 = cy - hh + pw;
+    ports[0].ex = 0.f;
+    ports[0].ey = -1.f;
+    ports[1].x0 = cx - hw * 0.35f;
+    ports[1].x1 = cx + hw * 0.35f;
+    ports[1].y0 = cy + hh - pw;
+    ports[1].y1 = cy + hh;
+    ports[1].ex = 0.f;
+    ports[1].ey = 1.f;
+  } else if (rot == 2) {
+    /* CLN32: yellow NW ↔ SE */
+    float s = pw + 2.f;
+    ports[0].x0 = cx - hw;
+    ports[0].x1 = cx - hw + s + 4.f;
+    ports[0].y0 = cy - hh;
+    ports[0].y1 = cy - hh + s + 4.f;
+    ports[0].ex = -0.7071f;
+    ports[0].ey = -0.7071f;
+    ports[1].x0 = cx + hw - s - 4.f;
+    ports[1].x1 = cx + hw;
+    ports[1].y0 = cy + hh - s - 4.f;
+    ports[1].y1 = cy + hh;
+    ports[1].ex = 0.7071f;
+    ports[1].ey = 0.7071f;
+  } else {
+    /* CLN32 flip: yellow NE ↔ SW */
+    float s = pw + 2.f;
+    ports[0].x0 = cx + hw - s - 4.f;
+    ports[0].x1 = cx + hw;
+    ports[0].y0 = cy - hh;
+    ports[0].y1 = cy - hh + s + 4.f;
+    ports[0].ex = 0.7071f;
+    ports[0].ey = -0.7071f;
+    ports[1].x0 = cx - hw;
+    ports[1].x1 = cx - hw + s + 4.f;
+    ports[1].y0 = cy + hh - s - 4.f;
+    ports[1].y1 = cy + hh;
+    ports[1].ex = -0.7071f;
+    ports[1].ey = 0.7071f;
+  }
+  (void)cf;
 }
 
-/* GUESS: footage — gorfs coast toward nearer yellow CLN rim (docs/findings/gorf-update-cadence.md). */
+/* GUESS: steer only toward nearer yellow CLN port (docs/findings/gorf-update-cadence.md). */
 static void steer_gorf_to_clone_port(foe_t *f) {
-  if (!clone_vis || f->cool > 0.f) return;
-  port_t L, R;
-  clone_ports(&L, &R);
-  float lx = 0.5f * (L.x0 + L.x1), ly = 0.5f * (L.y0 + L.y1);
-  float rx = 0.5f * (R.x0 + R.x1), ry = 0.5f * (R.y0 + R.y1);
-  float dl = hypotf(f->x - lx, f->y - ly);
-  float dr = hypotf(f->x - rx, f->y - ry);
-  float tx = (dl < dr) ? lx : rx;
-  float ty = (dl < dr) ? ly : ry;
+  if (!clone_vis || burst.active || f->cool > 0.f) return;
+  port_t ports[2];
+  clone_yellow_ports(ports);
+  float best_d = 1e9f;
+  float tx = ports[0].x0, ty = ports[0].y0;
+  for (int i = 0; i < 2; i++) {
+    float px = 0.5f * (ports[i].x0 + ports[i].x1);
+    float py = 0.5f * (ports[i].y0 + ports[i].y1);
+    float d = hypotf(f->x - px, f->y - py);
+    if (d < best_d) {
+      best_d = d;
+      tx = px;
+      ty = py;
+    }
+  }
   float dx = tx - f->x, dy = ty - f->y;
   float dist = hypotf(dx, dy);
   if (dist < 1.f) return;
-  /* Mild seek — keep coast character, don't snap to chase. */
   float seek = 0.35f;
   float sp = hypotf(f->vx, f->vy);
   if (sp < 1.f) sp = GORF_SPEED;
@@ -524,25 +651,28 @@ static int overlaps_port(const foe_t *f, const port_t *p) {
          f->y - f->r < p->y1;
 }
 
-static void emit_clones(int exit_right, const char *kind) {
-  port_t L, R;
-  clone_ports(&L, &R);
-  port_t *port = exit_right ? &R : &L;
+static void emit_clones(int exit_port, const char *kind) {
+  port_t ports[2];
+  clone_yellow_ports(ports);
+  if (exit_port < 0 || exit_port > 1) exit_port = 1;
+  port_t *port = &ports[exit_port];
   float mid_x = (port->x0 + port->x1) * 0.5f;
   float mid_y = (port->y0 + port->y1) * 0.5f;
-  float dir = exit_right ? 1.f : -1.f;
-  float dys[2] = {-6.f, 6.f};
+  float ex = port->ex, ey = port->ey;
+  float perp_x = -ey, perp_y = ex;
+  float offs[2] = {-6.f, 6.f};
   for (int i = 0; i < 2; i++) {
-    spawn_gorf(mid_x + dir * 8.f, mid_y + dys[i], dir * CLONE_EXIT_SPEED, dys[i] * 2.f, kind,
-               CLONE_COOL);
+    float ox = perp_x * offs[i];
+    float oy = perp_y * offs[i];
+    spawn_gorf(mid_x + ex * 8.f + ox, mid_y + ey * 8.f + oy, ex * CLONE_EXIT_SPEED + oy * 0.4f,
+               ey * CLONE_EXIT_SPEED + ox * 0.4f, kind, CLONE_COOL);
   }
 }
 
 static void process_clone_machine(float dt) {
-  if (!clone_vis) return;
-  const int ncycle = (int)(sizeof CLONE_CYCLE / sizeof CLONE_CYCLE[0]);
-  clone_frame = fmodf(clone_frame + dt * 2.4f, (float)ncycle);
-  if (clone_frame < 0) clone_frame += ncycle;
+  if (!clone_vis || burst.active) return;
+  clone_frame = fmodf(clone_frame + dt * 2.4f, (float)CLONE_CYCLE_N);
+  if (clone_frame < 0) clone_frame += CLONE_CYCLE_N;
   /* Continuous Lissajous (video fit). Floor only at blit — see pix(). */
   clone_x = clone_home_x + CLONE_AMP_X * sinf(t_accum * CLONE_OMEGA_X + CLONE_PHASE_X);
   clone_y = clone_home_y + CLONE_AMP_Y * cosf(t_accum * CLONE_OMEGA_Y + CLONE_PHASE_Y);
@@ -551,21 +681,21 @@ static void process_clone_machine(float dt) {
   if (clone_y < 48.f) clone_y = 48.f;
   if (clone_y > FB_H - 40.f) clone_y = FB_H - 40.f;
 
-  port_t L, R;
-  clone_ports(&L, &R);
+  port_t ports[2];
+  clone_yellow_ports(ports);
   for (int i = 0; i < n_foes; i++) {
     foe_t *f = &foes[i];
     if (f->hp <= 0 || f->cool > 0) continue;
     int hit = -1;
-    if (overlaps_port(f, &L))
-      hit = L.exit_right;
-    else if (overlaps_port(f, &R))
-      hit = R.exit_right;
+    if (overlaps_port(f, &ports[0]))
+      hit = 0;
+    else if (overlaps_port(f, &ports[1]))
+      hit = 1;
     if (hit < 0) continue;
     f->hp = 0;
     if (n_clone_jobs < MAX_CLONE_JOBS) {
       clone_jobs[n_clone_jobs].t = CLONE_PROCESS_T;
-      clone_jobs[n_clone_jobs].exit_right = hit;
+      clone_jobs[n_clone_jobs].exit_port = 1 - hit; /* opposite yellow */
       clone_jobs[n_clone_jobs].kind = f->kind;
       n_clone_jobs++;
     }
@@ -575,7 +705,7 @@ static void process_clone_machine(float dt) {
   for (int i = 0; i < n_clone_jobs; i++) {
     clone_jobs[i].t -= dt;
     if (clone_jobs[i].t <= 0) {
-      emit_clones(clone_jobs[i].exit_right, clone_jobs[i].kind);
+      emit_clones(clone_jobs[i].exit_port, clone_jobs[i].kind);
     } else {
       clone_jobs[w++] = clone_jobs[i];
     }
@@ -618,9 +748,83 @@ static int key_down(game_t *g, int sc) {
   return g->keys[sc];
 }
 
+static void update_burst(float dt) {
+  if (!burst.active) return;
+  burst.age += dt;
+  /* Hold cloner at burst origin; still morph frames for presence. */
+  clone_x = burst.x;
+  clone_y = burst.y;
+  clone_frame = fmodf(clone_frame + dt * 2.4f, (float)CLONE_CYCLE_N);
+  if (clone_frame < 0) clone_frame += CLONE_CYCLE_N;
+  if (burst.age >= BURST_DUR) end_clear_burst();
+}
+
+static int burst_flash_on(void) {
+  if (!burst.active) return 0;
+  float phase = fmodf(burst.age, BURST_FLASH_PERIOD) / BURST_FLASH_PERIOD;
+  if (phase < 0) phase += 1.f;
+  return phase < BURST_FLASH_DUTY;
+}
+
+static void burst_flash_rgb(uint8_t *r, uint8_t *g, uint8_t *b) {
+  /* Pink/lavender → yellow over the burst (GUESS from footage colour drift). */
+  float t = burst.age / BURST_DUR;
+  if (t < 0) t = 0;
+  if (t > 1) t = 1;
+  *r = 255;
+  *g = (uint8_t)(200 + t * 45);
+  *b = (uint8_t)(250 - t * 160);
+}
+
+static void draw_burst_bg(uint8_t *rgb) {
+  if (!burst.active || !burst_flash_on()) return;
+  uint8_t r, g, b;
+  burst_flash_rgb(&r, &g, &b);
+  for (int y = PLAYFIELD_TOP; y < FB_H; y++) {
+    for (int x = 0; x < FB_W; x++) put_px(rgb, x, y, r, g, b);
+  }
+}
+
+static void draw_burst_rays(uint8_t *rgb) {
+  if (!burst.active) return;
+  int flash = burst_flash_on();
+  uint8_t rr, rg, rb;
+  if (flash) {
+    rr = 40;
+    rg = 20;
+    rb = 30;
+  } else {
+    rr = 220;
+    rg = 210;
+    rb = 255;
+  }
+  int cx = pix(burst.x), cy = pix(burst.y);
+  int period = BURST_DASH_ON + BURST_DASH_GAP;
+  for (int i = 0; i < BURST_RAYS; i++) {
+    burst_ray_t *ray = &burst_rays[i];
+    float life = burst.age - ray->born;
+    if (life <= 0.f) continue;
+    int len = (int)(life * ray->spd);
+    if (len < 1) continue;
+    if (len > 240) len = 240;
+    float ca = cosf(ray->ang), sa = sinf(ray->ang);
+    /* Tip advances each frame; solid dashes with gaps from the centre out. */
+    for (int d = 0; d < len; d++) {
+      int slot = d % period;
+      if (slot >= BURST_DASH_ON) continue;
+      put_px(rgb, cx + (int)(ca * d), cy + (int)(sa * d), rr, rg, rb);
+    }
+  }
+}
+
 static void update_play(game_t *g, float dt) {
   t_accum += dt;
   if (!player_vis) return;
+
+  if (burst.active) {
+    update_burst(dt);
+    /* Player can still move during burst; no foes to fight. */
+  }
 
   float speed = 70.f;
   float dx = 0, dy = 0;
@@ -643,7 +847,7 @@ static void update_play(game_t *g, float dt) {
   float aim = atan2f(g->mouse_y - player_y, g->mouse_x - player_x);
   fire_cd -= dt;
   int fire = g->mouse_down || key_down(g, 44) || key_down(g, 14); /* Space / K */
-  if (fire && fire_cd <= 0 && n_bullets < MAX_BULLETS) {
+  if (!burst.active && fire && fire_cd <= 0 && n_bullets < MAX_BULLETS) {
     fire_cd = 0.12f;
     float sp = 160.f;
     float c = cosf(aim), s = sinf(aim);
@@ -666,12 +870,12 @@ static void update_play(game_t *g, float dt) {
   }
   n_bullets = wb;
 
-  process_clone_machine(dt);
+  if (!burst.active) process_clone_machine(dt);
 
   for (int i = 0; i < n_foes; i++) {
     foe_t *f = &foes[i];
     if (f->cool > 0) f->cool -= dt;
-    steer_gorf_to_clone_port(f);
+    if (!burst.active) steer_gorf_to_clone_port(f);
     f->x += f->vx * dt;
     f->y += f->vy * dt;
     bounce_walls(f);
@@ -691,7 +895,7 @@ static void update_play(game_t *g, float dt) {
         f->hp = 0;
         b->life = 0;
         score += 1000;
-        spawn_burst(f->x, f->y);
+        spawn_bang(f->x, f->y);
       }
     }
   }
@@ -704,31 +908,37 @@ static void update_play(game_t *g, float dt) {
     if (foes[i].hp > 0) foes[wf++] = foes[i];
   n_foes = wf;
 
+  if (!burst.active && n_foes == 0 && clone_vis && n_clone_jobs == 0) start_clear_burst();
+
   for (int i = 0; i < n_fx; i++) fx[i].hp -= dt;
   wf = 0;
   for (int i = 0; i < n_fx; i++)
     if (fx[i].hp > 0) fx[wf++] = fx[i];
   n_fx = wf;
 
-  for (int i = 0; i < n_foes; i++) {
-    foe_t *f = &foes[i];
-    if (hypotf(f->x - player_x, f->y - player_y) < f->r + 8) {
-      ships_left -= 1;
-      spawn_burst(player_x, player_y);
-      player_x = FB_W * 0.5f;
-      player_y = FB_H * 0.5f;
-      if (ships_left <= 0) G->mode = MODE_DEAD;
-      break;
+  if (!burst.active) {
+    for (int i = 0; i < n_foes; i++) {
+      foe_t *f = &foes[i];
+      if (hypotf(f->x - player_x, f->y - player_y) < f->r + 8) {
+        ships_left -= 1;
+        spawn_bang(player_x, player_y);
+        player_x = FB_W * 0.5f;
+        player_y = FB_H * 0.5f;
+        if (ships_left <= 0) G->mode = MODE_DEAD;
+        break;
+      }
     }
   }
 }
 
 static void draw_world(uint8_t *rgb, int with_galaxy) {
   fb_clear(rgb);
+  draw_burst_bg(rgb);
   for (int i = 0; i < n_foes; i++) blit_named(rgb, foes[i].kind, pix(foes[i].x), pix(foes[i].y), 0);
   if (with_galaxy) draw_galaxy(rgb);
   for (int i = 0; i < n_fx; i++)
     blit_named(rgb, fx[i].hp > 0.22f ? "FBEXP5" : "FBEXP6", pix(fx[i].x), pix(fx[i].y), 0);
+  draw_burst_rays(rgb);
   if (clone_vis) {
     const clone_frame_t *cf = current_clone_frame();
     blit_named(rgb, cf->name, pix(clone_x), pix(clone_y), cf->flip);

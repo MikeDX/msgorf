@@ -58,9 +58,12 @@ source yet): **`LINE` / `LINES` / `LINELOAD`**, **`FLASHES`**.
    length over ~3 s.
 3. Toggle playfield clear colour on a **~13-frame** cycle; hue can shift pink→yellow across the
    burst; keep HUD on black.
-4. At end: remove cloner + rays (next wave / galaxy / whatever the missing logic does).
+4. At end: remove cloner + rays briefly, then respawn wave (demo) / whatever missing logic does.
 
-Current SDL `spawn_burst` only blits `FBEXP5/6` — wrong effect for this beat.
+**SDL:** `reconstructed/sdl-demo/game.c` — sparks fly out from the cloner (staggered
+angles/speeds, short trails); BG flash unchanged. When the burst ends: clear playfield
+(keep HUD) → `MODE_INTRO` concentric rings → reveal player/clone + edge gorfs. Score/lives
+persist. Gorf kills still use `FBEXP5/6` via `spawn_bang`.
 
 ## Related
 
