@@ -14,22 +14,56 @@ holes in that box (transparent when blitted).
 So the on-screen `$` / digit strip should be about as tall as the **ink inside** P1/P2, not the
 outer yellow bezel. HUD yellow runs on video (~11px with bloom) match the **12**-tall markers.
 
-## Scraped from Ms. Gorf patterns
+## Remake font (current)
 
-Digits **`1`** and **`2`** in [`reconstructed/video-demo/font_guess.json`](../../reconstructed/video-demo/font_guess.json)
-are now taken directly from `P1UP` / `P2UP` hole masks (cell **6×10**). Other glyphs are the old
-video-traced 5×7 set **padded** to 6×10 until a full atlas exists.
+[`reconstructed/video-demo/font_guess.json`](../../reconstructed/video-demo/font_guess.json)
+now uses **arcade Gorf `CHAR_TABLE`**, rotated **90° CCW** and cropped to **6×10** (ink rows
+4–13). Exports:
 
-## Gorf arcade / MAME / Astrocade
+| File | Contents |
+|------|----------|
+| `work/gorf_rom/font_dump/gorf_chartable_export.json` | raw hex + stored + upright + cropped |
+| `work/gorf_rom/font_dump/gorf_chartable_upright.txt` | ASCII upright crop |
+| `work/gorf_rom/font_dump/gorf_chartable.txt` | stored + full upright per glyph |
+
+`$` is still **GUESS** (not in Gorf’s table). P1UP/P2UP markers stay disk patterns; only the
+software `$score` / `SELECT…` blitter uses this charset.
+
+## Gorf arcade — assembly *does* name the charset
+
+Arcade Gorf does **not** use the Astrocade home `FNTSYS` dope. It embeds its own table and
+draw routine. From the APD disassembly (`Gorf_Disassembly.asm`, blocks 0048–0051):
+
+- Comment: **“8 × 10 CHARACTER SET - ROTATED”** (vertical monitor; glyphs stored on their side).
+- Label **`CHAR_TABLE`** / TERSE **`CHRTBL`**: full bitmaps for space, `0–9`, `A–Z`, `:`, ©.
+- Each glyph = **12 bytes** = **6 rows × 2 bytes** (16 source bits). Drawn with **Magic Expand**
+  (`drawchar` → pattern xfer with `DE=$0602`).
+- Indexing: ASCII − `$20`, then digit/letter range adjust; offset = index × 12.
+- ROM: **`gorf-a.bin` + `$076A`** (CPU `$076A`). Full dump:
+  [`work/gorf_rom/font_dump/gorf_chartable.txt`](../../work/gorf_rom/font_dump/gorf_chartable.txt).
+
+Example (digit `0` as documented in the asm):
+
+```
+$1F,$E0  ---XXXXXXXX-----
+$3F,$F0  --XXXXXXXXXX----
+$30,$30  --XX------XX----
+…
+```
+
+**Vs Ms. Gorf HUD:** P1UP’s 6×10 hole-mask `1` is a thick stem + double base; Gorf’s rotated
+`CHAR_TABLE` `1` is a different silhouette (see
+[`gorf_vs_msgorf_1.txt`](../../work/gorf_rom/font_dump/gorf_vs_msgorf_1.txt)). So Gorf’s
+charset is fully recoverable — it is just **not** the Ms. Gorf HUD font.
 
 | Source | Location | Result |
 |--------|----------|--------|
-| MAME driver | `~/src/mame/src/mame/bally/astrocde.cpp` (`ROM_START(gorf)`) | Program ROMs only — no separate chargen ROM |
-| Gorf ROMs | Extracted to `work/gorf_rom/gorf-a.bin`…`h` (from APD zip) | **No** raw match to P1UP’s 6×10 “1” bitmap; no font-descriptor hits in a scan |
-| Astrocade home BIOS | `astro.bin` / MAME `astrocde` | **`FNTSYS` / `FNTSML` dumped** (below) |
-| Text API | `CHRDIS` / `STRDIS` / `DISNUM` | Software character blit, not Ms. Gorf `P1UP` |
+| MAME driver | `~/src/mame/src/mame/bally/astrocde.cpp` | Program ROMs only — no separate chargen |
+| Gorf `CHAR_TABLE` | `$076A` in `gorf-a.bin` + asm listing | **Full** arcade Gorf alphabet |
+| Astrocade home BIOS | `FNTSYS` / `FNTSML` at `$0206` / `$020D` | Height **7** / **5** — also not P1UP |
+| Ms. Gorf | `GFONTPAT` (named, file missing) | Still the missing atlas |
 
-### FNTSYS / FNTSML dump (MAME `astrocde`, after boot)
+### FNTSYS / FNTSML (home BIOS, for contrast)
 
 Dope vector layout from `HVGLIB.ASM`: `FTBASE`, `FTFSX`, `FTFSY`, `FTBYTE`, `FTYSIZ`, `FTPT`.
 
@@ -38,15 +72,13 @@ Dope vector layout from `HVGLIB.ASM`: `FTBASE`, `FTFSX`, `FTFSY`, `FTBYTE`, `FTY
 | **FNTSYS** | `$0206` | `20 08 08 01 07 E4 08` | `$20` | 8×8 | 1 | **7** | `$08E4` in BIOS |
 | **FNTSML** | `$020D` | `A0 04 06 01 05 BF 0A` | `$A0` | 4×6 | 1 | **5** | `$0ABF` in BIOS |
 
-Ink in FNTSYS is roughly **5×7** inside an 8-wide cell (classic Bally). P1UP’s thick 6×10 **`1`/`2`**
-do **not** match FNTSYS. Some padded remake digits (`3`–`9`) resemble FNTSYS with blank rows — that
-is leftover video/BIOS-shaped GUESS, not proof the HUD used `CHRDIS`. Side-by-side:
-[`work/gorf_rom/font_dump/compare_digits.txt`](../../work/gorf_rom/font_dump/compare_digits.txt);
-full table: [`fntsys_glyphs.json`](../../work/gorf_rom/font_dump/fntsys_glyphs.json).
+Side-by-side vs HUD guess:
+[`compare_digits.txt`](../../work/gorf_rom/font_dump/compare_digits.txt);
+[`fntsys_glyphs.json`](../../work/gorf_rom/font_dump/fntsys_glyphs.json).
 
-**Verdict:** System fonts are **height 7 / 5**, not **6×10**. Keep the P1UP-sized cell. Arcade
-**Gorf** does **not** use the home dope at `$0206` (that region is code after boot). `GFONTPAT`
-remains the missing Ms. Gorf atlas.
+**Verdict:** Gorf’s own `CHRTBL` and the home `FNTSYS` are both known; neither matches Ms. Gorf’s
+6×10 marker digits. Keep the P1UP-sized cell; hunt `GFONTPAT` / application TERSE for the HUD
+atlas.
 
 ## Ms. Gorf `GFONTPAT`
 
@@ -55,6 +87,6 @@ disks. Application TERSE / Ice video ROM still missing.
 
 ## Remake action
 
-- Cell **6×10**; `1`/`2` from disk markers; regenerate `font_gen.h` via `gen_font.py`.
+- Cell **6×10** from Gorf upright crop; regenerate `font_gen.h` via `gen_font.py`.
 - Keep polarity as **yellow ink on black** for `$score` / SELECT (footage), while markers stay
   yellow box + black holes.
