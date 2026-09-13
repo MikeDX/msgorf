@@ -27,6 +27,8 @@
 /* Jamie on tape: laser ~10 rounds/sec (work/video_refs/yt-transcript.txt ~7:48). */
 #define FIRE_ROUNDS_PER_SEC 10.f
 #define FIRE_COOLDOWN (1.f / FIRE_ROUNDS_PER_SEC)
+#define PLAYER_DEATH_LINGER 2.5f /* continue play after ship destroyed */
+#define INTRO_BLACK_T 0.45f      /* black beat before field + galaxy */
 #define CLONE_PROCESS_T 0.35f
 #define CLONE_EXIT_SPEED 55.f
 #define CLONE_COOL 0.75f
@@ -137,6 +139,9 @@ static float t_accum;
 static float fire_cd;
 static float player_x, player_y;
 static int player_vis;
+static float death_linger; /* >0: ship gone, world still runs */
+static int respawn_gorf_count;
+static float intro_black; /* >0: full black before frozen field + galaxy */
 static float clone_x, clone_y, clone_frame;
 static float clone_home_x, clone_home_y;
 static int clone_vis;
@@ -372,12 +377,8 @@ static void spawn_gorf_at_edge(int side) {
   spawn_gorf(x, y, vx, vy, "GORF_PAT", 0);
 }
 
-static void reveal_player_and_clone(void) {
-  player_vis = 1;
-  player_x = FB_W * 0.5f;
-  player_y = FB_H * 0.5f;
+static void place_clone_at_home(void) {
   clone_vis = 1;
-  /* GUESS: continuous Lissajous — docs/findings/motion-fit-guess.md */
   clone_home_x = CLONE_HOME_X;
   clone_home_y = CLONE_HOME_Y;
   clone_x = clone_home_x + CLONE_AMP_X * sinf(CLONE_PHASE_X);
@@ -385,12 +386,60 @@ static void reveal_player_and_clone(void) {
   clone_frame = 0;
 }
 
+static void reveal_player_center(void) {
+  player_vis = 1;
+  player_x = FB_W * 0.5f;
+  player_y = FB_H * 0.5f;
+}
+
+/* Shared wave entry: black → frozen gorfs+cloner → galaxy → player.
+ * Used after clear-burst, player death, and fresh start. */
+static void start_wave_intro(int gorf_count) {
+  n_bullets = 0;
+  n_fx = 0;
+  n_clone_jobs = 0;
+  n_foes = 0;
+  burst.active = 0;
+  burst.age = 0;
+  death_linger = 0;
+
+  if (gorf_count < 1) gorf_count = 4;
+  if (gorf_count > MAX_FOES) gorf_count = MAX_FOES;
+  for (int i = 0; i < gorf_count; i++) spawn_gorf_at_edge(i % 4);
+
+  player_vis = 0;
+  player_x = FB_W * 0.5f;
+  player_y = FB_H * 0.5f;
+  place_clone_at_home();
+
+  intro_black = INTRO_BLACK_T;
+  galaxy_phase = 0;
+  galaxy_age = 0;
+  galaxy_peel_age = 0;
+  galaxy_stars_drawn = 0;
+  galaxy_shells_peeled = 0;
+  G->mode = MODE_INTRO;
+}
+
+static void start_respawn_intro(void) { start_wave_intro(respawn_gorf_count); }
+
 static void spawn_bang(float x, float y) {
   if (n_fx >= MAX_FX) return;
   fx[n_fx].x = x;
   fx[n_fx].y = y;
   fx[n_fx].hp = 0.45f;
   n_fx++;
+}
+
+static void player_destroyed(void) {
+  if (!player_vis || death_linger > 0.f) return;
+  ships_left -= 1;
+  spawn_bang(player_x, player_y);
+  player_vis = 0;
+  n_bullets = 0;
+  death_linger = PLAYER_DEATH_LINGER;
+  respawn_gorf_count = n_foes;
+  if (respawn_gorf_count < 1) respawn_gorf_count = 1;
 }
 
 static void start_clear_burst(void) {
@@ -405,42 +454,17 @@ static void start_clear_burst(void) {
 }
 
 static void end_clear_burst(void) {
-  burst.active = 0;
-  burst.age = 0;
-  n_clone_jobs = 0;
-  n_bullets = 0;
-  n_fx = 0;
-  n_foes = 0;
-  clone_vis = 0;
-  player_vis = 0;
-  /* Screen clear (HUD only) → same concentric-ring intro as level start. */
-  for (int i = 0; i < 4; i++) spawn_gorf_at_edge(i);
-  galaxy_phase = 0;
-  galaxy_age = 0;
-  galaxy_peel_age = 0;
-  galaxy_stars_drawn = 0;
-  galaxy_shells_peeled = 0;
-  G->mode = MODE_INTRO;
+  /* Explosion done → same wave intro as death / start (new set of 4). */
+  start_wave_intro(4);
 }
 
 static void begin_level(game_t *g) {
   (void)g;
   score = 0;
   ships_left = 3;
-  n_bullets = n_foes = n_fx = n_clone_jobs = 0;
-  player_vis = 0;
-  clone_vis = 0;
-  burst.active = 0;
-  burst.age = 0;
   fire_cd = 0;
   t_accum = 0;
-  for (int i = 0; i < 4; i++) spawn_gorf_at_edge(i);
-  galaxy_phase = 0;
-  galaxy_age = 0;
-  galaxy_peel_age = 0;
-  galaxy_stars_drawn = 0;
-  galaxy_shells_peeled = 0;
-  G->mode = MODE_INTRO;
+  start_wave_intro(4);
 }
 
 static void draw_galaxy(uint8_t *rgb) {
@@ -742,17 +766,22 @@ static void emit_clones(int exit_port, const char *kind) {
   }
 }
 
-static void process_clone_machine(float dt) {
+static void tick_clone_pose(float dt) {
   if (!clone_vis || burst.active) return;
   clone_frame = fmodf(clone_frame + dt * CLONE_ROT_RATE, (float)CLONE_CYCLE_N);
   if (clone_frame < 0) clone_frame += CLONE_CYCLE_N;
-  /* Continuous Lissajous (video fit). Floor only at blit — see pix(). */
   clone_x = clone_home_x + CLONE_AMP_X * sinf(t_accum * CLONE_OMEGA_X + CLONE_PHASE_X);
   clone_y = clone_home_y + CLONE_AMP_Y * cosf(t_accum * CLONE_OMEGA_Y + CLONE_PHASE_Y);
   if (clone_x < 48.f) clone_x = 48.f;
   if (clone_x > FB_W - 48.f) clone_x = FB_W - 48.f;
   if (clone_y < 48.f) clone_y = 48.f;
   if (clone_y > FB_H - 40.f) clone_y = FB_H - 40.f;
+}
+
+static void process_clone_machine(float dt) {
+  if (!clone_vis || burst.active) return;
+  tick_clone_pose(dt);
+  if (G && G->mode != MODE_PLAY) return;
 
   port_t ports[2];
   clone_yellow_ports(ports);
@@ -794,6 +823,12 @@ static void process_clone_machine(float dt) {
 
 static void update_intro(float dt) {
   t_accum += dt;
+  /* Black beat, then frozen field + galaxy. Cloner/gorfs do not move. */
+  if (intro_black > 0.f) {
+    intro_black -= dt;
+    if (intro_black < 0.f) intro_black = 0.f;
+    return;
+  }
   galaxy_age += dt;
   if (galaxy_phase == 0) {
     galaxy_stars_drawn = (int)(galaxy_age * GALAXY_STARS_PER_SEC);
@@ -810,7 +845,7 @@ static void update_intro(float dt) {
     if (galaxy_shells_peeled > total) galaxy_shells_peeled = total;
     if (galaxy_shells_peeled >= total) {
       galaxy_phase = 2;
-      reveal_player_and_clone();
+      reveal_player_center();
       G->mode = MODE_PLAY;
     }
   }
@@ -900,54 +935,67 @@ static void draw_burst_rays(uint8_t *rgb) {
 
 static void update_play(game_t *g, float dt) {
   t_accum += dt;
-  if (!player_vis) return;
 
-  if (burst.active) {
-    update_burst(dt);
-    /* Player can still move during burst; no foes to fight. */
+  if (death_linger > 0.f) {
+    death_linger -= dt;
+    if (death_linger <= 0.f) {
+      death_linger = 0.f;
+      if (ships_left <= 0) {
+        G->mode = MODE_DEAD;
+        return;
+      }
+      start_respawn_intro();
+      return;
+    }
   }
 
-  float speed = 70.f;
-  float dx = g->pad_move_x;
-  float dy = g->pad_move_y;
-  /* SDL scancodes: A=4 D=7 W=26 S=22 Left=80 Right=79 Up=82 Down=81 Space=44 */
-  if (key_down(g, 4) || key_down(g, 80)) dx -= 1;
-  if (key_down(g, 7) || key_down(g, 79)) dx += 1;
-  if (key_down(g, 26) || key_down(g, 82)) dy -= 1;
-  if (key_down(g, 22) || key_down(g, 81)) dy += 1;
-  if (dx > 1.f) dx = 1.f;
-  if (dx < -1.f) dx = -1.f;
-  if (dy > 1.f) dy = 1.f;
-  if (dy < -1.f) dy = -1.f;
-  float move_mag = hypotf(dx, dy);
-  if (move_mag > 0.18f) {
-    player_x += (dx / move_mag) * speed * dt * fminf(1.f, move_mag);
-    player_y += (dy / move_mag) * speed * dt * fminf(1.f, move_mag);
-  }
-  if (player_x < 12) player_x = 12;
-  if (player_x > FB_W - 12) player_x = FB_W - 12;
-  if (player_y < 28) player_y = 28;
-  if (player_y > FB_H - 12) player_y = FB_H - 12;
+  if (burst.active) update_burst(dt);
 
-  float aim_mag = hypotf(g->pad_aim_x, g->pad_aim_y);
-  float aim;
-  int stick_aim = aim_mag > 0.28f;
-  if (stick_aim)
-    aim = atan2f(g->pad_aim_y, g->pad_aim_x);
-  else
-    aim = atan2f(g->mouse_y - player_y, g->mouse_x - player_x);
-  fire_cd -= dt;
-  int fire = g->mouse_down || g->pad_fire || stick_aim || key_down(g, 44) || key_down(g, 14);
-  if (!burst.active && fire && fire_cd <= 0 && n_bullets < MAX_BULLETS) {
-    fire_cd = FIRE_COOLDOWN;
-    float sp = 160.f;
-    float c = cosf(aim), s = sinf(aim);
-    bullet_t *b = &bullets[n_bullets++];
-    b->x = player_x + c * BULLET_MUZZLE;
-    b->y = player_y + s * BULLET_MUZZLE;
-    b->vx = c * sp;
-    b->vy = s * sp;
-    b->life = 1.f; /* flag only — travel until playfield edge (or hit) */
+  /* Player control / fire only while alive. */
+  if (player_vis && !burst.active) {
+    float speed = 70.f;
+    float dx = g->pad_move_x;
+    float dy = g->pad_move_y;
+    if (key_down(g, 4) || key_down(g, 80)) dx -= 1;
+    if (key_down(g, 7) || key_down(g, 79)) dx += 1;
+    if (key_down(g, 26) || key_down(g, 82)) dy -= 1;
+    if (key_down(g, 22) || key_down(g, 81)) dy += 1;
+    if (dx > 1.f) dx = 1.f;
+    if (dx < -1.f) dx = -1.f;
+    if (dy > 1.f) dy = 1.f;
+    if (dy < -1.f) dy = -1.f;
+    float move_mag = hypotf(dx, dy);
+    if (move_mag > 0.18f) {
+      player_x += (dx / move_mag) * speed * dt * fminf(1.f, move_mag);
+      player_y += (dy / move_mag) * speed * dt * fminf(1.f, move_mag);
+    }
+    if (player_x < 12) player_x = 12;
+    if (player_x > FB_W - 12) player_x = FB_W - 12;
+    if (player_y < 28) player_y = 28;
+    if (player_y > FB_H - 12) player_y = FB_H - 12;
+
+    float aim_mag = hypotf(g->pad_aim_x, g->pad_aim_y);
+    float aim;
+    int stick_aim = aim_mag > 0.28f;
+    if (stick_aim)
+      aim = atan2f(g->pad_aim_y, g->pad_aim_x);
+    else
+      aim = atan2f(g->mouse_y - player_y, g->mouse_x - player_x);
+    fire_cd -= dt;
+    int fire = g->mouse_down || g->pad_fire || stick_aim || key_down(g, 44) || key_down(g, 14);
+    if (fire && fire_cd <= 0 && n_bullets < MAX_BULLETS) {
+      fire_cd = FIRE_COOLDOWN;
+      float sp = 160.f;
+      float c = cosf(aim), s = sinf(aim);
+      bullet_t *b = &bullets[n_bullets++];
+      b->x = player_x + c * BULLET_MUZZLE;
+      b->y = player_y + s * BULLET_MUZZLE;
+      b->vx = c * sp;
+      b->vy = s * sp;
+      b->life = 1.f;
+    }
+  } else {
+    fire_cd -= dt;
   }
 
   int wb = 0;
@@ -955,7 +1003,6 @@ static void update_play(game_t *g, float dt) {
     bullet_t *b = &bullets[i];
     b->x += b->vx * dt;
     b->y += b->vy * dt;
-    /* GUESS from Jamie: shots run to the playfield boundary (no mid-air timeout). */
     if (b->life > 0 && b->x >= 0 && b->x < FB_W && b->y >= 0 && b->y < FB_H)
       bullets[wb++] = *b;
   }
@@ -974,7 +1021,7 @@ static void update_play(game_t *g, float dt) {
   for (int i = 0; i < n_foes; i++)
     for (int j = i + 1; j < n_foes; j++) bounce_pair(&foes[i], &foes[j]);
   for (int i = 0; i < n_foes; i++) {
-    bounce_walls(&foes[i]); /* re-clamp after pair shove */
+    bounce_walls(&foes[i]);
     keep_gorf_speed(&foes[i]);
   }
   for (int bi = 0; bi < n_bullets; bi++) {
@@ -999,7 +1046,8 @@ static void update_play(game_t *g, float dt) {
     if (foes[i].hp > 0) foes[wf++] = foes[i];
   n_foes = wf;
 
-  if (!burst.active && n_foes == 0 && clone_vis && n_clone_jobs == 0) start_clear_burst();
+  if (!burst.active && player_vis && n_foes == 0 && clone_vis && n_clone_jobs == 0)
+    start_clear_burst();
 
   for (int i = 0; i < n_fx; i++) fx[i].hp -= dt;
   wf = 0;
@@ -1007,15 +1055,11 @@ static void update_play(game_t *g, float dt) {
     if (fx[i].hp > 0) fx[wf++] = fx[i];
   n_fx = wf;
 
-  if (!burst.active) {
+  if (!burst.active && player_vis && death_linger <= 0.f) {
     for (int i = 0; i < n_foes; i++) {
       foe_t *f = &foes[i];
       if (hypotf(f->x - player_x, f->y - player_y) < f->r + 8) {
-        ships_left -= 1;
-        spawn_bang(player_x, player_y);
-        player_x = FB_W * 0.5f;
-        player_y = FB_H * 0.5f;
-        if (ships_left <= 0) G->mode = MODE_DEAD;
+        player_destroyed();
         break;
       }
     }
@@ -1038,7 +1082,7 @@ static void draw_world(uint8_t *rgb, int with_galaxy) {
   for (int i = 0; i < n_bullets; i++) {
     bullet_t *b = &bullets[i];
     float ang = atan2f(b->vy, b->vx);
-    float len = 5.f;
+    float len = 2.5f; /* ~3–4 px streak (GUESS) */
     int x0 = pix(b->x - cosf(ang) * len);
     int y0 = pix(b->y - sinf(ang) * len);
     int x1 = pix(b->x + cosf(ang) * len);
@@ -1123,7 +1167,12 @@ void game_render(game_t *g) {
   if (g->mode == MODE_SELECT) {
     draw_select(rgb);
   } else if (g->mode == MODE_INTRO) {
-    draw_world(rgb, 1);
+    if (intro_black > 0.f) {
+      fb_clear(rgb);
+      draw_hud(rgb);
+    } else {
+      draw_world(rgb, 1); /* frozen gorfs + cloner + galaxy; no player yet */
+    }
   } else if (g->mode == MODE_PLAY) {
     draw_world(rgb, 0);
   } else {
