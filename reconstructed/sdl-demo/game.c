@@ -45,6 +45,16 @@
 #define GALAXY_STARS_PER_SEC (18.f * 30.f) /* GUESS: faster than first pass; ~7/frame felt slow vs footage */
 #define GALAXY_SHELL_PEEL_DT 0.035f
 
+/* GUESS: HUD anchors — docs/findings/hud-layout-guess.md (f00666 crop). */
+#define HUD_Y 2
+#define SCORE_RIGHT_X 50
+#define SCORE2_RIGHT_X 317
+#define P1_CX 68
+#define P2_CX 228
+#define LIFE0_CX 85
+#define LIFE_SPACING 11
+#define LIFE_CY 5
+
 typedef struct {
   float x, y, vx, vy;
   float life;
@@ -193,6 +203,16 @@ static int draw_text(uint8_t *rgb, const char *str, int x, int y, int px) {
   int cx = x;
   for (; *str; str++) cx += draw_glyph(rgb, *str, cx, y, px);
   return cx;
+}
+
+static int text_width(const char *str, int px) {
+  int n = (int)strlen(str);
+  if (n <= 0) return 0;
+  return n * (FONT_CW + 1) * px - px; /* no trailing pad */
+}
+
+static int draw_text_right(uint8_t *rgb, const char *str, int right_x, int y, int px) {
+  return draw_text(rgb, str, right_x - text_width(str, px), y, px);
 }
 
 static void draw_line(uint8_t *rgb, int x0, int y0, int x1, int y1, uint8_t r, uint8_t g,
@@ -368,39 +388,20 @@ static void draw_galaxy(uint8_t *rgb) {
 static void draw_hud(uint8_t *rgb) {
   char buf[32];
   snprintf(buf, sizeof buf, "$%d", (int)score);
-  int x = draw_text(rgb, buf, 4, 4, 1);
-  x += 4;
-  if (((int)(t_accum * 4.f) % 2) == 0) blit_named(rgb, "P1UP", x + 4, 10, 0);
-  x += 12;
-  for (int i = 0; i < ships_left; i++) blit_named(rgb, "SBASE", x + 6 + i * 10, 10, 0);
+  /* Right-aligned to fixed column — lives/P1 stay put as score grows. */
+  draw_text_right(rgb, buf, SCORE_RIGHT_X, HUD_Y, 1);
+  if (((int)(t_accum * 4.f) % 2) == 0) blit_named(rgb, "P1UP", P1_CX, LIFE_CY + 2, 0);
+  for (int i = 0; i < ships_left; i++)
+    blit_named(rgb, "SBASE", LIFE0_CX + i * LIFE_SPACING, LIFE_CY, 0);
 }
 
 static void draw_select(uint8_t *rgb) {
   fb_clear(rgb);
-  draw_text(rgb, "$8000", 8, 8, 1);
-  /* boxed 1 / 2 */
-  int box_l = 8 + 6 * 6;
-  for (int i = 0; i < FONT_CW + 4; i++) {
-    put_px(rgb, box_l + i, 6, FONT_RGB[0], FONT_RGB[1], FONT_RGB[2]);
-    put_px(rgb, box_l + i, 6 + FONT_CH + 3, FONT_RGB[0], FONT_RGB[1], FONT_RGB[2]);
-  }
-  for (int j = 0; j < FONT_CH + 4; j++) {
-    put_px(rgb, box_l, 6 + j, FONT_RGB[0], FONT_RGB[1], FONT_RGB[2]);
-    put_px(rgb, box_l + FONT_CW + 3, 6 + j, FONT_RGB[0], FONT_RGB[1], FONT_RGB[2]);
-  }
-  draw_glyph(rgb, '1', box_l + 2, 8, 1);
-
-  int box_r = FB_W - 8 - 6 * 6 - FONT_CW - 4;
-  for (int i = 0; i < FONT_CW + 4; i++) {
-    put_px(rgb, box_r + i, 6, FONT_RGB[0], FONT_RGB[1], FONT_RGB[2]);
-    put_px(rgb, box_r + i, 6 + FONT_CH + 3, FONT_RGB[0], FONT_RGB[1], FONT_RGB[2]);
-  }
-  for (int j = 0; j < FONT_CH + 4; j++) {
-    put_px(rgb, box_r, 6 + j, FONT_RGB[0], FONT_RGB[1], FONT_RGB[2]);
-    put_px(rgb, box_r + FONT_CW + 3, 6 + j, FONT_RGB[0], FONT_RGB[1], FONT_RGB[2]);
-  }
-  draw_glyph(rgb, '2', box_r + 2, 8, 1);
-  draw_text(rgb, "$4500", FB_W - 8 - 5 * 6, 8, 1);
+  /* Same top chrome as play: scores + player markers (footage GUESS). */
+  draw_text_right(rgb, "$8000", SCORE_RIGHT_X, HUD_Y, 1);
+  blit_named(rgb, "P1UP", P1_CX, LIFE_CY + 2, 0);
+  blit_named(rgb, "P2UP", P2_CX, LIFE_CY + 2, 0);
+  draw_text_right(rgb, "$4500", SCORE2_RIGHT_X, HUD_Y, 1);
 
   const char *msg1 = "SELECT 1 OR 2";
   const char *msg2 = "PLAYER GAME";
@@ -488,6 +489,34 @@ static void clone_ports(port_t *left, port_t *right) {
   right->y0 = y0;
   right->y1 = y1;
   right->exit_right = 0;
+}
+
+/* GUESS: footage — gorfs coast toward nearer yellow CLN rim (docs/findings/gorf-update-cadence.md). */
+static void steer_gorf_to_clone_port(foe_t *f) {
+  if (!clone_vis || f->cool > 0.f) return;
+  port_t L, R;
+  clone_ports(&L, &R);
+  float lx = 0.5f * (L.x0 + L.x1), ly = 0.5f * (L.y0 + L.y1);
+  float rx = 0.5f * (R.x0 + R.x1), ry = 0.5f * (R.y0 + R.y1);
+  float dl = hypotf(f->x - lx, f->y - ly);
+  float dr = hypotf(f->x - rx, f->y - ry);
+  float tx = (dl < dr) ? lx : rx;
+  float ty = (dl < dr) ? ly : ry;
+  float dx = tx - f->x, dy = ty - f->y;
+  float dist = hypotf(dx, dy);
+  if (dist < 1.f) return;
+  /* Mild seek — keep coast character, don't snap to chase. */
+  float seek = 0.35f;
+  float sp = hypotf(f->vx, f->vy);
+  if (sp < 1.f) sp = GORF_SPEED;
+  float wx = f->vx / sp, wy = f->vy / sp;
+  float sx = dx / dist, sy = dy / dist;
+  float nx = wx * (1.f - seek) + sx * seek;
+  float ny = wy * (1.f - seek) + sy * seek;
+  float nn = hypotf(nx, ny);
+  if (nn < 1e-3f) return;
+  f->vx = (nx / nn) * sp;
+  f->vy = (ny / nn) * sp;
 }
 
 static int overlaps_port(const foe_t *f, const port_t *p) {
@@ -642,6 +671,7 @@ static void update_play(game_t *g, float dt) {
   for (int i = 0; i < n_foes; i++) {
     foe_t *f = &foes[i];
     if (f->cool > 0) f->cool -= dt;
+    steer_gorf_to_clone_port(f);
     f->x += f->vx * dt;
     f->y += f->vy * dt;
     bounce_walls(f);
