@@ -21,7 +21,7 @@ Source clip: `work/video_refs/gameplay.mp4` (~163 s chopped Media Burn fullscr
 
 | Element | Evidence | Working hypothesis |
 |---------|----------|-------------------|
-| `$` + digits + `SELECT 1 OR 2 PLAYER GAME` | Clear yellow HUD on clip open | Character generator / font in **application** TERSE or Ice video ROM — dictionary noise mentions `GFONTPAT` but **no glyph file** here |
+| `$` + digits + `SELECT…` | Video; sized to **P1UP inner 6×10**; `1`/`2` from disk `P1UP`/`P2UP` | [`hud-font.md`](hud-font.md); still no `GFONTPAT` file |
 | Thin shot streaks | Always 1-px-ish lines, any angle | Hardware line / `BULLETS` verb path — `FS.XC` only has stub `: BULLETS  p-i @ -2 P-I ;` |
 | Purple life diamonds | HUD next to score | **Wrong earlier:** those are INDEX `SBi` → pattern `SBASE` (ships remaining), not a separate diamond glyph |
 | Flashing mark by score | Near `$` | INDEX `P1Ui` → `P1UP` (alternates with `NULPAT`) |

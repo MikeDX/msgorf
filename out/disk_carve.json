@@ -1,0 +1,2992 @@
+{
+  "GUESS": "carve of corrected images only \u2014 not undelete of a foreign FS",
+  "summary": {
+    "MSGORF": {
+      "blocks": 162,
+      "classes": {
+        "text": 153,
+        "pattern": 9
+      },
+      "flagged_screens": 0,
+      "keyword_hits": {},
+      "duplicate_block_groups": 1
+    },
+    "MSGORPAT": {
+      "blocks": 308,
+      "classes": {
+        "mixed": 73,
+        "load_chain": 8,
+        "binary": 44,
+        "text": 45,
+        "colon_defs": 13,
+        "pattern": 109,
+        "empty": 16
+      },
+      "flagged_screens": 85,
+      "keyword_hits": {
+        "BULLET": [
+          10,
+          45,
+          88
+        ],
+        "OBJECT-FILE": [
+          58,
+          86,
+          105
+        ],
+        "XC.LOGIC": [
+          87
+        ],
+        "FS.XCM": [
+          87
+        ],
+        "XC.VIDEO": [
+          172
+        ],
+        "PLAYER": [
+          193,
+          200,
+          201,
+          244
+        ],
+        "SCORE": [
+          193
+        ]
+      },
+      "duplicate_block_groups": 30
+    },
+    "MSGPATLD": {
+      "blocks": 308,
+      "classes": {
+        "mixed": 72,
+        "load_chain": 6,
+        "binary": 39,
+        "text": 93,
+        "colon_defs": 15,
+        "pattern": 59,
+        "empty": 24
+      },
+      "flagged_screens": 83,
+      "keyword_hits": {
+        "BULLET": [
+          10,
+          45
+        ],
+        "OBJECT-FILE": [
+          58,
+          76,
+          86
+        ],
+        "XC.LOGIC": [
+          90,
+          175
+        ],
+        "GFONTPAT": [
+          155
+        ],
+        "gfontpat": [
+          155
+        ],
+        "GFONT": [
+          155
+        ],
+        "XC.VIDEO": [
+          172
+        ],
+        "PLAYER": [
+          200,
+          201,
+          244
+        ]
+      },
+      "duplicate_block_groups": 30
+    }
+  },
+  "gfontpat_contexts": [
+    {
+      "disk": "MSGPATLD",
+      "offset": 159120,
+      "screen": 155,
+      "within": 400,
+      "window_hex": "a5002082025203980580ad1501a50020a50020b501060256adab01af002fad8847464f4e54504154cdd6847c16005bad085041545354415254cf66ad1483e60143012a83af009ead06504154454e44cf",
+      "window_ascii": ".. ..R......... .. ....V...../..GFONTPAT...|..[..PATSTART.f.....C.*......PATEND.",
+      "screen_kind": "mixed"
+    }
+  ],
+  "gameish_colon_names": {
+    "MSGORF": [],
+    "MSGORPAT": [
+      "BULLETS @ [10, 45, 88]",
+      "GORF-PAT @ [151]"
+    ],
+    "MSGPATLD": [
+      "BULLETS @ [10, 45]"
+    ]
+  },
+  "unique_to_MSGORPAT_vs_MSGPATLD": [
+    {
+      "i": 44,
+      "kind": "colon_defs",
+      "flags": [],
+      "preview": "* / 0 1 2 3 4 5 6 7 8 9 : ; < = > ? @ A B C D E F G H I J K L M N O P Q R S T U X Y /",
+      "keywords": []
+    },
+    {
+      "i": 45,
+      "kind": "colon_defs",
+      "flags": [
+        "keyword"
+      ],
+      "preview": ": BULLETS p-i @ -2 P-I ; : ENDBULL P-I ; STK> ;S c y ( Upgraded Schlocko Editor 12/14/81 ) <STKD <there <STKD Q c i a8 -",
+      "keywords": [
+        "BULLET"
+      ]
+    },
+    {
+      "i": 61,
+      "kind": "mixed",
+      "flags": [
+        "mixed_text_binary"
+      ],
+      "preview": "; V u FS XCSAVENS 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 ",
+      "keywords": []
+    },
+    {
+      "i": 62,
+      "kind": "binary",
+      "flags": [],
+      "preview": "",
+      "keywords": []
+    },
+    {
+      "i": 83,
+      "kind": "binary",
+      "flags": [],
+      "preview": "",
+      "keywords": []
+    },
+    {
+      "i": 84,
+      "kind": "binary",
+      "flags": [],
+      "preview": "n XCTERSE- ARC-TERSE@ ARCLOADT XCLOADV",
+      "keywords": []
+    },
+    {
+      "i": 86,
+      "kind": "pattern",
+      "flags": [
+        "keyword"
+      ],
+      "preview": "( LOAD BLK FOR CROSS-COMPILING ) DECIMAL FSLD FS XC xcsys xc ASM OPS MORE-BUFFERS ( allocate 2 more disk buffers ) 17 <D",
+      "keywords": [
+        "OBJECT-FILE"
+      ]
+    },
+    {
+      "i": 87,
+      "kind": "load_chain",
+      "flags": [
+        "erased_tail",
+        "keyword"
+      ],
+      "preview": "ABINLOADX XC LOGICn LLOAD FS XC\\ BINLOADZ FS XCM ^ g ^ g g ^ n ^ n ^ n ^ n ^ n ^ n ^ x x x x x x x x x x x x x x x x x x",
+      "keywords": [
+        "XC.LOGIC",
+        "FS.XCM"
+      ]
+    },
+    {
+      "i": 88,
+      "kind": "colon_defs",
+      "flags": [
+        "keyword"
+      ],
+      "preview": "FSLD FS XC xcsys xc ASM OPS MORE-BUFFERS ( allocate 2 more disk buffers ) 17 <DRIVE : BULLETS p-i @ -2 P-I ; : ENDBULL P",
+      "keywords": [
+        "BULLET"
+      ]
+    },
+    {
+      "i": 89,
+      "kind": "binary",
+      "flags": [],
+      "preview": "-> ,; UU UU ? \\ 5_ _ _ _ _ _ \\ 5 ? UU UU *; @P PP P @ @ : 0 -< @ P UT i m @ UUPUUUT /; UU UUP )= U@ U@ -? w UP U U U +< ",
+      "keywords": []
+    },
+    {
+      "i": 91,
+      "kind": "text",
+      "flags": [],
+      "preview": "* ] ^ _ ` a b c d e f g h i j k l m z { | } ~ ^",
+      "keywords": []
+    },
+    {
+      "i": 92,
+      "kind": "text",
+      "flags": [],
+      "preview": "U @ c y ( Upgraded Schlocko Editor 12/14/81 ) <STKD <there <STKD Q c i a8 \\ ge ^ | >d e *",
+      "keywords": []
+    },
+    {
+      "i": 105,
+      "kind": "mixed",
+      "flags": [
+        "mixed_text_binary",
+        "keyword"
+      ],
+      "preview": "> ROMSTART RAMSTART RSTACK PSTACK ROMHERE < RAMHERE K xcsys ' tov Z V>~) TOPDEF s XCSTATE no-restart byterse final BUF-S",
+      "keywords": [
+        "OBJECT-FILE"
+      ]
+    },
+    {
+      "i": 108,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "; V u f AT-HERE PT-HERE \" ATBL < @ 1 PBASE > ^ / 2 j n / V 2 h r K QUADPAT F BINPAT F ~ p F p PATTERN e QUAD <ANIMATION ",
+      "keywords": []
+    },
+    {
+      "i": 109,
+      "kind": "text",
+      "flags": [],
+      "preview": "o p q r s t u v w x y Z [ p p p p p p p p p p p p p",
+      "keywords": []
+    },
+    {
+      "i": 110,
+      "kind": "binary",
+      "flags": [],
+      "preview": "O W B B6B QBcB- t 0 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ ",
+      "keywords": []
+    },
+    {
+      "i": 121,
+      "kind": "mixed",
+      "flags": [
+        "mixed_text_binary"
+      ],
+      "preview": "2 C 2 R C 2 R , p p * | 2 C 2 R n p C C \" J C p * ! / blkp v @ r NULPATi < P1i < P2i < SBi < P1Ui < P2Ui < BANGAi < BANG",
+      "keywords": []
+    },
+    {
+      "i": 142,
+      "kind": "binary",
+      "flags": [],
+      "preview": "fB oB-",
+      "keywords": []
+    },
+    {
+      "i": 143,
+      "kind": "binary",
+      "flags": [],
+      "preview": "n",
+      "keywords": []
+    },
+    {
+      "i": 144,
+      "kind": "binary",
+      "flags": [],
+      "preview": "fB oB-",
+      "keywords": []
+    },
+    {
+      "i": 145,
+      "kind": "binary",
+      "flags": [],
+      "preview": "n U @ c y",
+      "keywords": []
+    },
+    {
+      "i": 146,
+      "kind": "mixed",
+      "flags": [
+        "mixed_text_binary"
+      ],
+      "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : ",
+      "keywords": []
+    },
+    {
+      "i": 147,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( ANIMATION/PATTERN MAP FILE - BELONGS TO KASEY AND JAN ) NULPAT NULPATi AT! PLY1-P P1i AT! PLY2-P P2i AT! SBASE SBi AT!",
+      "keywords": []
+    },
+    {
+      "i": 148,
+      "kind": "text",
+      "flags": [],
+      "preview": "( MORE MAP ASSIGNMENTS ) GORF-PAT GORFi AT! LAZON LAZONi AT! SPINV KAMIi AT! SMINE SMINEi AT! SHLD-P SHLDi AT! MITE-P MI",
+      "keywords": []
+    },
+    {
+      "i": 149,
+      "kind": "load_chain",
+      "flags": [],
+      "preview": "RMNDEX TABLE ) FLOAD ANIM-MAP -->",
+      "keywords": []
+    },
+    {
+      "i": 150,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "INSTRUCTIONS FOR MODIFYING PATTERNS CREATE PATTERNS AND ANIMATION TABLES USING THE ANIMATION TOOLS INSERT 'FLOAD' COMMAN",
+      "keywords": []
+    },
+    {
+      "i": 151,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "AN 'INDEX CONSTANT' IS A SPECIAL NAME THAT JAY'S PROGRAM USES TO REFER TO YOUR ANIMATION BY UPDATING YOUR 'ANIM-MAP' FIL",
+      "keywords": []
+    },
+    {
+      "i": 152,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "THE FILE 'ANIM-MAP' CONTAINS A LIST OF LINES LIKE THE ONE SHOWN IN THE EXAMPLE IT IS VERY IMPORTANT THAT THE FOLLOWING M",
+      "keywords": []
+    },
+    {
+      "i": 153,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "XCLOADV XC PATTERNSn PAT-LOAD BLANK FS XC- ANIM-VERBS KAMI-P PATTERN CODE-LOAD MEMV SMINE-P INDEX DCOP PLY-P PLUP BANG C",
+      "keywords": []
+    },
+    {
+      "i": 155,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "OTHER MISTAKES YOU MAY MAKE ARE RUNNING OUT OF MEMORY SPACE OR OVERFLOWING THE DISK DIRECTORY IF YOU RUN OUT OF SPACE TA",
+      "keywords": []
+    },
+    {
+      "i": 156,
+      "kind": "binary",
+      "flags": [],
+      "preview": "",
+      "keywords": []
+    },
+    {
+      "i": 158,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( table verbs ) <STKH ( PATTERN MEMORY GOODIES ) { : <ANIMATION } HERE AT-HERE ! PT-HERE @ DP ! { ; } { : ANIMATION> } H",
+      "keywords": []
+    },
+    {
+      "i": 159,
+      "kind": "colon_defs",
+      "flags": [],
+      "preview": "( table verbs ) <STKH { V= SPMARK } { BV= ETYPE } { BV= ESIZE } ( 2, or 3 bytes ) { V= IDX } { V= CNT } { BV= TTYPE } { ",
+      "keywords": []
+    },
+    {
+      "i": 161,
+      "kind": "text",
+      "flags": [],
+      "preview": "( table verbs cont ) IDX { @ 2- } U! ESIZE { B@ MINUS } IDX { +! } ESIZE { B@ 2 <> IF } IDX { @ } UB! { THEN } ESIZE { B",
+      "keywords": []
+    },
+    {
+      "i": 170,
+      "kind": "text",
+      "flags": [],
+      "preview": "( ANIM-TBL THECCZ ) <ANIM-TBL SPINV COMC5 8 COMC5A 8 COMC5B 8 COMC6 8 TBL> -->",
+      "keywords": []
+    },
+    {
+      "i": 171,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "FLOAD PATTERN FLOAD ANIM-VERBS FLOAD INIT-AT -->",
+      "keywords": []
+    },
+    {
+      "i": 173,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( INITIALIZE ANIMATION TABLE WITH POINTERS TO BLOCK PATTERN ) PATTERN blkp HEX 0 B, 0 B, 1 B, 4 B, 11 B, 22 B, 33 B, FFF",
+      "keywords": []
+    },
+    {
+      "i": 174,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "~ 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 111",
+      "keywords": []
+    },
+    {
+      "i": 175,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "~ 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 2211 2211 1111 1111 1111 1111 1111 1111 1111 1111 111",
+      "keywords": []
+    },
+    {
+      "i": 176,
+      "kind": "text",
+      "flags": [],
+      "preview": "",
+      "keywords": []
+    },
+    {
+      "i": 177,
+      "kind": "load_chain",
+      "flags": [],
+      "preview": "FLOAD NULPAT FLOAD PLY-P FLOAD PLUP FLOAD BANG FLOAD CLONE-P -->",
+      "keywords": []
+    },
+    {
+      "i": 180,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( PATTERN MEMORY GOODIES ) HEX ( { : <ANIMATION } HERE AT-HERE ! PT-HERE @ DP ! { ; } ) ( { : ANIMATION> } HERE PT-HERE ",
+      "keywords": []
+    },
+    {
+      "i": 184,
+      "kind": "text",
+      "flags": [],
+      "preview": "( ANIM-TBL THESMINE ) <ANIM-TBL SMINE SMINE0 6 SMINE1 6 TBL> -->",
+      "keywords": []
+    },
+    {
+      "i": 192,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( MORE INDEX NUMBERS ) NC= GORFi ( GORF ANIMATION ) NC= LAZONi ( LASER SHIP ANIMATION ) NC= KAMIi ( KAMIKAZI ANIMATION )",
+      "keywords": []
+    },
+    {
+      "i": 193,
+      "kind": "pattern",
+      "flags": [
+        "keyword"
+      ],
+      "preview": "( PATTERN INDEX NUMBERS -- THIS FILE COMES FROM JAY ) 0 SC= NULPATi ( NULL PATTERN ) NC= P1i ( PLAYER ONE'S SHIP ) NC= P",
+      "keywords": [
+        "PLAYER",
+        "SCORE"
+      ]
+    },
+    {
+      "i": 197,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "~ 2220 0333 3300 2220 ^ ~ 2220 0022 2000 2220 ^ STK> -->",
+      "keywords": []
+    },
+    {
+      "i": 198,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( SMALL FIREBASE PATTERN INDICATING REMAINING SHIPS ) PATTERN SBASE 3 B, 4 B, 2 B, 8 B, HEX 15 B, 26 B, 37 B, DECIMAL QU",
+      "keywords": []
+    },
+    {
+      "i": 199,
+      "kind": "binary",
+      "flags": [],
+      "preview": "M M q Z [ i 5 }P T 9",
+      "keywords": []
+    },
+    {
+      "i": 223,
+      "kind": "text",
+      "flags": [],
+      "preview": "",
+      "keywords": []
+    },
+    {
+      "i": 225,
+      "kind": "text",
+      "flags": [],
+      "preview": "",
+      "keywords": []
+    },
+    {
+      "i": 229,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "~ 0000 3333 3333 0000 ^ ~ 0000 1111 1111 0000 ^ ~ 0000 1111 1111 0000 ^ STK> -->",
+      "keywords": []
+    },
+    {
+      "i": 231,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( Pattern MITE-P ) <STKD PATTERN MITE-P 5 B, 5 B, 3 B, 11 B, HEX 19 B, 2A B, 3B B, DECIMAL QUADPAT ~ 0001 0010 0000 ^ ~ ",
+      "keywords": []
+    },
+    {
+      "i": 233,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( Pattern TRION-P ) <STKD PATTERN TRION-P 8 B, 4 B, 4 B, 8 B, HEX 1E B, 2D B, 3C B, DECIMAL QUADPAT ~ 0000 0001 0000 000",
+      "keywords": []
+    },
+    {
+      "i": 235,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( Pattern DEB-P ) <STKD PATTERN DEB-P 8 B, 3 B, 4 B, 7 B, HEX 19 B, 2F B, 3B B, DECIMAL QUADPAT ~ 0001 1111 1111 0000 ^ ",
+      "keywords": []
+    },
+    {
+      "i": 237,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( Pattern HK-P ) <STKD PATTERN HK-P 6 B, 5 B, 3 B, 10 B, HEX 1E B, 29 B, 3D B, DECIMAL QUADPAT ~ 0003 3330 0000 ^ ~ 0012",
+      "keywords": []
+    },
+    {
+      "i": 239,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( Pattern GB-P ) <STKD PATTERN GB-P 6 B, 5 B, 3 B, 10 B, HEX 1A B, 2D B, 3F B, DECIMAL QUADPAT ~ 0000 3130 0000 ^ ~ 0003",
+      "keywords": []
+    },
+    {
+      "i": 241,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( Pattern GRD-P ) <STKD PATTERN GRD-P 6 B, 5 B, 3 B, 10 B, HEX 1A B, 2B B, 3C B, DECIMAL QUADPAT ~ 0001 1100 0000 ^ ~ 00",
+      "keywords": []
+    },
+    {
+      "i": 243,
+      "kind": "text",
+      "flags": [],
+      "preview": "( EXPLOSION ANIM TABLE FOR GORFS ) <ANIM-TBL BANGA FBEXP1 2 FBEXP4 2 FBEXP2 2 FBEXP3 2 FBEXP5 2 FBEXP6 2 NULPAT 120 TBL>",
+      "keywords": []
+    },
+    {
+      "i": 244,
+      "kind": "text",
+      "flags": [
+        "keyword"
+      ],
+      "preview": "( EXPLOSION ANIM TABLE FOR PLAYER ) <ANIM-TBL BANGP FBEXP1 8 FBEXP4 8 FBEXP2 8 FBEXP3 8 FBEXP5 8 FBEXP6 8 NULPAT 120 TBL",
+      "keywords": [
+        "PLAYER"
+      ]
+    },
+    {
+      "i": 245,
+      "kind": "text",
+      "flags": [],
+      "preview": "( CLONE ROTATION TABLE ) <ROT-TBL CLONETBL CLN0 NORMAL CLN32 FLOP CLN64 FLOP CLN32 FLIP-FLOP CLN0 FLIP CLN32 FLIP CLN64 ",
+      "keywords": []
+    },
+    {
+      "i": 249,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( NULLPATS AND NEAT BIT ROUTINES ) DECIMAL PATTERN NULPAT 0 B, 0 B, 1 B, 1 B, HEX 10 B, 20 B, 30 B, DECIMAL 0 B, ;S",
+      "keywords": []
+    },
+    {
+      "i": 251,
+      "kind": "colon_defs",
+      "flags": [],
+      "preview": "-> ,; UU UU ? \\ 5_ _ _ _ _ _ \\ 5 ? UU UU *; @P PP P @ @ : 0 -< @ P UT i m @ UUPUUUT /; UU UUP )= U@ U@ -? w UP U U U +< ",
+      "keywords": []
+    },
+    {
+      "i": 252,
+      "kind": "mixed",
+      "flags": [
+        "mixed_text_binary"
+      ],
+      "preview": "UUUUUUUUUZ UUUUUUUUUUUUUUUUUj UUUUUUUUUUUUUUUUUUUUUUUUUUUUUZ T UUUUUUUUUUUUiUUUU UUUUUUUUUUUUUeeUUUUUUUUUUUUUUZUUT UUUUU",
+      "keywords": []
+    },
+    {
+      "i": 253,
+      "kind": "mixed",
+      "flags": [
+        "mixed_text_binary"
+      ],
+      "preview": "UUUUUU j jUUUUUUUV UUUUUUV UUUUUUUUUUUU UUUUUUUUUUUUV j Uj UUUUV UUUUUUUUeUUUUUUUUUUUV UUUUUUUUUUUUV V UUUV UUUUUUUUUUUU",
+      "keywords": []
+    },
+    {
+      "i": 259,
+      "kind": "binary",
+      "flags": [],
+      "preview": "\"3 0 &7 5p _ _ PW TW TW P _ | ? &7 5p _ U T QW P _ | ? &7 5p x ( ( &7UUT P P T T T T T @ @ UU &7UUP @ AAUAU T PUAU@ @ UU",
+      "keywords": []
+    },
+    {
+      "i": 260,
+      "kind": "binary",
+      "flags": [],
+      "preview": "? \" ? W W W _ _ ? ? ? ? ? ? ? ? ? ? ? T T @ ? T T @ ? ? P @ ? UUUP UUUP ? ? ? ? UUUP UUUP *<@ @ ? 5 [ g / # ,= ? | ?> ? ",
+      "keywords": []
+    },
+    {
+      "i": 261,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "~ 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 2222 2211 1221 1111 1111 1111 1111 1111 1111 1111 111",
+      "keywords": []
+    },
+    {
+      "i": 262,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "~ 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1112 2222 2220 1111 1111 1111 1111 1111 1111 1111 1111 111",
+      "keywords": []
+    },
+    {
+      "i": 263,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "~ 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 2222 2222 1111 1111 1111 1111 1111 1111 1111 1111 111",
+      "keywords": []
+    },
+    {
+      "i": 264,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "~ 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 2222 2222 2111 2222 2211 1111 2111 1111 1111 1111 111",
+      "keywords": []
+    },
+    {
+      "i": 265,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "~ 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1112 2222 2222 2211 1222 2222 2211 1111 1222 2221 1111 111",
+      "keywords": []
+    },
+    {
+      "i": 266,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "~ 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1112 2222 2222 2222 2222 2222 2111 2222 2222 2222 2211 111",
+      "keywords": []
+    },
+    {
+      "i": 267,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "~ 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1112 2222 2222 2222 2222 2222 2222 2222 2222 2222 2222 111",
+      "keywords": []
+    },
+    {
+      "i": 268,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "~ 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1122 2222 2222 2222 2222 2222 2222 2222 2222 2222 2222 222",
+      "keywords": []
+    },
+    {
+      "i": 269,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "~ 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1112 2222 2222 2222 2222 2222 2222 2222 2222 2222 2222 222",
+      "keywords": []
+    },
+    {
+      "i": 270,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "~ 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 2222 2222 2222 2222 2222 2222 2222 2222 2222 2222 201",
+      "keywords": []
+    },
+    {
+      "i": 271,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "~ 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 2222 2222 2222 2222 2222 2222 2222 2222 2222 2222 211",
+      "keywords": []
+    },
+    {
+      "i": 272,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "~ 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 2222 2222 2222 2222 2222 2222 2222 2222 2222 2222 222",
+      "keywords": []
+    },
+    {
+      "i": 273,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "~ 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 2222 2222 2222 2222 2222 2222 2222 2222 2222 2222 222",
+      "keywords": []
+    },
+    {
+      "i": 274,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "~ 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1112 2222 2222 2222 2222 2222 2222 2222 2222 2222 2222 211",
+      "keywords": []
+    }
+  ],
+  "unique_to_MSGPATLD_vs_MSGORPAT": [
+    {
+      "i": 44,
+      "kind": "colon_defs",
+      "flags": [],
+      "preview": "/ 0 1 2 3 4 5 6 7 8 9 : ; < = > / @ A B C D E F G H I J K L M N O P Q R S T U X Y /",
+      "keywords": []
+    },
+    {
+      "i": 45,
+      "kind": "colon_defs",
+      "flags": [
+        "keyword"
+      ],
+      "preview": ": BULLETS p-i @ -2 P-I ; : ENDBULL P-I ; STK> ;S c y ( Upgraded Schlocko Editor 12/14/81 ) <STKD <there <STKD Q c i a8 -",
+      "keywords": [
+        "BULLET"
+      ]
+    },
+    {
+      "i": 61,
+      "kind": "mixed",
+      "flags": [
+        "mixed_text_binary"
+      ],
+      "preview": "; V u FS XCVEVENS 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 ",
+      "keywords": []
+    },
+    {
+      "i": 62,
+      "kind": "binary",
+      "flags": [],
+      "preview": "* @ A B C D E F G H I J K L M N O P Q R S T U X Y \\ ] ^ _ ` a b c d e f g h i j k l m",
+      "keywords": []
+    },
+    {
+      "i": 63,
+      "kind": "binary",
+      "flags": [],
+      "preview": "@ c y ( Upgraded Schlocko Editor 12/14/81 ) <STKD <there <STKD Q c i a8 ? ge ^ | >d e c *",
+      "keywords": []
+    },
+    {
+      "i": 76,
+      "kind": "mixed",
+      "flags": [
+        "mixed_text_binary",
+        "keyword"
+      ],
+      "preview": "> ROMSTART RAMSTART RSTACK PSTACK ROMHERE < RAMHERE K xcsys ' tov Z V>~) TOPDEF s XCSTATE no-restart byterse final BUF-S",
+      "keywords": [
+        "OBJECT-FILE"
+      ]
+    },
+    {
+      "i": 79,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "; V u f PT-HERE ATBL < @ \" PBASE / ^ / 2 [ _ / G 2 y } h c < QUADPAT 7 BINPAT 7 ~ p 7 p PATTERN e QUAD NC= SC= UB@ p C 6",
+      "keywords": []
+    },
+    {
+      "i": 80,
+      "kind": "mixed",
+      "flags": [
+        "mixed_text_binary"
+      ],
+      "preview": "C p * <ANIMATION p ANIMATION> , AT! ) * F NULPATi < W P1i < g P2i < s SBi < P1Ui < P2Ui < BANGAi < BANGPi < CLNi < GORFi",
+      "keywords": []
+    },
+    {
+      "i": 86,
+      "kind": "pattern",
+      "flags": [
+        "keyword"
+      ],
+      "preview": "( LOAD BLK FOR CROSS-COMPILING ) DECIMAL FSLD FS XC xcsys xc ASM OPS MORE-BUFFERS ( allocate 2 more disk buffers ) OBJEC",
+      "keywords": [
+        "OBJECT-FILE"
+      ]
+    },
+    {
+      "i": 89,
+      "kind": "text",
+      "flags": [],
+      "preview": "[",
+      "keywords": []
+    },
+    {
+      "i": 90,
+      "kind": "colon_defs",
+      "flags": [
+        "keyword"
+      ],
+      "preview": "( Load the Binary from a Xcompile Game File ) : BINLOAD [ EDIT ] FILE TERSE UNPROT 10 00 DO I BLOCK I 400 * 4000 + 400 B",
+      "keywords": [
+        "XC.LOGIC"
+      ]
+    },
+    {
+      "i": 105,
+      "kind": "binary",
+      "flags": [],
+      "preview": "fB oB N",
+      "keywords": []
+    },
+    {
+      "i": 106,
+      "kind": "binary",
+      "flags": [],
+      "preview": "n j",
+      "keywords": []
+    },
+    {
+      "i": 107,
+      "kind": "binary",
+      "flags": [],
+      "preview": "fB oB N ? * @ A B C D E F G H I J K L M N O P Q R S T U X",
+      "keywords": []
+    },
+    {
+      "i": 108,
+      "kind": "binary",
+      "flags": [],
+      "preview": "Y \\ ] ^ _ ` a b c d e f g h i j k l m @ c y",
+      "keywords": []
+    },
+    {
+      "i": 109,
+      "kind": "text",
+      "flags": [],
+      "preview": "o p q r s t u v w x y z { | } ~ p",
+      "keywords": []
+    },
+    {
+      "i": 110,
+      "kind": "binary",
+      "flags": [],
+      "preview": "K B B6Bz QBcB % M t Y _ x B Y _ x B S @: @s : S : s : 9 d TB fB",
+      "keywords": []
+    },
+    {
+      "i": 126,
+      "kind": "binary",
+      "flags": [],
+      "preview": "0 &7 5p _ _ PW TW TW P _ | ? &7 5p _ U T QW P _ | ? &7 5p x ( ( &7UUT P P T T T T T @ @ UU &7UUP @ AAUAU T PUAU@ @ UU *;",
+      "keywords": []
+    },
+    {
+      "i": 127,
+      "kind": "binary",
+      "flags": [],
+      "preview": "? \" ? W W W _ _ ? ? ? ? ? ? ? ? ? ? ? T T @ ? T T @ ? ? P @ ? UUUP UUUP ? ? ? ? UUUP UUUP *<@ @ ? 5 [ g / # ,= ? | ?> ? ",
+      "keywords": []
+    },
+    {
+      "i": 128,
+      "kind": "mixed",
+      "flags": [
+        "mixed_text_binary"
+      ],
+      "preview": "<ANIMATION p ANIMATION> , AT! ) * F NULPATi < W P1i < g P2i < s SBi < P1Ui < P2Ui < BANGAi < BANGPi < CLNi < GORFi < LAZ",
+      "keywords": []
+    },
+    {
+      "i": 129,
+      "kind": "colon_defs",
+      "flags": [],
+      "preview": "( DUMMY STUF ) : <ANIMATION ; : ANIMATION> ; : AT! 2DROP ; -->",
+      "keywords": []
+    },
+    {
+      "i": 133,
+      "kind": "text",
+      "flags": [],
+      "preview": "( ANIM-TBL THECCZ ) <ANIMATION <ANIM-TBL SPINV COMC5 8 COMC5A 8 COMC5B 8 COMC6 8 TBL> ANIMATION> SPINV KAMIi AT! -->",
+      "keywords": []
+    },
+    {
+      "i": 149,
+      "kind": "binary",
+      "flags": [],
+      "preview": "fB oB N",
+      "keywords": []
+    },
+    {
+      "i": 150,
+      "kind": "binary",
+      "flags": [],
+      "preview": "n",
+      "keywords": []
+    },
+    {
+      "i": 151,
+      "kind": "binary",
+      "flags": [],
+      "preview": "fB oB N * ] ^ _ ` a b c d e f g h i j k l m",
+      "keywords": []
+    },
+    {
+      "i": 152,
+      "kind": "text",
+      "flags": [],
+      "preview": "^ @ c y",
+      "keywords": []
+    },
+    {
+      "i": 153,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "XCLOADV XC PATTERNSn LLOAD BINLOADZ PAT-LOAD BLANK TESTPAT ANIM-VERBS KAMI-P PATTERN CODE-LOAD MEMV SMINE-P INDEX DCOP P",
+      "keywords": []
+    },
+    {
+      "i": 155,
+      "kind": "mixed",
+      "flags": [
+        "mixed_text_binary",
+        "keyword"
+      ],
+      "preview": "FLIP-FLOP-ON FLIP-FLOP-OFF MAGIC! - SELF < 1STWRITE I SLEEP? Z ACTIVE? revdy v & y revdx v 6 i REVDLIM F TIMEBSCALE! g T",
+      "keywords": [
+        "GFONTPAT",
+        "gfontpat",
+        "GFONT"
+      ]
+    },
+    {
+      "i": 156,
+      "kind": "text",
+      "flags": [],
+      "preview": "DATA NERD 0 B, 0 B, -->",
+      "keywords": []
+    },
+    {
+      "i": 158,
+      "kind": "colon_defs",
+      "flags": [],
+      "preview": "( table verbs ) <STKH { : NC= } 1+ DUP C= { ; } { : SC= } DUP C= { ; } { : UB@ } ( ADDR DATA ) DP { @ SWAP } DP { ! } di",
+      "keywords": []
+    },
+    {
+      "i": 159,
+      "kind": "colon_defs",
+      "flags": [],
+      "preview": "( table verbs ) <STKH { V= SPMARK } { BV= ETYPE } { BV= ESIZE } ( 2, or 3 bytes ) { V= IDX } { V= CNT } { BV= TTYPE } { ",
+      "keywords": []
+    },
+    {
+      "i": 161,
+      "kind": "text",
+      "flags": [],
+      "preview": "( table verbs cont ) IDX { @ 2- } U! ESIZE { B@ MINUS } IDX { +! } ESIZE { B@ 2 <> IF } IDX { @ } UB! { THEN } ESIZE { B",
+      "keywords": []
+    },
+    {
+      "i": 170,
+      "kind": "text",
+      "flags": [],
+      "preview": "( ANIM-TBL THECCZ ) <ANIMATION <ANIM-TBL SPINV COMC5 8 COMC5A 8 COMC5B 8 COMC6 8 TBL> ANIMATION> SPINV KAMIi AT! -->",
+      "keywords": []
+    },
+    {
+      "i": 171,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "FLOAD PATTERN FLOAD ANIM-VERBS FLOAD MEMV -->",
+      "keywords": []
+    },
+    {
+      "i": 173,
+      "kind": "text",
+      "flags": [],
+      "preview": "",
+      "keywords": []
+    },
+    {
+      "i": 174,
+      "kind": "text",
+      "flags": [],
+      "preview": "( Load the Binary from a Xcompile Game File ) HEX BFD7 DP ! C004 C= XFRFLG C005 C= XFRADR SUBR RESET DI, C007 JMP, NOP, ",
+      "keywords": []
+    },
+    {
+      "i": 175,
+      "kind": "colon_defs",
+      "flags": [
+        "keyword"
+      ],
+      "preview": "( Load the Binary from a Xcompile Game File ) CODE CRASHER A XRA, 0CC OUT, 0 JMP, NEXT : LLOAD [ EDIT ] FILE TERSE XFRFL",
+      "keywords": [
+        "XC.LOGIC"
+      ]
+    },
+    {
+      "i": 176,
+      "kind": "text",
+      "flags": [],
+      "preview": "",
+      "keywords": []
+    },
+    {
+      "i": 177,
+      "kind": "load_chain",
+      "flags": [],
+      "preview": "FLOAD INDEX FLOAD NULPAT FLOAD PLY-P FLOAD PLUP FLOAD BANG FLOAD CLONE-P -->",
+      "keywords": []
+    },
+    {
+      "i": 180,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( PATTERN MEMORY GOODIES ) HEX { : <ANIMATION } HERE PT-HERE @ DP ! { ; } { : ANIMATION> } HERE PT-HERE ! DP ! { ; } { :",
+      "keywords": []
+    },
+    {
+      "i": 184,
+      "kind": "text",
+      "flags": [],
+      "preview": "( ANIM-TBL THESMINE ) <ANIMATION <ANIM-TBL SMINE SMINE0 6 SMINE1 6 TBL> ANIMATION> SMINE SMINEi AT! -->",
+      "keywords": []
+    },
+    {
+      "i": 192,
+      "kind": "text",
+      "flags": [],
+      "preview": "( MORE INDEX NUMBERS ) NC= GORFi NC= LAZONi NC= KAMIi NC= SMINEi NC= SHLDi NC= MITEi NC= TRIONi NC= DEBi NC= HKi NC= GBi",
+      "keywords": []
+    },
+    {
+      "i": 193,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( PATTERN INDEX NUMBERS ) 0 SC= NULPATi NC= P1i NC= P2i NC= SBi NC= P1Ui NC= P2Ui NC= BANGAi NC= BANGPi NC= CLNi -->",
+      "keywords": []
+    },
+    {
+      "i": 197,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "~ 2220 0333 3300 2220 ^ ~ 2220 0022 2000 2220 ^ STK> PLY1-P P1i AT! PLY2-P P2i AT! -->",
+      "keywords": []
+    },
+    {
+      "i": 198,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( SMALL FIREBASE PATTERN INDICATING REMAINING SHIPS ) PATTERN SBASE 3 B, 4 B, 2 B, 8 B, HEX 15 B, 26 B, 37 B, DECIMAL QU",
+      "keywords": []
+    },
+    {
+      "i": 199,
+      "kind": "binary",
+      "flags": [],
+      "preview": "M M q Z [ i 5 }P T 9",
+      "keywords": []
+    },
+    {
+      "i": 223,
+      "kind": "text",
+      "flags": [],
+      "preview": "",
+      "keywords": []
+    },
+    {
+      "i": 225,
+      "kind": "text",
+      "flags": [],
+      "preview": "",
+      "keywords": []
+    },
+    {
+      "i": 229,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "~ 0000 3333 3333 0000 ^ ~ 0000 1111 1111 0000 ^ ~ 0000 1111 1111 0000 ^ STK> SHLD-P SHLDi AT! -->",
+      "keywords": []
+    },
+    {
+      "i": 231,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( Pattern MITE-P ) <STKD PATTERN MITE-P 5 B, 5 B, 3 B, 11 B, HEX 19 B, 2A B, 3B B, DECIMAL QUADPAT ~ 0001 0010 0000 ^ ~ ",
+      "keywords": []
+    },
+    {
+      "i": 233,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( Pattern TRION-P ) <STKD PATTERN TRION-P 8 B, 4 B, 4 B, 8 B, HEX 1E B, 2D B, 3C B, DECIMAL QUADPAT ~ 0000 0001 0000 000",
+      "keywords": []
+    },
+    {
+      "i": 235,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( Pattern DEB-P ) <STKD PATTERN DEB-P 8 B, 3 B, 4 B, 7 B, HEX 19 B, 2F B, 3B B, DECIMAL QUADPAT ~ 0001 1111 1111 0000 ^ ",
+      "keywords": []
+    },
+    {
+      "i": 237,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( Pattern HK-P ) <STKD PATTERN HK-P 6 B, 5 B, 3 B, 10 B, HEX 1E B, 29 B, 3D B, DECIMAL QUADPAT ~ 0003 3330 0000 ^ ~ 0012",
+      "keywords": []
+    },
+    {
+      "i": 239,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( Pattern GB-P ) <STKD PATTERN GB-P 6 B, 5 B, 3 B, 10 B, HEX 1A B, 2D B, 3F B, DECIMAL QUADPAT ~ 0000 3130 0000 ^ ~ 0003",
+      "keywords": []
+    },
+    {
+      "i": 241,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( Pattern GRD-P ) <STKD PATTERN GRD-P 6 B, 5 B, 3 B, 10 B, HEX 1A B, 2B B, 3C B, DECIMAL QUADPAT ~ 0001 1100 0000 ^ ~ 00",
+      "keywords": []
+    },
+    {
+      "i": 243,
+      "kind": "text",
+      "flags": [],
+      "preview": "( EXPLOSION ANIM TABLE FOR GORFS ) <ANIMATION <ANIM-TBL BANGA FBEXP1 2 FBEXP4 2 FBEXP2 2 FBEXP3 2 FBEXP5 2 FBEXP6 2 NULP",
+      "keywords": []
+    },
+    {
+      "i": 244,
+      "kind": "text",
+      "flags": [
+        "keyword"
+      ],
+      "preview": "( EXPLOSION ANIM TABLE FOR PLAYER ) <ANIMATION <ANIM-TBL BANGP FBEXP1 8 FBEXP4 8 FBEXP2 8 FBEXP3 8 FBEXP5 8 FBEXP6 8 NUL",
+      "keywords": [
+        "PLAYER"
+      ]
+    },
+    {
+      "i": 245,
+      "kind": "text",
+      "flags": [],
+      "preview": "( CLONE ROTATION TABLE ) <ANIMATION <ROT-TBL CLONETBL CLN0 NORMAL CLN32 FLOP CLN64 FLOP CLN32 FLIP-FLOP CLN0 FLIP CLN32 ",
+      "keywords": []
+    },
+    {
+      "i": 249,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( NULLPATS AND NEAT BIT ROUTINES ) DECIMAL PATTERN NULPAT 0 B, 0 B, 1 B, 1 B, HEX 10 B, 20 B, 30 B, DECIMAL 0 B, NULPAT ",
+      "keywords": []
+    },
+    {
+      "i": 251,
+      "kind": "binary",
+      "flags": [],
+      "preview": "_ _ _ _ \\ 5 ? UU UU *; @P PP P @ @ : 0 -< @ P UT i m @ UUPUUUT /; UU UUP )= U@ U@ -? w UP U U U +< P U UU@ UU@UU@UU@*",
+      "keywords": []
+    },
+    {
+      "i": 261,
+      "kind": "text",
+      "flags": [],
+      "preview": "",
+      "keywords": []
+    },
+    {
+      "i": 262,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( MERGE CROSS COMPILE DATA INTO LOGIC AND VIDEO OBJECT ) HEX 0A000 C= TBUF DECIMAL CODE LDIR EXX, B POP, D POP, H POP, L",
+      "keywords": []
+    },
+    {
+      "i": 263,
+      "kind": "text",
+      "flags": [],
+      "preview": "( table verbs cont ) IDX { @ 2- } U! ESIZE { B@ MINUS } IDX { +! } ESIZE { B@ 2 <> IF } IDX { @ } UB! { THEN } ESIZE { B",
+      "keywords": []
+    },
+    {
+      "i": 264,
+      "kind": "pattern",
+      "flags": [],
+      "preview": "( ANIM!-ON ) <STKH CODE ANIM! ( table or pattern --- ) ( if pattern resets anim bits else sets anim bits ) ( if 3rd byte",
+      "keywords": []
+    },
+    {
+      "i": 265,
+      "kind": "text",
+      "flags": [],
+      "preview": "0 D BIT, 0<>, IF, ( 3 ) ( anim ) 0 VANIMINX Y MVIX, 3 D BIT, 0<>, IF, ( 4 ) ( animmag ) VMAGIC Y A LDX, 03F ANI, M ORA, ",
+      "keywords": []
+    },
+    {
+      "i": 266,
+      "kind": "text",
+      "flags": [],
+      "preview": "<STKH CODE ANIM-OFF ( --- ; turn animation off ) vaddr LHLD, VLOGICSTAT2 D LXI, D DAD, VBANIM-CHK M RES, NEXT HEX 0 C= N",
+      "keywords": []
+    }
+  ],
+  "unique_counts": {
+    "MSGORPAT_only": 113,
+    "MSGPATLD_only": 66
+  },
+  "dense_binary_screens": {
+    "MSGORF": [],
+    "MSGORPAT": [
+      {
+        "i": 178,
+        "entropy": 6.449,
+        "preview": "S S S S S R 5 o GM ~ w @ @ s 6 6 S * s * #! R * s { \" 9 # * # * ^#V # |/g}/o# z/"
+      },
+      {
+        "i": 181,
+        "entropy": 5.753,
+        "preview": ") * ~P wP sQ NL FM 5 @ 5 ^ V/ R NQ t1 u0 ^& V' R NQ t) u( * } w D g |M VM ^L gi)"
+      }
+    ],
+    "MSGPATLD": [
+      {
+        "i": 178,
+        "entropy": 6.449,
+        "preview": "S S S S S R 5 o GM ~ w @ @ s 6 6 S * s * #! R * s { \" 9 # * # * ^#V # |/g}/o# z/"
+      },
+      {
+        "i": 181,
+        "entropy": 5.753,
+        "preview": ") * ~P wP sQ NL FM 5 @ 5 ^ V/ R NQ t1 u0 ^& V' R NQ t) u( * } w D g |M VM ^L gi)"
+      }
+    ]
+  },
+  "mixed_screens": {
+    "MSGORF": [],
+    "MSGORPAT": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      6,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      46,
+      47,
+      48,
+      49,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      93,
+      94,
+      95,
+      96,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      121,
+      133,
+      134,
+      135,
+      136,
+      137,
+      138,
+      139,
+      140,
+      146,
+      157,
+      187,
+      214,
+      252,
+      253
+    ],
+    "MSGPATLD": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      6,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      46,
+      47,
+      48,
+      49,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      64,
+      65,
+      66,
+      67,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      80,
+      96,
+      97,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      128,
+      140,
+      141,
+      142,
+      143,
+      144,
+      145,
+      146,
+      147,
+      155,
+      157,
+      187,
+      214
+    ]
+  },
+  "flagged_detail": {
+    "MSGORF": [],
+    "MSGORPAT": [
+      {
+        "i": 0,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": + p + q >` ? NEXT o g p const ^#V LIT o g BLIT o& ; N # F # ALIT ~#fo ) ABLIT ~#fo 0! 1! DUP 2DUP DROP R> n # f # >R +"
+      },
+      {
+        "i": 1,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "I+ n f OVER +! ~ w#~ w 1+! % 1-! % ; SWAB ]lc H OUTP i V INP h& e ROT u PICK +)9^#V 2DROP * ! 8 x # /MOD x x/Gy/O | |/g}"
+      },
+      {
+        "i": 2,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "! BYE MON: \\= abp V & okabp T 1 err? S > ABORT*V J OKABORT*T V EXECUTE d SP@! 9 o RP@ | d-f-abptr Q s-b-ptr O s-e-abptr "
+      },
+      {
+        "i": 3,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ")= ->L { # | g} o PTSTAT \" & PTDATA 4 PLSTAT # B PLDATA ! P LITES G \" G o& *G \"G | '} & k ( p \" W( } ^ GET E PUT C GETC "
+      },
+      {
+        "i": 4,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "U* ! \" > < $ * J\" # = [ (NUMBER) a Q a | p | p 4 W : NUMBER - Q Q | Q | -2 4 4 # $ B E Q R 3 W LITERAL \" p \" Z \" PIMODE "
+      },
+      {
+        "i": 6,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "^#V#~ B ++ #~ B [r ; 6 +++ # < # | x\" _ - / O \" T \" n \" p | { { _ c ystr o& DM y\" \" n | { ,\" A\" OK O K QUERY \\ | \\ 9 k F"
+      },
+      {
+        "i": 10,
+        "kind": "colon_defs",
+        "flags": [
+          "keyword"
+        ],
+        "keywords": [
+          "BULLET"
+        ],
+        "preview": ": BULLETS p-i @ -2 P-I ; : ENDBULL P-I ; STK> ;S d< c y ( Upgraded Schlocko Editor 12/14/81 ) <STKD <there <STKD Q c i V"
+      },
+      {
+        "i": 12,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "Q Q a # 2 = [COMPILE] +! /!n R ! BLK 1! LINE 7!p K <! \"BLK T Blk= P! LIST 7! K k | C!q D k = a! DIR C C K p ( 2 !k | q D"
+      },
+      {
+        "i": 13,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "her> n X# \" ldmp K T :Q Q | # T / | B ^ A% T /= W $ HEXLIST ^ / C k W! C C k # K $ 2 % % F %\" 2 % m T% HEXSHOW C ^% % DU"
+      },
+      {
+        "i": 14,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "A= a( ( BA= s( ( R= '& ' ( RAMALLOT ( ( BR= 'G ' ) BRAMALLOT ) ) DATA '@ n /) IMMED I' ' x' x I'p ' H) : '\\ ' f) TERSE '"
+      },
+      {
+        "i": 15,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "K R , , o g , <FORK , n , FORK> n C - offl No PrinterR - hou & > # T- T-$ T- - # _ ]- W A-} ! 4- HOU ;- e- LIST l- w- dm"
+      },
+      {
+        "i": 16,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "t-alloc# - p 0 RMOVE + +x 1 0 mlength %0 0 1 $ins ! %0 ?1 / / U1 0 1 0 0 /4 /4 1 $ins-f &1 ]1 insert 2/f1 m1 INSERT 2/ &"
+      },
+      {
+        "i": 17,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "9 i4 4 LOAD C 594 / 4/ 4 5Y / 4 --> A5 0%0 2 55 }4/ / =5 /4 0S C5d 5 SCR X5 / Z5- E5 LINELOAD { { 594 / 9 4/ i4 5 / \\5 D"
+      },
+      {
+        "i": 19,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "C < REPLACE < < < < FIX K= p C p C \" 1= C < G=T No 2nd def R M=R < WCMD2 \\= } > O= VWC >Z m= CONFIG@ ? \\= & o = CONFIG! "
+      },
+      {
+        "i": 20,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "~) comvir @ crflg @ pass# @ opsflg (@ oldioff 6@ pos E@ twid P@ rst 9 p @@ @4 @ \\@ ( ) 1@p @#@p @ @p @k T ( n _ T ) @4 9"
+      },
+      {
+        "i": 21,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "C C E C D H C D L C \"D M C /D X C <D Y C ID SP C VD PSW C dD rt ~D @ sD tt D * * D gr 3Cp O B yDp { Dp B ILLEGALSC3Cp B "
+      },
+      {
+        "i": 22,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "A G PUSH, kE B H POP, kE B H XTHL, A +H SPHL, A ;H IN, &C KH OUT, &C YH EI, A hH DI, A vH RST, B H LHLD, * C H SHLD, \" C"
+      },
+      {
+        "i": 23,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "A K BITX, DEaJ B F B L SETX, DEaJ B B L RESX, DEaJ B B 6L DADX, E 2 tL ) A L A B R AZA OL DADY, E 2 L ) A L A B R AZA L "
+      },
+      {
+        "i": 24,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "A C O RRCR, 8E A C P RARR, 8E A C \"P SLAR, 8E A C 9P SRAR, 8E A ( C PP SRLR, 8E A 8 C gP RLD, o A ~P RRD, g A P BIT, 8E "
+      },
+      {
+        "i": 25,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "S DO, C En T LOOP, R T REPEAT, C Rp 9T R ;T H\\S T 0=, ?T 0<>, JT =, VT <>, `T <, kT >=, uT CY, T CY~, T PE, T PO, T V, T"
+      },
+      {
+        "i": 26,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "U U| U ? U UA W eraword U U| 2 c SX UX W 2 \" 2X %X passchar W X U U| U4 gX passchar? U XrX X password W X U U| 2 c X Up "
+      },
+      {
+        "i": 27,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "X Y U Y \\ Uk Y '\\k C \" C Y 2\\ Y Y =\\ Y Y H\\bV Y c\\ V U ; \" Q\\ Y v\\ Up \" U [Z OZ fsflag ~\\ search \\ \\ [Up 9n | hUp U | 2 "
+      },
+      {
+        "i": 28,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "/ 9 )4 %0 9 ; \" '` ^7 Y U9/ _ ENDPRT ~) $DF K` $BC V` $DC a` $SBC l` $SIY x` SCT ` CONT ` EXIT ` GETIY ` TRUE ` FALSE ` "
+      },
+      {
+        "i": 29,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "B \\` c c STEP k c `T No Verb d $RT /d Q \\`p b b 5d c5dp / b :d DHEAD bd Z od SEMIC vd DV p ` d DX p # ` d DHEX d d d \" \""
+      },
+      {
+        "i": 45,
+        "kind": "colon_defs",
+        "flags": [
+          "keyword"
+        ],
+        "keywords": [
+          "BULLET"
+        ],
+        "preview": ": BULLETS p-i @ -2 P-I ; : ENDBULL P-I ; STK> ;S c y ( Upgraded Schlocko Editor 12/14/81 ) <STKD <there <STKD Q c i a8 -"
+      },
+      {
+        "i": 46,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "& CONTEXT * lastvoc V' v \" \"l & ]<D[ &p ' (' <build &p p % dup k n _ T already defined ' <bd? I'9 p \\' 9 @' build> p &p "
+      },
+      {
+        "i": 47,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "killem p + p p C +p \" * 5* xxx {)+( ' * 'p / * p \" 9+ * FORGET ,+, \" X+ BASE? p n+ MAP {) + UNX 6 + ASM ' > tov + ) + AS"
+      },
+      {
+        "i": 48,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "/T Get JEC / C i-dmap / freeb Q U/\" C c/ q/ Disk fullR W */ DIR-SIZE y/ ALLOC-BLK / CUR-BLK / dtb / ablock /p F K / ABLO"
+      },
+      {
+        "i": 49,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "| 2 2/ a # a Q v a Q a Q Q /# 2 2 dexec H3 dscan l p \" 3 P3p n l - l `3 U3 dtyp s\"- p / %0 k 3 DIR 3 k T Name T Alloc T "
+      },
+      {
+        "i": 52,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "l ASM ' | tov f ^ comvir g crflg g pass# +g opsflg 8g oldioff Fg pos Ug twid `g rst 9 p Pg &g4 g Oj ( ) Agp 3gp B g gp g"
+      },
+      {
+        "i": 53,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "k hj k j j A j k B j k C j #k D j 0k E j =k H j Jk L j Wk M j dk X j qk Y j ~k SP j k PSW j k rt k @ k tt k * * k gr hjp"
+      },
+      {
+        "i": 54,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "i n CMC, ? i n STC, 7 i o LXI, l i h o PCHL, i -o PUSH, l j =o POP, l j Oo XTHL, i `o SPHL, i po IN, Hj o OUT, Hj o EI, "
+      },
+      {
+        "i": 55,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "RLX, yl q h h > i r PUSHX, yl q i s POPX, yl q i %s BITX, yl q j F j 9s SETX, yl q j j Rs RESX, yl q j j ks DADX, Al 2 s"
+      },
+      {
+        "i": 56,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "j v DSBC, l h B j v RLCR, ml h (j w RALR, ml h (j )w RRCR, ml h (j @w RARR, ml h (j Ww SLAR, ml h (j nw SRAR, ml h ((j w"
+      },
+      {
+        "i": 57,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "z END, yp { z i R |y #{ i R h h z DO, k m %{ LOOP, y 4{ REPEAT, C yp \\{ y ^{ p{z A{ 0=, b{ 0<>, m{ =, y{ <>, { <, { >=, "
+      },
+      {
+        "i": 58,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary",
+          "keyword"
+        ],
+        "keywords": [
+          "OBJECT-FILE"
+        ],
+        "preview": "> ROMSTART RAMSTART RSTACK PSTACK ROMHERE < RAMHERE K xcsys ' tov Z V>~) TOPDEF s XCSTATE no-restart byterse final BUF-S"
+      },
+      {
+        "i": 59,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "\" # ref | C newbyt p ^ k TOO MANY VERBSR p h 4 0 byt, p p p 2 h 9 h n CODE u +( =; P)[ +( fZ; p VERB NOT EXECUTEDR p u h"
+      },
+      {
+        "i": 60,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "C 4 tick ' )u , R ) ]'[ 0 XCSTAT k p T NEXT= #T LIT=, #T DBEG=H #T DEND=V #k T ROMSTART= p #T ROMHERE=F p #T RAMSTART= p"
+      },
+      {
+        "i": 61,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "; V u FS XCSAVENS 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 "
+      },
+      {
+        "i": 74,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 75,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 76,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 77,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 78,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 79,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 80,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 81,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 86,
+        "kind": "pattern",
+        "flags": [
+          "keyword"
+        ],
+        "keywords": [
+          "OBJECT-FILE"
+        ],
+        "preview": "( LOAD BLK FOR CROSS-COMPILING ) DECIMAL FSLD FS XC xcsys xc ASM OPS MORE-BUFFERS ( allocate 2 more disk buffers ) 17 <D"
+      },
+      {
+        "i": 87,
+        "kind": "load_chain",
+        "flags": [
+          "erased_tail",
+          "keyword"
+        ],
+        "keywords": [
+          "XC.LOGIC",
+          "FS.XCM"
+        ],
+        "preview": "ABINLOADX XC LOGICn LLOAD FS XC\\ BINLOADZ FS XCM ^ g ^ g g ^ n ^ n ^ n ^ n ^ n ^ n ^ x x x x x x x x x x x x x x x x x x"
+      },
+      {
+        "i": 88,
+        "kind": "colon_defs",
+        "flags": [
+          "keyword"
+        ],
+        "keywords": [
+          "BULLET"
+        ],
+        "preview": "FSLD FS XC xcsys xc ASM OPS MORE-BUFFERS ( allocate 2 more disk buffers ) 17 <DRIVE : BULLETS p-i @ -2 P-I ; : ENDBULL P"
+      },
+      {
+        "i": 93,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "& CONTEXT * lastvoc V' v \" \"l & ]<D[ &p ' (' <build &p p % dup k n _ T already defined ' <bd? I'9 p \\' 9 @' build> p &p "
+      },
+      {
+        "i": 94,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "killem p + p p C +p \" * 5* xxx {)+( ' * 'p / * p \" 9+ * FORGET ,+, \" X+ BASE? p n+ MAP {) + UNX 6 + ASM ' > tov + ) + AS"
+      },
+      {
+        "i": 95,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "/T Get JEC / C i-dmap / freeb Q U/\" C c/ q/ Disk fullR W */ DIR-SIZE y/ ALLOC-BLK / CUR-BLK / dtb / ablock /p F K / ABLO"
+      },
+      {
+        "i": 96,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "| 2 2/ a # a Q v a Q a Q Q /# 2 2 dexec H3 dscan l p \" 3 P3p n l - l `3 U3 dtyp s\"- p / %0 k 3 DIR 3 k T Name T Alloc T "
+      },
+      {
+        "i": 99,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "l ASM ' | tov f ^ comvir g crflg g pass# +g opsflg 8g oldioff Fg pos Ug twid `g rst 9 p Pg &g4 g Oj ( ) Agp 3gp B g gp g"
+      },
+      {
+        "i": 100,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "k hj k j j A j k B j k C j #k D j 0k E j =k H j Jk L j Wk M j dk X j qk Y j ~k SP j k PSW j k rt k @ k tt k * * k gr hjp"
+      },
+      {
+        "i": 101,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "i n CMC, ? i n STC, 7 i o LXI, l i h o PCHL, i -o PUSH, l j =o POP, l j Oo XTHL, i `o SPHL, i po IN, Hj o OUT, Hj o EI, "
+      },
+      {
+        "i": 102,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "RLX, yl q h h > i r PUSHX, yl q i s POPX, yl q i %s BITX, yl q j F j 9s SETX, yl q j j Rs RESX, yl q j j ks DADX, Al 2 s"
+      },
+      {
+        "i": 103,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "j v DSBC, l h B j v RLCR, ml h (j w RALR, ml h (j )w RRCR, ml h (j @w RARR, ml h (j Ww SLAR, ml h (j nw SRAR, ml h ((j w"
+      },
+      {
+        "i": 104,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "z END, yp { z i R |y #{ i R h h z DO, k m %{ LOOP, y 4{ REPEAT, C yp \\{ y ^{ p{z A{ 0=, b{ 0<>, m{ =, y{ <>, { <, { >=, "
+      },
+      {
+        "i": 105,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary",
+          "keyword"
+        ],
+        "keywords": [
+          "OBJECT-FILE"
+        ],
+        "preview": "> ROMSTART RAMSTART RSTACK PSTACK ROMHERE < RAMHERE K xcsys ' tov Z V>~) TOPDEF s XCSTATE no-restart byterse final BUF-S"
+      },
+      {
+        "i": 106,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "\" # ref | C newbyt p ^ k TOO MANY VERBSR p h 4 0 byt, p p p 2 h 9 h n CODE u +( =; P)[ +( fZ; p VERB NOT EXECUTEDR p u h"
+      },
+      {
+        "i": 107,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "C 4 tick ' )u , R ) ]'[ 0 XCSTAT k p T NEXT= #T LIT=, #T DBEG=H #T DEND=V #k T ROMSTART= p #T ROMHERE=F p #T RAMSTART= p"
+      },
+      {
+        "i": 121,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "2 C 2 R C 2 R , p p * | 2 C 2 R n p C C \" J C p * ! / blkp v @ r NULPATi < P1i < P2i < SBi < P1Ui < P2Ui < BANGAi < BANG"
+      },
+      {
+        "i": 133,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 134,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 135,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 136,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 137,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 138,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 139,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 140,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 146,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 157,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "v v v v v CLN32 v CLN64 v $ GORF-PAT v 2 LAZON v C COMC5B v Q COMC5A v ` COMC5 v o COMC6 v } SMINE0 v SMINE1 v SHLD-P v "
+      },
+      {
+        "i": 172,
+        "kind": "binary",
+        "flags": [
+          "keyword"
+        ],
+        "keywords": [
+          "XC.VIDEO"
+        ],
+        "preview": "9 @ v XC VIDEOO DUP I + BLOCK I 400 * 4000 + 400 BMOVE LOOP n j t c y"
+      },
+      {
+        "i": 178,
+        "kind": "binary",
+        "flags": [
+          "dense_binary"
+        ],
+        "keywords": [],
+        "preview": "S S S S S R 5 o GM ~ w @ @ s 6 6 S * s * #! R * s { \" 9 # * # * ^#V # |/g}/o# z/W{/_ x/Gy/O h h h S W ^#V # ~ < w N Y F "
+      },
+      {
+        "i": 181,
+        "kind": "binary",
+        "flags": [
+          "dense_binary"
+        ],
+        "keywords": [],
+        "preview": ") * ~P wP sQ NL FM 5 @ 5 ^ V/ R NQ t1 u0 ^& V' R NQ t) u( * } w D g |M VM ^L gi)G } < < & o _ , , eo * * # # | > % % lg "
+      },
+      {
+        "i": 187,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "h h h h h ! $(_ [ M _ Q!k h b { ' # h h \" h h a _ r( h `_ 8 h h a < S M _ k P c S M \" O (h a h L ( ( S ! a ~ ( R ! ! K B"
+      },
+      {
+        "i": 193,
+        "kind": "pattern",
+        "flags": [
+          "keyword"
+        ],
+        "keywords": [
+          "PLAYER",
+          "SCORE"
+        ],
+        "preview": "( PATTERN INDEX NUMBERS -- THIS FILE COMES FROM JAY ) 0 SC= NULPATi ( NULL PATTERN ) NC= P1i ( PLAYER ONE'S SHIP ) NC= P"
+      },
+      {
+        "i": 200,
+        "kind": "pattern",
+        "flags": [
+          "keyword"
+        ],
+        "keywords": [
+          "PLAYER"
+        ],
+        "preview": "( PLAYER UP INDICATOR - PLAYER 1 ) DATA P1UP 3 B, 6 B, 2 B, 12 B, HEX 15 B, 26 B, 37 B, DECIMAL QUADPAT ~ 1111 1111 ^ ~ "
+      },
+      {
+        "i": 201,
+        "kind": "pattern",
+        "flags": [
+          "keyword"
+        ],
+        "keywords": [
+          "PLAYER"
+        ],
+        "preview": "( PLAYER UP INDICATOR - PLAYER 2 ) DATA P2UP 3 B, 6 B, 2 B, 12 B, HEX 15 B, 26 B, 37 B, DECIMAL QUADPAT ~ 1111 1111 ^ ~ "
+      },
+      {
+        "i": 214,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 "
+      },
+      {
+        "i": 244,
+        "kind": "text",
+        "flags": [
+          "keyword"
+        ],
+        "keywords": [
+          "PLAYER"
+        ],
+        "preview": "( EXPLOSION ANIM TABLE FOR PLAYER ) <ANIM-TBL BANGP FBEXP1 8 FBEXP4 8 FBEXP2 8 FBEXP3 8 FBEXP5 8 FBEXP6 8 NULPAT 120 TBL"
+      },
+      {
+        "i": 252,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "UUUUUUUUUZ UUUUUUUUUUUUUUUUUj UUUUUUUUUUUUUUUUUUUUUUUUUUUUUZ T UUUUUUUUUUUUiUUUU UUUUUUUUUUUUUeeUUUUUUUUUUUUUUZUUT UUUUU"
+      },
+      {
+        "i": 253,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "UUUUUU j jUUUUUUUV UUUUUUV UUUUUUUUUUUU UUUUUUUUUUUUV j Uj UUUUV UUUUUUUUeUUUUUUUUUUUV UUUUUUUUUUUUV V UUUV UUUUUUUUUUUU"
+      }
+    ],
+    "MSGPATLD": [
+      {
+        "i": 0,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": + p + q >` ? NEXT o g p const ^#V LIT o g BLIT o& ; N # F # ALIT ~#fo ) ABLIT ~#fo 0! 1! DUP 2DUP DROP R> n # f # >R +"
+      },
+      {
+        "i": 1,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "I+ n f OVER +! ~ w#~ w 1+! % 1-! % ; SWAB ]lc H OUTP i V INP h& e ROT u PICK +)9^#V 2DROP * ! 8 x # /MOD x x/Gy/O | |/g}"
+      },
+      {
+        "i": 2,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "! BYE MON: \\= abp V & okabp T 1 err? S > ABORT*V J OKABORT*T V EXECUTE d SP@! 9 o RP@ | d-f-abptr Q s-b-ptr O s-e-abptr "
+      },
+      {
+        "i": 3,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ")= ->L { # | g} o PTSTAT \" & PTDATA 4 PLSTAT # B PLDATA ! P LITES G \" G o& *G \"G | '} & k ( p \" W( } ^ GET E PUT C GETC "
+      },
+      {
+        "i": 4,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "U* ! \" > < $ * J\" # = [ (NUMBER) a Q a | p | p 4 W : NUMBER - Q Q | Q | -2 4 4 # $ B E Q R 3 W LITERAL \" p \" Z \" PIMODE "
+      },
+      {
+        "i": 6,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "^#V#~ B ++ #~ B [r ; 6 +++ # < # | x\" _ - / O \" T \" n \" p | { { _ c ystr o& DM y\" \" n | { ,\" A\" OK O K QUERY \\ | \\ 9 k F"
+      },
+      {
+        "i": 10,
+        "kind": "colon_defs",
+        "flags": [
+          "keyword"
+        ],
+        "keywords": [
+          "BULLET"
+        ],
+        "preview": ": BULLETS p-i @ -2 P-I ; : ENDBULL P-I ; STK> ;S d< c y ( Upgraded Schlocko Editor 12/14/81 ) <STKD <there <STKD Q c i V"
+      },
+      {
+        "i": 12,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "Q Q a # 2 = [COMPILE] +! /!n R ! BLK 1! LINE 7!p K <! \"BLK T Blk= P! LIST 7! K k | C!q D k = a! DIR C C K p ( 2 !k | q D"
+      },
+      {
+        "i": 13,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "her> n X# \" ldmp K T :Q Q | # T / | B ^ A% T /= W $ HEXLIST ^ / C k W! C C k # K $ 2 % % F %\" 2 % m T% HEXSHOW C ^% % DU"
+      },
+      {
+        "i": 14,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "A= a( ( BA= s( ( R= '& ' ( RAMALLOT ( ( BR= 'G ' ) BRAMALLOT ) ) DATA '@ n /) IMMED I' ' x' x I'p ' H) : '\\ ' f) TERSE '"
+      },
+      {
+        "i": 15,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "K R , , o g , <FORK , n , FORK> n C - offl No PrinterR - hou & > # T- T-$ T- - # _ ]- W A-} ! 4- HOU ;- e- LIST l- w- dm"
+      },
+      {
+        "i": 16,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "t-alloc# - p 0 RMOVE + +x 1 0 mlength %0 0 1 $ins ! %0 ?1 / / U1 0 1 0 0 /4 /4 1 $ins-f &1 ]1 insert 2/f1 m1 INSERT 2/ &"
+      },
+      {
+        "i": 17,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "9 i4 4 LOAD C 594 / 4/ 4 5Y / 4 --> A5 0%0 2 55 }4/ / =5 /4 0S C5d 5 SCR X5 / Z5- E5 LINELOAD { { 594 / 9 4/ i4 5 / \\5 D"
+      },
+      {
+        "i": 19,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "C < REPLACE < < < < FIX K= p C p C \" 1= C < G=T No 2nd def R M=R < WCMD2 \\= } > O= VWC >Z m= CONFIG@ ? \\= & o = CONFIG! "
+      },
+      {
+        "i": 20,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "~) comvir @ crflg @ pass# @ opsflg (@ oldioff 6@ pos E@ twid P@ rst 9 p @@ @4 @ \\@ ( ) 1@p @#@p @ @p @k T ( n _ T ) @4 9"
+      },
+      {
+        "i": 21,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "C C E C D H C D L C \"D M C /D X C <D Y C ID SP C VD PSW C dD rt ~D @ sD tt D * * D gr 3Cp O B yDp { Dp B ILLEGALSC3Cp B "
+      },
+      {
+        "i": 22,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "A G PUSH, kE B H POP, kE B H XTHL, A +H SPHL, A ;H IN, &C KH OUT, &C YH EI, A hH DI, A vH RST, B H LHLD, * C H SHLD, \" C"
+      },
+      {
+        "i": 23,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "A K BITX, DEaJ B F B L SETX, DEaJ B B L RESX, DEaJ B B 6L DADX, E 2 tL ) A L A B R AZA OL DADY, E 2 L ) A L A B R AZA L "
+      },
+      {
+        "i": 24,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "A C O RRCR, 8E A C P RARR, 8E A C \"P SLAR, 8E A C 9P SRAR, 8E A ( C PP SRLR, 8E A 8 C gP RLD, o A ~P RRD, g A P BIT, 8E "
+      },
+      {
+        "i": 25,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "S DO, C En T LOOP, R T REPEAT, C Rp 9T R ;T H\\S T 0=, ?T 0<>, JT =, VT <>, `T <, kT >=, uT CY, T CY~, T PE, T PO, T V, T"
+      },
+      {
+        "i": 26,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "U U| U ? U UA W eraword U U| 2 c SX UX W 2 \" 2X %X passchar W X U U| U4 gX passchar? U XrX X password W X U U| 2 c X Up "
+      },
+      {
+        "i": 27,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "X Y U Y \\ Uk Y '\\k C \" C Y 2\\ Y Y =\\ Y Y H\\bV Y c\\ V U ; \" Q\\ Y v\\ Up \" U [Z OZ fsflag ~\\ search \\ \\ [Up 9n | hUp U | 2 "
+      },
+      {
+        "i": 28,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "/ 9 )4 %0 9 ; \" '` ^7 Y U9/ _ ENDPRT ~) $DF K` $BC V` $DC a` $SBC l` $SIY x` SCT ` CONT ` EXIT ` GETIY ` TRUE ` FALSE ` "
+      },
+      {
+        "i": 29,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "B \\` c c STEP k c `T No Verb d $RT /d Q \\`p b b 5d c5dp / b :d DHEAD bd Z od SEMIC vd DV p ` d DX p # ` d DHEX d d d \" \""
+      },
+      {
+        "i": 45,
+        "kind": "colon_defs",
+        "flags": [
+          "keyword"
+        ],
+        "keywords": [
+          "BULLET"
+        ],
+        "preview": ": BULLETS p-i @ -2 P-I ; : ENDBULL P-I ; STK> ;S c y ( Upgraded Schlocko Editor 12/14/81 ) <STKD <there <STKD Q c i a8 -"
+      },
+      {
+        "i": 46,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "& CONTEXT * lastvoc V' v \" \"l & ]<D[ &p ' (' <build &p p % dup k n _ T already defined ' <bd? I'9 p \\' 9 @' build> p &p "
+      },
+      {
+        "i": 47,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "killem p + p p C +p \" * 5* xxx {)+( ' * 'p / * p \" 9+ * FORGET ,+, \" X+ BASE? p n+ MAP {) + UNX 6 + ASM ' > tov + ) + AS"
+      },
+      {
+        "i": 48,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "/T Get JEC / C i-dmap / freeb Q U/\" C c/ q/ Disk fullR W */ DIR-SIZE y/ ALLOC-BLK / CUR-BLK / dtb / ablock /p F K / ABLO"
+      },
+      {
+        "i": 49,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "| 2 2/ a # a Q v a Q a Q Q /# 2 2 dexec H3 dscan l p \" 3 P3p n l - l `3 U3 dtyp s\"- p / %0 k 3 DIR 3 k T Name T Alloc T "
+      },
+      {
+        "i": 52,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "l ASM ' | tov f ^ comvir g crflg g pass# +g opsflg 8g oldioff Fg pos Ug twid `g rst 9 p Pg &g4 g Oj ( ) Agp 3gp B g gp g"
+      },
+      {
+        "i": 53,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "k hj k j j A j k B j k C j #k D j 0k E j =k H j Jk L j Wk M j dk X j qk Y j ~k SP j k PSW j k rt k @ k tt k * * k gr hjp"
+      },
+      {
+        "i": 54,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "i n CMC, ? i n STC, 7 i o LXI, l i h o PCHL, i -o PUSH, l j =o POP, l j Oo XTHL, i `o SPHL, i po IN, Hj o OUT, Hj o EI, "
+      },
+      {
+        "i": 55,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "RLX, yl q h h > i r PUSHX, yl q i s POPX, yl q i %s BITX, yl q j F j 9s SETX, yl q j j Rs RESX, yl q j j ks DADX, Al 2 s"
+      },
+      {
+        "i": 56,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "j v DSBC, l h B j v RLCR, ml h (j w RALR, ml h (j )w RRCR, ml h (j @w RARR, ml h (j Ww SLAR, ml h (j nw SRAR, ml h ((j w"
+      },
+      {
+        "i": 57,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "z END, yp { z i R |y #{ i R h h z DO, k m %{ LOOP, y 4{ REPEAT, C yp \\{ y ^{ p{z A{ 0=, b{ 0<>, m{ =, y{ <>, { <, { >=, "
+      },
+      {
+        "i": 58,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary",
+          "keyword"
+        ],
+        "keywords": [
+          "OBJECT-FILE"
+        ],
+        "preview": "> ROMSTART RAMSTART RSTACK PSTACK ROMHERE < RAMHERE K xcsys ' tov Z V>~) TOPDEF s XCSTATE no-restart byterse final BUF-S"
+      },
+      {
+        "i": 59,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "\" # ref | C newbyt p ^ k TOO MANY VERBSR p h 4 0 byt, p p p 2 h 9 h n CODE u +( =; P)[ +( fZ; p VERB NOT EXECUTEDR p u h"
+      },
+      {
+        "i": 60,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "C 4 tick ' )u , R ) ]'[ 0 XCSTAT k p T NEXT= #T LIT=, #T DBEG=H #T DEND=V #k T ROMSTART= p #T ROMHERE=F p #T RAMSTART= p"
+      },
+      {
+        "i": 61,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "; V u FS XCVEVENS 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 "
+      },
+      {
+        "i": 64,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "& CONTEXT * lastvoc V' v \" \"l & ]<D[ &p ' (' <build &p p % dup k n _ T already defined ' <bd? I'9 p \\' 9 @' build> p &p "
+      },
+      {
+        "i": 65,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "killem p + p p C +p \" * 5* xxx {)+( ' * 'p / * p \" 9+ * FORGET ,+, \" X+ BASE? p n+ MAP {) + UNX 6 + ASM ' > tov + ) + AS"
+      },
+      {
+        "i": 66,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "/T Get JEC / C i-dmap / freeb Q U/\" C c/ q/ Disk fullR W */ DIR-SIZE y/ ALLOC-BLK / CUR-BLK / dtb / ablock /p F K / ABLO"
+      },
+      {
+        "i": 67,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "| 2 2/ a # a Q v a Q a Q Q /# 2 2 dexec H3 dscan l p \" 3 P3p n l - l `3 U3 dtyp s\"- p / %0 k 3 DIR 3 k T Name T Alloc T "
+      },
+      {
+        "i": 70,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "l ASM ' | tov f ^ comvir g crflg g pass# +g opsflg 8g oldioff Fg pos Ug twid `g rst 9 p Pg &g4 g Oj ( ) Agp 3gp B g gp g"
+      },
+      {
+        "i": 71,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "k hj k j j A j k B j k C j #k D j 0k E j =k H j Jk L j Wk M j dk X j qk Y j ~k SP j k PSW j k rt k @ k tt k * * k gr hjp"
+      },
+      {
+        "i": 72,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "i n CMC, ? i n STC, 7 i o LXI, l i h o PCHL, i -o PUSH, l j =o POP, l j Oo XTHL, i `o SPHL, i po IN, Hj o OUT, Hj o EI, "
+      },
+      {
+        "i": 73,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "RLX, yl q h h > i r PUSHX, yl q i s POPX, yl q i %s BITX, yl q j F j 9s SETX, yl q j j Rs RESX, yl q j j ks DADX, Al 2 s"
+      },
+      {
+        "i": 74,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "j v DSBC, l h B j v RLCR, ml h (j w RALR, ml h (j )w RRCR, ml h (j @w RARR, ml h (j Ww SLAR, ml h (j nw SRAR, ml h ((j w"
+      },
+      {
+        "i": 75,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "z END, yp { z i R |y #{ i R h h z DO, k m %{ LOOP, y 4{ REPEAT, C yp \\{ y ^{ p{z A{ 0=, b{ 0<>, m{ =, y{ <>, { <, { >=, "
+      },
+      {
+        "i": 76,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary",
+          "keyword"
+        ],
+        "keywords": [
+          "OBJECT-FILE"
+        ],
+        "preview": "> ROMSTART RAMSTART RSTACK PSTACK ROMHERE < RAMHERE K xcsys ' tov Z V>~) TOPDEF s XCSTATE no-restart byterse final BUF-S"
+      },
+      {
+        "i": 77,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "\" # ref | C newbyt p ^ k TOO MANY VERBSR p h 4 0 byt, p p p 2 h 9 h n CODE u +( =; P)[ +( fZ; p VERB NOT EXECUTEDR p u h"
+      },
+      {
+        "i": 78,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "C 4 tick ' )u , R ) ]'[ 0 XCSTAT k p T NEXT= #T LIT=, #T DBEG=H #T DEND=V #k T ROMSTART= p #T ROMHERE=F p #T RAMSTART= p"
+      },
+      {
+        "i": 80,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "C p * <ANIMATION p ANIMATION> , AT! ) * F NULPATi < W P1i < g P2i < s SBi < P1Ui < P2Ui < BANGAi < BANGPi < CLNi < GORFi"
+      },
+      {
+        "i": 86,
+        "kind": "pattern",
+        "flags": [
+          "keyword"
+        ],
+        "keywords": [
+          "OBJECT-FILE"
+        ],
+        "preview": "( LOAD BLK FOR CROSS-COMPILING ) DECIMAL FSLD FS XC xcsys xc ASM OPS MORE-BUFFERS ( allocate 2 more disk buffers ) OBJEC"
+      },
+      {
+        "i": 90,
+        "kind": "colon_defs",
+        "flags": [
+          "keyword"
+        ],
+        "keywords": [
+          "XC.LOGIC"
+        ],
+        "preview": "( Load the Binary from a Xcompile Game File ) : BINLOAD [ EDIT ] FILE TERSE UNPROT 10 00 DO I BLOCK I 400 * 4000 + 400 B"
+      },
+      {
+        "i": 96,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 97,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 98,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 99,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 100,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 101,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 102,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 103,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 128,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "<ANIMATION p ANIMATION> , AT! ) * F NULPATi < W P1i < g P2i < s SBi < P1Ui < P2Ui < BANGAi < BANGPi < CLNi < GORFi < LAZ"
+      },
+      {
+        "i": 140,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 141,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 142,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 143,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 144,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 145,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 146,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 147,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": ": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : "
+      },
+      {
+        "i": 155,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary",
+          "keyword"
+        ],
+        "keywords": [
+          "GFONTPAT",
+          "gfontpat",
+          "GFONT"
+        ],
+        "preview": "FLIP-FLOP-ON FLIP-FLOP-OFF MAGIC! - SELF < 1STWRITE I SLEEP? Z ACTIVE? revdy v & y revdx v 6 i REVDLIM F TIMEBSCALE! g T"
+      },
+      {
+        "i": 157,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "v v v v v CLN32 v CLN64 v $ GORF-PAT v 2 LAZON v C COMC5B v Q COMC5A v ` COMC5 v o COMC6 v } SMINE0 v SMINE1 v SHLD-P v "
+      },
+      {
+        "i": 172,
+        "kind": "binary",
+        "flags": [
+          "keyword"
+        ],
+        "keywords": [
+          "XC.VIDEO"
+        ],
+        "preview": "9 @ v XC VIDEOO DUP I + BLOCK I 400 * 4000 + 400 BMOVE LOOP n j t c y"
+      },
+      {
+        "i": 175,
+        "kind": "colon_defs",
+        "flags": [
+          "keyword"
+        ],
+        "keywords": [
+          "XC.LOGIC"
+        ],
+        "preview": "( Load the Binary from a Xcompile Game File ) CODE CRASHER A XRA, 0CC OUT, 0 JMP, NEXT : LLOAD [ EDIT ] FILE TERSE XFRFL"
+      },
+      {
+        "i": 178,
+        "kind": "binary",
+        "flags": [
+          "dense_binary"
+        ],
+        "keywords": [],
+        "preview": "S S S S S R 5 o GM ~ w @ @ s 6 6 S * s * #! R * s { \" 9 # * # * ^#V # |/g}/o# z/W{/_ x/Gy/O h h h S W ^#V # ~ < w N Y F "
+      },
+      {
+        "i": 181,
+        "kind": "binary",
+        "flags": [
+          "dense_binary"
+        ],
+        "keywords": [],
+        "preview": ") * ~P wP sQ NL FM 5 @ 5 ^ V/ R NQ t1 u0 ^& V' R NQ t) u( * } w D g |M VM ^L gi)G } < < & o _ , , eo * * # # | > % % lg "
+      },
+      {
+        "i": 187,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "h h h h h ! $(_ [ M _ Q!k h b { ' # h h \" h h a _ r( h `_ 8 h h a < S M _ k P c S M \" O (h a h L ( ( S ! a ~ ( R ! ! K B"
+      },
+      {
+        "i": 200,
+        "kind": "pattern",
+        "flags": [
+          "keyword"
+        ],
+        "keywords": [
+          "PLAYER"
+        ],
+        "preview": "( PLAYER UP INDICATOR - PLAYER 1 ) DATA P1UP 3 B, 6 B, 2 B, 12 B, HEX 15 B, 26 B, 37 B, DECIMAL QUADPAT ~ 1111 1111 ^ ~ "
+      },
+      {
+        "i": 201,
+        "kind": "pattern",
+        "flags": [
+          "keyword"
+        ],
+        "keywords": [
+          "PLAYER"
+        ],
+        "preview": "( PLAYER UP INDICATOR - PLAYER 2 ) DATA P2UP 3 B, 6 B, 2 B, 12 B, HEX 15 B, 26 B, 37 B, DECIMAL QUADPAT ~ 1111 1111 ^ ~ "
+      },
+      {
+        "i": 214,
+        "kind": "mixed",
+        "flags": [
+          "mixed_text_binary"
+        ],
+        "keywords": [],
+        "preview": "9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 "
+      },
+      {
+        "i": 244,
+        "kind": "text",
+        "flags": [
+          "keyword"
+        ],
+        "keywords": [
+          "PLAYER"
+        ],
+        "preview": "( EXPLOSION ANIM TABLE FOR PLAYER ) <ANIMATION <ANIM-TBL BANGP FBEXP1 8 FBEXP4 8 FBEXP2 8 FBEXP3 8 FBEXP5 8 FBEXP6 8 NUL"
+      }
+    ]
+  }
+}

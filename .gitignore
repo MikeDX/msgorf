@@ -4,6 +4,7 @@ __pycache__/
 *.pyc
 .venv/
 work/.venv_motion/
+work/gorf_rom/
 work/*.tmp
 work/bitsavers_compare/
 work/gorf_index.html

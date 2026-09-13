@@ -51,6 +51,8 @@ False positives from loaders: `FLOAD BLK`, `FLOAD THIS`, etc. are TERSE words, n
 ## What will *not* find it
 
 - Deeper parse of MSGORPAT/MSGPATLD (pattern FLOAD tree is already complete, `missing: []`).
+- Screen/slack **carve** of the corrected images ([`disk-carve.md`](disk-carve.md)) — ran; still
+  only name references (`GFONTPAT` in CFA beside `PATSTART`/`PATEND`, `XC.LOGIC` in loaders).
 - Inventing gameplay in the SDL validator.
 - Treating ROTO (Robby Roto) sources as Ms. Gorf logic.
 
