@@ -905,26 +905,36 @@ static void update_play(game_t *g, float dt) {
   }
 
   float speed = 70.f;
-  float dx = 0, dy = 0;
+  float dx = g->pad_move_x;
+  float dy = g->pad_move_y;
   /* SDL scancodes: A=4 D=7 W=26 S=22 Left=80 Right=79 Up=82 Down=81 Space=44 */
   if (key_down(g, 4) || key_down(g, 80)) dx -= 1;
   if (key_down(g, 7) || key_down(g, 79)) dx += 1;
   if (key_down(g, 26) || key_down(g, 82)) dy -= 1;
   if (key_down(g, 22) || key_down(g, 81)) dy += 1;
-  if (dx || dy) {
-    float n = hypotf(dx, dy);
-    if (n < 1e-3f) n = 1.f;
-    player_x += (dx / n) * speed * dt;
-    player_y += (dy / n) * speed * dt;
+  if (dx > 1.f) dx = 1.f;
+  if (dx < -1.f) dx = -1.f;
+  if (dy > 1.f) dy = 1.f;
+  if (dy < -1.f) dy = -1.f;
+  float move_mag = hypotf(dx, dy);
+  if (move_mag > 0.18f) {
+    player_x += (dx / move_mag) * speed * dt * fminf(1.f, move_mag);
+    player_y += (dy / move_mag) * speed * dt * fminf(1.f, move_mag);
   }
   if (player_x < 12) player_x = 12;
   if (player_x > FB_W - 12) player_x = FB_W - 12;
   if (player_y < 28) player_y = 28;
   if (player_y > FB_H - 12) player_y = FB_H - 12;
 
-  float aim = atan2f(g->mouse_y - player_y, g->mouse_x - player_x);
+  float aim_mag = hypotf(g->pad_aim_x, g->pad_aim_y);
+  float aim;
+  int stick_aim = aim_mag > 0.28f;
+  if (stick_aim)
+    aim = atan2f(g->pad_aim_y, g->pad_aim_x);
+  else
+    aim = atan2f(g->mouse_y - player_y, g->mouse_x - player_x);
   fire_cd -= dt;
-  int fire = g->mouse_down || key_down(g, 44) || key_down(g, 14); /* Space / K */
+  int fire = g->mouse_down || g->pad_fire || stick_aim || key_down(g, 44) || key_down(g, 14);
   if (!burst.active && fire && fire_cd <= 0 && n_bullets < MAX_BULLETS) {
     fire_cd = 0.12f;
     float sp = 160.f;
@@ -1067,6 +1077,37 @@ void game_mouse(game_t *g, int x, int y, int down) {
   g->mouse_y = y;
   if (down >= 0) g->mouse_down = down;
 }
+
+static float clampf(float v, float lo, float hi) {
+  if (v < lo) return lo;
+  if (v > hi) return hi;
+  return v;
+}
+
+void game_pad_move(game_t *g, float x, float y) {
+  g->pad_move_x = clampf(x, -1.f, 1.f);
+  g->pad_move_y = clampf(y, -1.f, 1.f);
+}
+
+void game_pad_aim(game_t *g, float x, float y) {
+  g->pad_aim_x = clampf(x, -1.f, 1.f);
+  g->pad_aim_y = clampf(y, -1.f, 1.f);
+}
+
+void game_pad_fire(game_t *g, int down) { g->pad_fire = down ? 1 : 0; }
+
+void game_pad_start(game_t *g, int players) {
+  if (players < 1) players = 1;
+  if (players > 2) players = 2;
+  if (g->mode == MODE_SELECT) {
+    g->start_players = players;
+    begin_level(g);
+  } else if (g->mode == MODE_DEAD) {
+    g->mode = MODE_SELECT;
+  }
+}
+
+int game_get_mode(game_t *g) { return (int)g->mode; }
 
 void game_update(game_t *g, float dt) {
   if (dt > 0.05f) dt = 0.05f;

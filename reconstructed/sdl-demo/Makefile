@@ -30,7 +30,7 @@ EMCC ?= emcc
 WEB_DIR := web
 WEB_OUT := $(WEB_DIR)/index.html
 
-.PHONY: all native run web clean assets font
+.PHONY: all native run web deploy clean assets font
 
 all: native
 
@@ -61,9 +61,21 @@ web: assets
 	  emcc -O1 -Wall -std=c11 -DVIEW_SCALE=$(VIEW_SCALE) $(INCLUDES) \
 	    main.c game.c $(ASSETS_C) \
 	    -sUSE_SDL=2 -sALLOW_MEMORY_GROWTH=1 -sFORCE_FILESYSTEM=0 \
+	    -sEXPORTED_FUNCTIONS=_main,_msgorf_pad_move,_msgorf_pad_aim,_msgorf_pad_fire,_msgorf_pad_start,_msgorf_get_mode \
+	    -sEXPORTED_RUNTIME_METHODS=ccall,cwrap \
 	    --shell-file shell.html \
 	    -o $(WEB_OUT)'
 	@echo "Open $(WEB_OUT) via a local HTTP server (file:// may block WASM)."
+
+# Optional: DEPLOY_HOST=mike@192.168.68.105 DEPLOY_PATH=~/msgorf
+DEPLOY_HOST ?= mike@192.168.68.105
+DEPLOY_PATH ?= ~/msgorf
+
+deploy: web
+	rsync -avz --delete \
+	  --exclude docker-compose.yml --exclude nginx \
+	  $(WEB_DIR)/ $(DEPLOY_HOST):$(DEPLOY_PATH)/
+	ssh $(DEPLOY_HOST) 'chmod 755 $(DEPLOY_PATH)'
 
 clean:
 	rm -f $(NATIVE_BIN)

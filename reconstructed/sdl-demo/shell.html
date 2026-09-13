@@ -1,27 +1,296 @@
-/* Minimal Emscripten shell — canvas sized for 320×204 × scale. */
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ms. Gorf (GUESS SDL / web)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Ms. Gorf</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet" />
   <style>
-    html, body { margin: 0; background: #111; color: #ccc; font-family: ui-monospace, monospace; }
-    #wrap { display: flex; flex-direction: column; align-items: center; padding: 1rem; gap: 0.5rem; }
-    canvas.emscripten { image-rendering: pixelated; image-rendering: crisp-edges; background: #000; }
-    .note { font-size: 12px; max-width: 40rem; text-align: center; }
+    :root {
+      --bg0: #0a0c10;
+      --bg1: #12161e;
+      --ink: #e8e2d4;
+      --muted: #8a8490;
+      --amber: #f0c820;
+      --amber-dim: #9a7a18;
+      --panel: rgba(18, 22, 30, 0.92);
+      --line: rgba(240, 200, 32, 0.22);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% 0%, #1a2030 0%, transparent 55%),
+        var(--bg0);
+      color: var(--ink);
+      font-family: "Silkscreen", monospace;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: none;
+      overflow: hidden;
+      user-select: none;
+    }
+    #app {
+      height: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: env(safe-area-inset-top) 0.75rem env(safe-area-inset-bottom);
+      gap: 0.55rem;
+    }
+    header {
+      text-align: center;
+      padding-top: 0.35rem;
+    }
+    header h1 {
+      margin: 0;
+      font-size: clamp(1.1rem, 4.5vw, 1.55rem);
+      letter-spacing: 0.12em;
+      color: var(--amber);
+      text-shadow: 0 0 18px rgba(240, 200, 32, 0.35);
+    }
+    header p {
+      margin: 0.25rem 0 0;
+      font-size: 0.55rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+    #stage {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 0;
+      border: 1px solid var(--line);
+      background: #000;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    canvas.emscripten {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      background: #000;
+      outline: none;
+    }
+    #hud-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      min-height: 2.4rem;
+    }
+    #btn-start {
+      appearance: none;
+      border: 2px solid var(--amber);
+      background: linear-gradient(180deg, #2a2410, #15120a);
+      color: var(--amber);
+      font: inherit;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      padding: 0.55rem 1.4rem;
+      cursor: pointer;
+      border-radius: 2px;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.5), 0 0 20px rgba(240, 200, 32, 0.15);
+      transition: transform 0.08s ease, background 0.15s ease, opacity 0.2s ease;
+    }
+    #btn-start:active { transform: scale(0.97); background: #3a3018; }
+    #btn-start.hidden { opacity: 0; pointer-events: none; }
+    #pads {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      padding: 0.15rem 0 0.5rem;
+      align-items: end;
+    }
+    .stick {
+      position: relative;
+      width: min(38vw, 150px);
+      aspect-ratio: 1;
+      margin: 0 auto;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 45%, #1c2230 0%, #0e1218 70%);
+      border: 2px solid var(--line);
+      box-shadow: inset 0 0 24px rgba(0,0,0,0.65);
+      touch-action: none;
+    }
+    .stick[data-side="aim"] { border-color: rgba(220, 80, 60, 0.35); }
+    .stick .knob {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 42%;
+      height: 42%;
+      margin: -21% 0 0 -21%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #f4e08a, var(--amber-dim) 55%, #4a3a10);
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.45);
+      pointer-events: none;
+      will-change: transform;
+    }
+    .stick[data-side="aim"] .knob {
+      background: radial-gradient(circle at 35% 30%, #f0a090, #a83828 55%, #401410);
+    }
+    .stick-label {
+      text-align: center;
+      font-size: 0.5rem;
+      color: var(--muted);
+      letter-spacing: 0.14em;
+      margin-top: 0.35rem;
+    }
+    #status {
+      text-align: center;
+      font-size: 0.5rem;
+      color: var(--muted);
+      min-height: 1em;
+    }
+    @media (min-width: 700px) {
+      #app { max-width: 840px; }
+      .stick { width: 160px; }
+    }
   </style>
 </head>
 <body>
-  <div id="wrap">
-    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
-    <p class="note">GUESS remake — disk patterns, video-derived rules. Not XC.LOGIC.
-      Keys: 1 start · WASD move · mouse aim · click/space fire</p>
+  <div id="app">
+    <header>
+      <h1>MS. GORF</h1>
+      <p>GUESS REMAKE · DISK PATTERNS · NOT XC.LOGIC</p>
+    </header>
+
+    <div id="stage">
+      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+    </div>
+
+    <div id="controls">
+      <div id="hud-bar">
+        <button type="button" id="btn-start">START</button>
+      </div>
+      <div id="pads">
+        <div>
+          <div class="stick" id="stick-move" data-side="move"><div class="knob"></div></div>
+          <div class="stick-label">MOVE</div>
+        </div>
+        <div>
+          <div class="stick" id="stick-aim" data-side="aim"><div class="knob"></div></div>
+          <div class="stick-label">AIM / FIRE</div>
+        </div>
+      </div>
+      <div id="status">Loading…</div>
+    </div>
   </div>
+
   <script>
     var Module = {
-      canvas: (function () { return document.getElementById('canvas'); })()
+      canvas: document.getElementById("canvas"),
+      onRuntimeInitialized: function () {
+        document.getElementById("status").textContent =
+          "Left stick move · Right stick aim & fire · Desktop: WASD + mouse also work";
+        bindUi();
+        setInterval(syncStartButton, 250);
+      }
     };
+
+    function ready() {
+      return typeof Module._msgorf_pad_move === "function";
+    }
+
+    function syncStartButton() {
+      if (!ready()) return;
+      var mode = Module._msgorf_get_mode();
+      var btn = document.getElementById("btn-start");
+      if (mode === 0) { /* SELECT */
+        btn.textContent = "START";
+        btn.classList.remove("hidden");
+      } else if (mode === 3) { /* DEAD */
+        btn.textContent = "AGAIN";
+        btn.classList.remove("hidden");
+      } else {
+        btn.classList.add("hidden");
+      }
+    }
+
+    function bindStick(el, onMove, onEnd) {
+      var knob = el.querySelector(".knob");
+      var pid = null;
+
+      function setKnob(nx, ny) {
+        var max = el.clientWidth * 0.28;
+        knob.style.transform = "translate(" + (nx * max) + "px," + (ny * max) + "px)";
+      }
+
+      function normFromEvent(ev) {
+        var r = el.getBoundingClientRect();
+        var cx = r.left + r.width / 2;
+        var cy = r.top + r.height / 2;
+        var dx = (ev.clientX - cx) / (r.width * 0.5);
+        var dy = (ev.clientY - cy) / (r.height * 0.5);
+        var m = Math.hypot(dx, dy);
+        if (m > 1) { dx /= m; dy /= m; m = 1; }
+        return { x: dx, y: dy, m: m };
+      }
+
+      function down(ev) {
+        if (pid !== null) return;
+        pid = ev.pointerId;
+        el.setPointerCapture(pid);
+        var n = normFromEvent(ev);
+        setKnob(n.x, n.y);
+        onMove(n.x, n.y, n.m);
+        ev.preventDefault();
+      }
+      function move(ev) {
+        if (ev.pointerId !== pid) return;
+        var n = normFromEvent(ev);
+        setKnob(n.x, n.y);
+        onMove(n.x, n.y, n.m);
+        ev.preventDefault();
+      }
+      function up(ev) {
+        if (ev.pointerId !== pid) return;
+        pid = null;
+        setKnob(0, 0);
+        onEnd();
+        ev.preventDefault();
+      }
+
+      el.addEventListener("pointerdown", down);
+      el.addEventListener("pointermove", move);
+      el.addEventListener("pointerup", up);
+      el.addEventListener("pointercancel", up);
+    }
+
+    function bindUi() {
+      document.getElementById("btn-start").addEventListener("click", function () {
+        if (!ready()) return;
+        Module._msgorf_pad_start(1);
+        syncStartButton();
+      });
+
+      bindStick(document.getElementById("stick-move"), function (x, y) {
+        if (ready()) Module._msgorf_pad_move(x, y);
+      }, function () {
+        if (ready()) Module._msgorf_pad_move(0, 0);
+      });
+
+      bindStick(document.getElementById("stick-aim"), function (x, y, m) {
+        if (!ready()) return;
+        Module._msgorf_pad_aim(x, y);
+        Module._msgorf_pad_fire(m > 0.28 ? 1 : 0);
+      }, function () {
+        if (!ready()) return;
+        Module._msgorf_pad_aim(0, 0);
+        Module._msgorf_pad_fire(0);
+      });
+    }
   </script>
   {{{ SCRIPT }}}
 </body>

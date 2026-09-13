@@ -60,6 +60,17 @@ static void map_mouse(int wx, int wy, int *ox, int *oy) {
   if (*oy >= FB_H) *oy = FB_H - 1;
 }
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+
+/* JS twin-stick / Start → game (Module._msgorf_*) */
+EMSCRIPTEN_KEEPALIVE void msgorf_pad_move(float x, float y) { game_pad_move(&game, x, y); }
+EMSCRIPTEN_KEEPALIVE void msgorf_pad_aim(float x, float y) { game_pad_aim(&game, x, y); }
+EMSCRIPTEN_KEEPALIVE void msgorf_pad_fire(int down) { game_pad_fire(&game, down); }
+EMSCRIPTEN_KEEPALIVE void msgorf_pad_start(int players) { game_pad_start(&game, players); }
+EMSCRIPTEN_KEEPALIVE int msgorf_get_mode(void) { return game_get_mode(&game); }
+#endif
+
 static void frame(void) {
   Uint64 now = SDL_GetPerformanceCounter();
   float dt = (float)(now - H.last) / (float)SDL_GetPerformanceFrequency();

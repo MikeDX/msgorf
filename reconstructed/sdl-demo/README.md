@@ -35,6 +35,23 @@ cd reconstructed/sdl-demo
 make web EMSDK=$HOME/src/emsdk
 python3 -m http.server -d web 8080
 ```
+
+Patterns are **compiled into the WASM** (`assets_gen.c`) — no separate `assets.js`.
+
+### Deploy (LXC / msgorf.mikedx.co.uk)
+
+Ship **`reconstructed/sdl-demo/web/`** (not `video-demo/`):
+
+```bash
+cd "/Users/mike/Documents/Ms GORF/reconstructed/sdl-demo"
+make web EMSDK=$HOME/src/emsdk
+rsync -avz --delete \
+  --exclude docker-compose.yml --exclude nginx \
+  web/ mike@192.168.68.105:~/msgorf/
+ssh mike@192.168.68.105 'chmod 755 ~/msgorf'
+```
+
+That updates `index.html` / `index.js` / `index.wasm` only. `--delete` drops leftover JS-proto files; `nginx` / `docker-compose.yml` on the host are kept via `--exclude`.
 ## Controls
 
 | Input | Action |
@@ -45,6 +62,9 @@ python3 -m http.server -d web 8080
 | Click / Space / K | Fire |
 | Esc | Quit (native) |
 | Enter / `1` | After game over → select |
+| **Web:** Start button | Begin / again |
+| **Web:** Left stick | Move |
+| **Web:** Right stick | Aim + fire (past deadzone) |
 
 ## Layout
 

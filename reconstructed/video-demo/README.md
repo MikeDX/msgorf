@@ -28,12 +28,14 @@ See also: [`../findings/reconstruction-stubs.md`](../../docs/findings/reconstruc
 
 ## Deploy (msgorf.mikedx.co.uk)
 
-`assets.js` lives in this folder (copy of `../../play/assets.js`) so a plain rsync works:
+**Use the SDL web build instead** — see [`../sdl-demo/README.md`](../sdl-demo/README.md):
 
 ```bash
-rsync -avz "/Users/mike/Documents/Ms GORF/reconstructed/video-demo/" mike@192.168.68.105:~/msgorf/ \
-  --exclude docker-compose.yml --exclude nginx
-ssh mike@192.168.68.105 'chmod 755 ~/msgorf'
+cd "/Users/mike/Documents/Ms GORF/reconstructed/sdl-demo"
+make web EMSDK=$HOME/src/emsdk
+rsync -avz --delete \
+  --exclude docker-compose.yml --exclude nginx \
+  web/ mike@192.168.68.105:~/msgorf/
 ```
 
-After regenerating play assets: `cp ../../play/assets.js ./assets.js` (from this directory).
+This JS proto needed `assets.js` beside `index.html` (or under `../../play/`). The Emscripten build embeds patterns in WASM, so that path issue goes away.
