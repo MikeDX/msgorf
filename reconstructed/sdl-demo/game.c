@@ -27,6 +27,13 @@
 #define CLONE_PROCESS_T 0.35f
 #define CLONE_EXIT_SPEED 55.f
 #define CLONE_COOL 0.75f
+/* gameplay.mp4 is ~29.97 fps (30000/1001). Morph step ≈ 5–6 video frames → ~5.45 steps/s. */
+#define CLONE_VIDEO_FPS (30000.f / 1001.f)
+#define CLONE_MORPH_VIDEO_FRAMES 5.5f
+#define CLONE_ROT_RATE (CLONE_VIDEO_FPS / CLONE_MORPH_VIDEO_FRAMES)
+#define CLONE_WAIT_R 40.f   /* hold outside body until yellow face aligns */
+#define CLONE_BODY_R 20.f
+#define CLONE_FACE_HALF ((float)M_PI / 8.f) /* ±22.5° per hex/oct face */
 /* GUESS: Lissajous from seg_c_late fit + readable omega floor. */
 #define CLONE_AMP_X 12.f
 #define CLONE_AMP_Y 10.f
@@ -610,13 +617,96 @@ static void clone_yellow_ports(port_t ports[2]) {
   (void)cf;
 }
 
-/* GUESS: steer only toward nearer yellow CLN port (docs/findings/gorf-update-cadence.md). */
+static float ang_diff(float a, float b) {
+  float d = a - b;
+  while (d > (float)M_PI) d -= (float)(M_PI * 2.0);
+  while (d < -(float)M_PI) d += (float)(M_PI * 2.0);
+  return d;
+}
+
+/* Yellow opposite faces for current rotation (screen atan2, y-down). */
+static void yellow_face_angles(int rot, float out[2]) {
+  if (rot == 3) {
+    out[0] = 0.f;
+    out[1] = (float)M_PI; /* E ↔ W — CLN0 */
+  } else if (rot == 1) {
+    out[0] = (float)M_PI * 0.5f;
+    out[1] = -(float)M_PI * 0.5f; /* S ↔ N — CLN64 */
+  } else if (rot == 2) {
+    out[0] = (float)M_PI * 0.25f;
+    out[1] = -(float)M_PI * 0.75f; /* SE ↔ NW — CLN32 */
+  } else {
+    out[0] = -(float)M_PI * 0.25f;
+    out[1] = (float)M_PI * 0.75f; /* NE ↔ SW — CLN32 flip */
+  }
+}
+
+static int gorf_on_yellow_face(const foe_t *f) {
+  float ang = atan2f(f->y - clone_y, f->x - clone_x);
+  float faces[2];
+  yellow_face_angles(clone_rot_index(), faces);
+  for (int i = 0; i < 2; i++) {
+    if (fabsf(ang_diff(ang, faces[i])) <= CLONE_FACE_HALF + 0.2f) return 1;
+  }
+  return 0;
+}
+
+static void set_vel_toward(foe_t *f, float tx, float ty, float seek, float sp) {
+  float dx = tx - f->x, dy = ty - f->y;
+  float dist = hypotf(dx, dy);
+  if (dist < 1.f) return;
+  if (sp < 1.f) sp = GORF_SPEED;
+  float wx = f->vx, wy = f->vy;
+  float wn = hypotf(wx, wy);
+  if (wn > 1.f) {
+    wx /= wn;
+    wy /= wn;
+  } else {
+    wx = dx / dist;
+    wy = dy / dist;
+  }
+  float sx = dx / dist, sy = dy / dist;
+  float nx = wx * (1.f - seek) + sx * seek;
+  float ny = wy * (1.f - seek) + sy * seek;
+  float nn = hypotf(nx, ny);
+  if (nn < 1e-3f) return;
+  f->vx = (nx / nn) * sp;
+  f->vy = (ny / nn) * sp;
+}
+
+/* Approach cloner; if close but yellow face isn't toward gorf, wait on that side. */
 static void steer_gorf_to_clone_port(foe_t *f) {
   if (!clone_vis || burst.active || f->cool > 0.f) return;
+
+  float dx = f->x - clone_x, dy = f->y - clone_y;
+  float dist = hypotf(dx, dy);
+  float sp = hypotf(f->vx, f->vy);
+  if (sp < 1.f) sp = GORF_SPEED;
+
+  if (dist > CLONE_WAIT_R) {
+    /* Far: coast toward cloner; yellow alignment handled when close. */
+    set_vel_toward(f, clone_x, clone_y, 0.28f, sp);
+    return;
+  }
+
+  if (!gorf_on_yellow_face(f)) {
+    /* Wait on this face until morph brings yellow around. */
+    float ang = atan2f(dy, dx);
+    float hold = CLONE_BODY_R + 8.f;
+    float hx = clone_x + cosf(ang) * hold;
+    float hy = clone_y + sinf(ang) * hold;
+    f->vx *= 0.72f;
+    f->vy *= 0.72f;
+    set_vel_toward(f, hx, hy, 0.55f, GORF_SPEED * 0.25f);
+    return;
+  }
+
+  /* Yellow faces this gorf — seek nearer yellow port. */
   port_t ports[2];
   clone_yellow_ports(ports);
   float best_d = 1e9f;
-  float tx = ports[0].x0, ty = ports[0].y0;
+  float tx = 0.5f * (ports[0].x0 + ports[0].x1);
+  float ty = 0.5f * (ports[0].y0 + ports[0].y1);
   for (int i = 0; i < 2; i++) {
     float px = 0.5f * (ports[i].x0 + ports[i].x1);
     float py = 0.5f * (ports[i].y0 + ports[i].y1);
@@ -627,20 +717,7 @@ static void steer_gorf_to_clone_port(foe_t *f) {
       ty = py;
     }
   }
-  float dx = tx - f->x, dy = ty - f->y;
-  float dist = hypotf(dx, dy);
-  if (dist < 1.f) return;
-  float seek = 0.35f;
-  float sp = hypotf(f->vx, f->vy);
-  if (sp < 1.f) sp = GORF_SPEED;
-  float wx = f->vx / sp, wy = f->vy / sp;
-  float sx = dx / dist, sy = dy / dist;
-  float nx = wx * (1.f - seek) + sx * seek;
-  float ny = wy * (1.f - seek) + sy * seek;
-  float nn = hypotf(nx, ny);
-  if (nn < 1e-3f) return;
-  f->vx = (nx / nn) * sp;
-  f->vy = (ny / nn) * sp;
+  set_vel_toward(f, tx, ty, 0.45f, sp);
 }
 
 static int overlaps_port(const foe_t *f, const port_t *p) {
@@ -668,7 +745,7 @@ static void emit_clones(int exit_port, const char *kind) {
 
 static void process_clone_machine(float dt) {
   if (!clone_vis || burst.active) return;
-  clone_frame = fmodf(clone_frame + dt * 2.4f, (float)CLONE_CYCLE_N);
+  clone_frame = fmodf(clone_frame + dt * CLONE_ROT_RATE, (float)CLONE_CYCLE_N);
   if (clone_frame < 0) clone_frame += CLONE_CYCLE_N;
   /* Continuous Lissajous (video fit). Floor only at blit — see pix(). */
   clone_x = clone_home_x + CLONE_AMP_X * sinf(t_accum * CLONE_OMEGA_X + CLONE_PHASE_X);
@@ -748,11 +825,9 @@ static int key_down(game_t *g, int sc) {
 static void update_burst(float dt) {
   if (!burst.active) return;
   burst.age += dt;
-  /* Hold cloner at burst origin; still morph frames for presence. */
+  /* Freeze cloner pose/morph for the burst. */
   clone_x = burst.x;
   clone_y = burst.y;
-  clone_frame = fmodf(clone_frame + dt * 2.4f, (float)CLONE_CYCLE_N);
-  if (clone_frame < 0) clone_frame += CLONE_CYCLE_N;
 
   burst_spawn_acc += dt;
   while (burst_spawn_acc >= BURST_RAY_SPAWN_DT && n_burst_rays < BURST_RAYS_MAX) {
