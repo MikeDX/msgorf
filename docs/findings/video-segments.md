@@ -38,7 +38,7 @@ Default map: [`work/video_refs/tracks/playfield_map.json`](../../work/video_refs
 | `seg_a_play` | 8 | 20 | Active play: gorfs + CLONE + player |
 | `galaxy_ish` | ~25 | ~45 | Spiral/vortex + perimeter gorfs |
 | `seg_b_mid` | 88 | 98 | Gorfs + cloner + painted blocks |
-| `burst` | ~100 | ~105 | Radial burst around cloner-like core |
+| `burst` | ~19.7 | ~22.6 | Frames **`f00590`–`f00685`**: dashed rays from cloner + BG strobe (see [`clone-burst-explosion.md`](clone-burst-explosion.md)) |
 | `seg_c_late` | 150 | 163 | Late play; motion streaks |
 
 Use the **full frame dump** below to refine this table (every frame).
