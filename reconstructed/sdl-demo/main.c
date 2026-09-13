@@ -1,6 +1,7 @@
 /* GUESS SDL host — simulate & paint only on 320×204, then integer-scale to window.
  * Never present fractional buffer→window mapping (that looks like “scaled pixel” motion). */
 #include "game.h"
+#include "sound.h"
 
 #include <SDL.h>
 #include <stdio.h>
@@ -121,9 +122,12 @@ int main(int argc, char **argv) {
 
   /* Must be set before renderer/texture creation for nearest filtering. */
   SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO) != 0) {
     fprintf(stderr, "SDL_Init: %s\n", SDL_GetError());
     return 1;
+  }
+  if (sound_init() != 0) {
+    fprintf(stderr, "sound_init failed (continuing without audio)\n");
   }
 
   H.win = SDL_CreateWindow(
@@ -166,6 +170,7 @@ int main(int argc, char **argv) {
   SDL_DestroyTexture(H.tex);
   SDL_DestroyRenderer(H.ren);
   SDL_DestroyWindow(H.win);
+  sound_quit();
   SDL_Quit();
   return 0;
 }

@@ -3,6 +3,7 @@
 #include "game.h"
 #include "font_gen.h"
 #include "assets_gen.h"
+#include "sound.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -441,6 +442,7 @@ static void player_destroyed(void) {
   death_linger = PLAYER_DEATH_LINGER;
   respawn_gorf_count = n_foes;
   if (respawn_gorf_count < 1) respawn_gorf_count = 1;
+  sound_play_playerdie();
 }
 
 static void start_clear_burst(void) {
@@ -452,6 +454,7 @@ static void start_clear_burst(void) {
   n_clone_jobs = 0;
   n_burst_rays = 0;
   burst_spawn_acc = 0;
+  sound_play_clonedestroy();
 }
 
 static void end_clear_burst(void) {
@@ -461,11 +464,18 @@ static void end_clear_burst(void) {
 
 static void begin_level(game_t *g) {
   (void)g;
+  sound_stop_title();
+  sound_play_startup();
   score = 0;
   ships_left = 3;
   fire_cd = 0;
   t_accum = 0;
   start_wave_intro(4);
+}
+
+static void enter_select(game_t *g) {
+  g->mode = MODE_SELECT;
+  sound_play_title();
 }
 
 static void draw_galaxy(uint8_t *rgb) {
@@ -827,7 +837,10 @@ static void update_intro(float dt) {
    * t_accum stays at 0 so cloner pose matches place_clone_at_home until PLAY. */
   if (intro_black > 0.f) {
     intro_black -= dt;
-    if (intro_black < 0.f) intro_black = 0.f;
+    if (intro_black <= 0.f) {
+      intro_black = 0.f;
+      sound_play_galaxy(); /* rings appear after black beat */
+    }
     return;
   }
   galaxy_age += dt;
@@ -994,6 +1007,7 @@ static void update_play(game_t *g, float dt) {
       b->vx = c * sp;
       b->vy = s * sp;
       b->life = 1.f;
+      sound_play_shoot();
     }
   } else {
     fire_cd -= dt;
@@ -1102,6 +1116,7 @@ void game_init(game_t *g, uint8_t *rgb) {
   G = g;
   build_galaxy();
   srand(1);
+  sound_play_title();
 }
 
 void game_keydown(game_t *g, int scancode) {
@@ -1112,7 +1127,7 @@ void game_keydown(game_t *g, int scancode) {
       begin_level(g);
     }
   } else if (g->mode == MODE_DEAD) {
-    if (scancode == 40 || scancode == 30) /* Enter / 1 */ g->mode = MODE_SELECT;
+    if (scancode == 40 || scancode == 30) /* Enter / 1 */ enter_select(g);
   }
 }
 
@@ -1151,7 +1166,7 @@ void game_pad_start(game_t *g, int players) {
     g->start_players = players;
     begin_level(g);
   } else if (g->mode == MODE_DEAD) {
-    g->mode = MODE_SELECT;
+    enter_select(g);
   }
 }
 

@@ -16,7 +16,9 @@ make
 make run
 ```
 
-Needs `sdl2-config` (Homebrew `sdl2` / `sdl2-compat`).
+Needs `sdl2-config` (Homebrew `sdl2` / `sdl2-compat`) and `SDL2_mixer`
+(Homebrew `sdl2_mixer`). SFX are OGG Vorbis in `sfx/` (encoded from
+`work/video_refs/audio/*.wav` via `ffmpeg` on `make`).
 
 ### Web (Emscripten)
 
@@ -72,6 +74,8 @@ That updates `index.html` / `index.js` / `index.wasm` only. `--delete` drops lef
 |------|------|
 | `main.c` | SDL/Emscripten host, nearest-neighbour scale |
 | `game.c` / `game.h` | 320×204 sim + render |
+| `sound.c` / `sound.h` | SDL_mixer SFX (title / startup / galaxy / shoot / die) |
+| `sfx/` | OGG cues (~100KB total; from `work/video_refs/audio/*.wav`) |
 | `font_gen.h` | HUD glyphs from `video-demo/font_guess.json` |
 | `Makefile` | `native` + `web` |
 
