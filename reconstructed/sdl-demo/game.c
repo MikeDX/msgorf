@@ -410,6 +410,7 @@ static void start_wave_intro(int gorf_count) {
   player_vis = 0;
   player_x = FB_W * 0.5f;
   player_y = FB_H * 0.5f;
+  t_accum = 0;
   place_clone_at_home();
 
   intro_black = INTRO_BLACK_T;
@@ -822,8 +823,8 @@ static void process_clone_machine(float dt) {
 }
 
 static void update_intro(float dt) {
-  t_accum += dt;
-  /* Black beat, then frozen field + galaxy. Cloner/gorfs do not move. */
+  /* Black beat, then frozen field + galaxy. Cloner/gorfs do not move.
+   * t_accum stays at 0 so cloner pose matches place_clone_at_home until PLAY. */
   if (intro_black > 0.f) {
     intro_black -= dt;
     if (intro_black < 0.f) intro_black = 0.f;
