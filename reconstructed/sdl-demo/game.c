@@ -41,8 +41,8 @@
 #define CLONE_OMEGA_Y 0.35f
 #define CLONE_PHASE_X 0.0979f
 #define CLONE_PHASE_Y 2.1879f
-#define CLONE_HOME_X 160.f
-#define CLONE_HOME_Y 100.f
+#define CLONE_HOME_X (FB_W * (2.f / 3.f)) /* ~2/3 across — above-right of player */
+#define CLONE_HOME_Y (FB_H * (1.f / 3.f)) /* ~1/3 down */
 /* GUESS: clear-burst — docs/findings/clone-burst-explosion.md (f00590–f00685). */
 #define BURST_DUR 2.9f
 #define BURST_FLASH_PERIOD (13.f / 30.f)
@@ -483,20 +483,41 @@ static void draw_select(uint8_t *rgb) {
 static void bounce_walls(foe_t *e) {
   const float margin = 4.f;
   const float top = 22.f;
+  int hit = 0;
+  int side = -1; /* 0 L 1 R 2 T 3 B */
   if (e->x - e->r < margin) {
     e->x = margin + e->r;
-    if (e->vx < 0) e->vx = -e->vx;
+    hit = 1;
+    side = 0;
   } else if (e->x + e->r > FB_W - margin) {
     e->x = FB_W - margin - e->r;
-    if (e->vx > 0) e->vx = -e->vx;
+    hit = 1;
+    side = 1;
   }
   if (e->y - e->r < top) {
     e->y = top + e->r;
-    if (e->vy < 0) e->vy = -e->vy;
+    hit = 1;
+    side = 2;
   } else if (e->y + e->r > FB_H - margin) {
     e->y = FB_H - margin - e->r;
-    if (e->vy > 0) e->vy = -e->vy;
+    hit = 1;
+    side = 3;
   }
+  if (!hit) return;
+  /* Bounce with a new outbound angle (not a perfect specular reflect). */
+  float sp = hypotf(e->vx, e->vy);
+  if (sp < 8.f) sp = GORF_SPEED;
+  float ang;
+  if (side == 0)
+    ang = (frand() - 0.5f) * (float)M_PI; /* leave left wall → mostly +x */
+  else if (side == 1)
+    ang = (float)M_PI + (frand() - 0.5f) * (float)M_PI; /* leave right → mostly -x */
+  else if (side == 2)
+    ang = (float)M_PI * 0.5f + (frand() - 0.5f) * (float)M_PI; /* leave top → +y */
+  else
+    ang = -(float)M_PI * 0.5f + (frand() - 0.5f) * (float)M_PI; /* leave bottom → -y */
+  e->vx = cosf(ang) * sp;
+  e->vy = sinf(ang) * sp;
 }
 
 static void bounce_pair(foe_t *a, foe_t *b) {
@@ -674,50 +695,25 @@ static void set_vel_toward(foe_t *f, float tx, float ty, float seek, float sp) {
   f->vy = (ny / nn) * sp;
 }
 
-/* Approach cloner; if close but yellow face isn't toward gorf, wait on that side. */
+/* No long-range seek — gorfs bounce freely. Only pause if already next to a
+ * non-yellow face until morph lines up (absorb still via port overlap). */
 static void steer_gorf_to_clone_port(foe_t *f) {
   if (!clone_vis || burst.active || f->cool > 0.f) return;
 
   float dx = f->x - clone_x, dy = f->y - clone_y;
   float dist = hypotf(dx, dy);
-  float sp = hypotf(f->vx, f->vy);
-  if (sp < 1.f) sp = GORF_SPEED;
-
-  if (dist > CLONE_WAIT_R) {
-    /* Far: coast toward cloner; yellow alignment handled when close. */
-    set_vel_toward(f, clone_x, clone_y, 0.28f, sp);
-    return;
-  }
+  if (dist > CLONE_WAIT_R) return;
 
   if (!gorf_on_yellow_face(f)) {
-    /* Wait on this face until morph brings yellow around. */
     float ang = atan2f(dy, dx);
     float hold = CLONE_BODY_R + 8.f;
     float hx = clone_x + cosf(ang) * hold;
     float hy = clone_y + sinf(ang) * hold;
     f->vx *= 0.72f;
     f->vy *= 0.72f;
-    set_vel_toward(f, hx, hy, 0.55f, GORF_SPEED * 0.25f);
-    return;
+    set_vel_toward(f, hx, hy, 0.55f, GORF_SPEED * 0.2f);
   }
-
-  /* Yellow faces this gorf — seek nearer yellow port. */
-  port_t ports[2];
-  clone_yellow_ports(ports);
-  float best_d = 1e9f;
-  float tx = 0.5f * (ports[0].x0 + ports[0].x1);
-  float ty = 0.5f * (ports[0].y0 + ports[0].y1);
-  for (int i = 0; i < 2; i++) {
-    float px = 0.5f * (ports[i].x0 + ports[i].x1);
-    float py = 0.5f * (ports[i].y0 + ports[i].y1);
-    float d = hypotf(f->x - px, f->y - py);
-    if (d < best_d) {
-      best_d = d;
-      tx = px;
-      ty = py;
-    }
-  }
-  set_vel_toward(f, tx, ty, 0.45f, sp);
+  /* On yellow face: keep current velocity — enter when overlap hits the port. */
 }
 
 static int overlaps_port(const foe_t *f, const port_t *p) {
