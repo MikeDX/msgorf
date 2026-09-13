@@ -37,3 +37,5 @@ Working conclusions from the Ms. Gorf disks and references. Parent map: [`../REA
 - [`hud-layout-guess.md`](hud-layout-guess.md) — score right-align + fixed P1/lives (select = play chrome)
 - [`gorf-update-cadence.md`](gorf-update-cadence.md) — gorf step rate / odd-even test / cloner approach
 - [`gorf-motion-from-video.md`](gorf-motion-from-video.md) — earlier noisy yellow-blob probe
+- [`yt-transcript-gameplay.md`](yt-transcript-gameplay.md) — Jamie YT captions: 10 rds/s, dual stick, 256 aim
+- [`clone-burst-explosion.md`](clone-burst-explosion.md) — clear-burst rays + BG strobe

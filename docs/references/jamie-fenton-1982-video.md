@@ -19,7 +19,9 @@
 
 **Local research copy (gitignored):** `work/video_refs/mediaburn_12827_fenton_followup2_480p.mp4` — 640×480 H.264 progressive (~189 MB). See `work/video_refs/README.md`.
 
-**Chopped gameplay (gitignored):** `work/video_refs/gameplay.mp4` (~163 s fullscreen). Drives the labeled remake in [`reconstructed/video-demo/`](../../reconstructed/video-demo/).
+**Chopped gameplay (gitignored):** `work/video_refs/gameplay.mp4` (~163 s fullscreen). Drives the labeled remake in [`reconstructed/video-demo/`](../../reconstructed/video-demo/) / [`reconstructed/sdl-demo/`](../../reconstructed/sdl-demo/).
+
+**Transcript (auto-caption):** [`work/video_refs/yt-transcript.txt`](../../work/video_refs/yt-transcript.txt) — gameplay takeaways in [`../findings/yt-transcript-gameplay.md`](../findings/yt-transcript-gameplay.md) (≈10 rounds/s, dual analog, 256 aim dirs).
 
 **Frame dump 4–10s:** `work/video_refs/gameplay_4to10/` — 180 JPEGs @ ~29.97 fps (`f0001` ≈ 4.0 s … `f0180` ≈ 10.0 s). For CRT crop / HUD lining.
 

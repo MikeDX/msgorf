@@ -24,6 +24,9 @@
 #define GORF_SPEED 45.f
 #define GORF_SPEED_SPREAD 0.3f
 #define BULLET_MUZZLE 12.f
+/* Jamie on tape: laser ~10 rounds/sec (work/video_refs/yt-transcript.txt ~7:48). */
+#define FIRE_ROUNDS_PER_SEC 10.f
+#define FIRE_COOLDOWN (1.f / FIRE_ROUNDS_PER_SEC)
 #define CLONE_PROCESS_T 0.35f
 #define CLONE_EXIT_SPEED 55.f
 #define CLONE_COOL 0.75f
@@ -936,7 +939,7 @@ static void update_play(game_t *g, float dt) {
   fire_cd -= dt;
   int fire = g->mouse_down || g->pad_fire || stick_aim || key_down(g, 44) || key_down(g, 14);
   if (!burst.active && fire && fire_cd <= 0 && n_bullets < MAX_BULLETS) {
-    fire_cd = 0.12f;
+    fire_cd = FIRE_COOLDOWN;
     float sp = 160.f;
     float c = cosf(aim), s = sinf(aim);
     bullet_t *b = &bullets[n_bullets++];
@@ -944,7 +947,7 @@ static void update_play(game_t *g, float dt) {
     b->y = player_y + s * BULLET_MUZZLE;
     b->vx = c * sp;
     b->vy = s * sp;
-    b->life = 0.9f;
+    b->life = 1.f; /* flag only — travel until playfield edge (or hit) */
   }
 
   int wb = 0;
@@ -952,8 +955,8 @@ static void update_play(game_t *g, float dt) {
     bullet_t *b = &bullets[i];
     b->x += b->vx * dt;
     b->y += b->vy * dt;
-    b->life -= dt;
-    if (b->life > 0 && b->x > -10 && b->x < FB_W + 10 && b->y > -10 && b->y < FB_H + 10)
+    /* GUESS from Jamie: shots run to the playfield boundary (no mid-air timeout). */
+    if (b->life > 0 && b->x >= 0 && b->x < FB_W && b->y >= 0 && b->y < FB_H)
       bullets[wb++] = *b;
   }
   n_bullets = wb;
