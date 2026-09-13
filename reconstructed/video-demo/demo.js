@@ -184,8 +184,8 @@
   // Anticlockwise around a shell (Y-down): decreasing angle
   const GALAXY_ARM_STEP = -(Math.PI * 2) / GALAXY_ARMS;
   const GALAXY_SHELL_TWIST = GALAXY_ARM_STEP / 3;
-  const GALAXY_STARS_PER_SEC = 7 * 30; // ~7 stars per video frame @ 30fps
-  const GALAXY_SHELL_PEEL_DT = 0.07;
+  const GALAXY_STARS_PER_SEC = 18 * 30; // GUESS: ~18 stars/video-frame — prior 7/frame felt slow vs footage
+  const GALAXY_SHELL_PEEL_DT = 0.035;
 
   /** @type {{x:number,y:number,shell:number,r:number}[]} */
   const GALAXY_STARS = [];

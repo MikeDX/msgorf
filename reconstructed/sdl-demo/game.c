@@ -42,8 +42,8 @@
 #define GALAXY_SHELLS_OVER 3
 #define GALAXY_SHELL_GAP 3.5f
 #define GALAXY_R1 5.f
-#define GALAXY_STARS_PER_SEC (7.f * 30.f)
-#define GALAXY_SHELL_PEEL_DT 0.07f
+#define GALAXY_STARS_PER_SEC (18.f * 30.f) /* GUESS: faster than first pass; ~7/frame felt slow vs footage */
+#define GALAXY_SHELL_PEEL_DT 0.035f
 
 typedef struct {
   float x, y, vx, vy;
