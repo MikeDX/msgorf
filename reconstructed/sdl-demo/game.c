@@ -40,11 +40,11 @@
 #define BURST_DUR 2.9f
 #define BURST_FLASH_PERIOD (13.f / 30.f)
 #define BURST_FLASH_DUTY (7.f / 13.f)
-#define BURST_RAYS 28
+#define BURST_RAYS_MAX 128
+#define BURST_RAY_SPAWN_DT (1.f / 30.f) /* ~1 new ray per video frame */
 #define BURST_DASH_ON 3
 #define BURST_DASH_GAP 3
 #define BURST_GROW_PX_PER_SEC 95.f
-#define PLAYFIELD_TOP 18 /* HUD strip stays black during BG flash */
 
 #define GALAXY_ARMS 16
 #define GALAXY_SHELLS_IN 17
@@ -131,7 +131,9 @@ static float clone_x, clone_y, clone_frame;
 static float clone_home_x, clone_home_y;
 static int clone_vis;
 static burst_t burst;
-static burst_ray_t burst_rays[BURST_RAYS];
+static burst_ray_t burst_rays[BURST_RAYS_MAX];
+static int n_burst_rays;
+static float burst_spawn_acc;
 
 static bullet_t bullets[MAX_BULLETS];
 static int n_bullets;
@@ -388,13 +390,8 @@ static void start_clear_burst(void) {
   burst.x = clone_x;
   burst.y = clone_y;
   n_clone_jobs = 0;
-  for (int i = 0; i < BURST_RAYS; i++) {
-    /* Spread angles; slight jitter + staggered start so tips aren't locked. */
-    burst_rays[i].ang =
-        (float)(M_PI * 2.0) * ((float)i / (float)BURST_RAYS) + (frand() - 0.5f) * 0.12f;
-    burst_rays[i].born = frand() * 0.45f;
-    burst_rays[i].spd = BURST_GROW_PX_PER_SEC * (0.75f + frand() * 0.5f);
-  }
+  n_burst_rays = 0;
+  burst_spawn_acc = 0;
 }
 
 static void end_clear_burst(void) {
@@ -756,6 +753,16 @@ static void update_burst(float dt) {
   clone_y = burst.y;
   clone_frame = fmodf(clone_frame + dt * 2.4f, (float)CLONE_CYCLE_N);
   if (clone_frame < 0) clone_frame += CLONE_CYCLE_N;
+
+  burst_spawn_acc += dt;
+  while (burst_spawn_acc >= BURST_RAY_SPAWN_DT && n_burst_rays < BURST_RAYS_MAX) {
+    burst_spawn_acc -= BURST_RAY_SPAWN_DT;
+    burst_ray_t *ray = &burst_rays[n_burst_rays++];
+    ray->ang = frand() * (float)(M_PI * 2.0);
+    ray->born = burst.age;
+    ray->spd = BURST_GROW_PX_PER_SEC * (0.7f + frand() * 0.6f);
+  }
+
   if (burst.age >= BURST_DUR) end_clear_burst();
 }
 
@@ -780,7 +787,7 @@ static void draw_burst_bg(uint8_t *rgb) {
   if (!burst.active || !burst_flash_on()) return;
   uint8_t r, g, b;
   burst_flash_rgb(&r, &g, &b);
-  for (int y = PLAYFIELD_TOP; y < FB_H; y++) {
+  for (int y = 0; y < FB_H; y++) {
     for (int x = 0; x < FB_W; x++) put_px(rgb, x, y, r, g, b);
   }
 }
@@ -800,7 +807,7 @@ static void draw_burst_rays(uint8_t *rgb) {
   }
   int cx = pix(burst.x), cy = pix(burst.y);
   int period = BURST_DASH_ON + BURST_DASH_GAP;
-  for (int i = 0; i < BURST_RAYS; i++) {
+  for (int i = 0; i < n_burst_rays; i++) {
     burst_ray_t *ray = &burst_rays[i];
     float life = burst.age - ray->born;
     if (life <= 0.f) continue;
