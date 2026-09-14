@@ -1646,11 +1646,12 @@ static void update_play(game_t *g, float dt) {
         aim = atan2f(g->pad_aim_y, g->pad_aim_x);
       else
         aim = atan2f(g->mouse_y - player_y, g->mouse_x - player_x);
-      int fire = g->mouse_down || g->pad_fire || stick_aim || key_down(g, 44) || key_down(g, 14);
-      /* First 2s of wave/respawn: fire lays player shields (no shooting). */
-      if (play_age < PLAYER_SHIELD_WINDOW) {
-        if (fire) lay_player_shield_at(player_x, player_y);
-      } else if (fire && fire_cd <= 0 && n_bullets < MAX_BULLETS) {
+      /* Shoot: right stick / mouse / keys only — never triggers. */
+      int shoot = g->mouse_down || stick_aim || key_down(g, 44) || key_down(g, 14);
+      /* L/R triggers lay shields only in the first seconds after wave/respawn. */
+      if (play_age < PLAYER_SHIELD_WINDOW && g->pad_shield)
+        lay_player_shield_at(player_x, player_y);
+      if (shoot && fire_cd <= 0 && n_bullets < MAX_BULLETS) {
         fire_cd = FIRE_COOLDOWN;
         float sp = 320.f;
         float c = cosf(aim), s = sinf(aim);
@@ -2003,6 +2004,8 @@ void game_pad_aim(game_t *g, float x, float y) {
 }
 
 void game_pad_fire(game_t *g, int down) { g->pad_fire = down ? 1 : 0; }
+
+void game_pad_shield(game_t *g, int down) { g->pad_shield = down ? 1 : 0; }
 
 void game_pad_start(game_t *g, int players) {
   if (players < 1) players = 1;

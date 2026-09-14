@@ -195,7 +195,7 @@
       canvas: document.getElementById("canvas"),
       onRuntimeInitialized: function () {
         document.getElementById("status").textContent =
-          "Left stick move · Right stick aim & fire · Desktop: WASD + mouse also work";
+          "Left stick move · Right stick aim/fire · L/R triggers shields (first 2s) · A/Start";
         bindUi();
         setInterval(syncStartButton, 250);
       }
@@ -283,16 +283,48 @@
         if (ready()) Module._msgorf_pad_move(0, 0);
       });
 
-      bindStick(document.getElementById("stick-aim"), function (x, y, m) {
+      bindStick(document.getElementById("stick-aim"), function (x, y) {
         if (!ready()) return;
         Module._msgorf_pad_aim(x, y);
-        Module._msgorf_pad_fire(m > 0.28 ? 1 : 0);
       }, function () {
         if (!ready()) return;
         Module._msgorf_pad_aim(0, 0);
-        Module._msgorf_pad_fire(0);
       });
     }
+
+    /* Physical gamepad on web: right stick aim/fire; L/R triggers = shields. */
+    function pollWebGamepad() {
+      if (!ready() || !navigator.getGamepads) return;
+      var pads = navigator.getGamepads();
+      var gp = null;
+      for (var i = 0; i < pads.length; i++) {
+        if (pads[i]) {
+          gp = pads[i];
+          break;
+        }
+      }
+      if (!gp) return;
+      var lx = gp.axes[0] || 0,
+        ly = gp.axes[1] || 0;
+      var rx = gp.axes[2] || 0,
+        ry = gp.axes[3] || 0;
+      if (Math.hypot(lx, ly) < 0.18) {
+        lx = 0;
+        ly = 0;
+      }
+      if (Math.hypot(rx, ry) < 0.18) {
+        rx = 0;
+        ry = 0;
+      }
+      Module._msgorf_pad_move(lx, ly);
+      Module._msgorf_pad_aim(rx, ry);
+      var lt = gp.buttons[6] ? gp.buttons[6].value : 0;
+      var rt = gp.buttons[7] ? gp.buttons[7].value : 0;
+      Module._msgorf_pad_shield(lt > 0.25 || rt > 0.25 ? 1 : 0);
+      if (gp.buttons[9] && gp.buttons[9].pressed) Module._msgorf_pad_start(1);
+      if (gp.buttons[0] && gp.buttons[0].pressed) Module._msgorf_pad_start(1);
+    }
+    setInterval(pollWebGamepad, 16);
   </script>
   <!-- Cache bust: make web stamps MSGORF_BUILD_ID; locateFile covers .wasm/.data -->
   <script>

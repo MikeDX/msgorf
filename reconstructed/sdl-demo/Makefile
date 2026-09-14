@@ -80,7 +80,7 @@ web: assets sync-sfx
 	    -sUSE_SDL=2 -sUSE_SDL_MIXER=2 -sSDL2_MIXER_FORMATS='\''["ogg"]'\'' \
 	    -sALLOW_MEMORY_GROWTH=1 -sMINIFY_HTML=0 \
 	    --preload-file $(SFX_DIR)@/sfx \
-	    -sEXPORTED_FUNCTIONS=_main,_msgorf_pad_move,_msgorf_pad_aim,_msgorf_pad_fire,_msgorf_pad_start,_msgorf_get_mode \
+	    -sEXPORTED_FUNCTIONS=_main,_msgorf_pad_move,_msgorf_pad_aim,_msgorf_pad_fire,_msgorf_pad_shield,_msgorf_pad_start,_msgorf_get_mode \
 	    -sEXPORTED_RUNTIME_METHODS=ccall,cwrap \
 	    --shell-file shell.html \
 	    -o $(WEB_OUT)'

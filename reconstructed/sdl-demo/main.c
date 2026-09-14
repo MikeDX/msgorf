@@ -97,20 +97,21 @@ static void close_pad(void) {
   game_pad_move(&game, 0.f, 0.f);
   game_pad_aim(&game, 0.f, 0.f);
   game_pad_fire(&game, 0);
+  game_pad_shield(&game, 0);
 }
 
 static void poll_gamepad(void) {
   if (!pad) return;
-  /* Left stick = move; right stick = aim (+ fire past deadzone in game). */
+  /* Left stick = move; right stick = aim (game fires from aim past deadzone). */
   game_pad_move(&game, pad_axis(pad, SDL_CONTROLLER_AXIS_LEFTX),
                 pad_axis(pad, SDL_CONTROLLER_AXIS_LEFTY));
   float ax = pad_axis(pad, SDL_CONTROLLER_AXIS_RIGHTX);
   float ay = pad_axis(pad, SDL_CONTROLLER_AXIS_RIGHTY);
   game_pad_aim(&game, ax, ay);
-  int fire = hypotf(ax, ay) > 0.28f ||
-             SDL_GameControllerGetButton(pad, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER) ||
-             SDL_GameControllerGetAxis(pad, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 12000;
-  game_pad_fire(&game, fire);
+  /* L/R triggers = shield drop only (game ignores outside placement window). */
+  int shield = SDL_GameControllerGetAxis(pad, SDL_CONTROLLER_AXIS_TRIGGERLEFT) > 12000 ||
+               SDL_GameControllerGetAxis(pad, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 12000;
+  game_pad_shield(&game, shield);
 }
 
 #ifdef __EMSCRIPTEN__
@@ -120,6 +121,7 @@ static void poll_gamepad(void) {
 EMSCRIPTEN_KEEPALIVE void msgorf_pad_move(float x, float y) { game_pad_move(&game, x, y); }
 EMSCRIPTEN_KEEPALIVE void msgorf_pad_aim(float x, float y) { game_pad_aim(&game, x, y); }
 EMSCRIPTEN_KEEPALIVE void msgorf_pad_fire(int down) { game_pad_fire(&game, down); }
+EMSCRIPTEN_KEEPALIVE void msgorf_pad_shield(int down) { game_pad_shield(&game, down); }
 EMSCRIPTEN_KEEPALIVE void msgorf_pad_start(int players) { game_pad_start(&game, players); }
 EMSCRIPTEN_KEEPALIVE int msgorf_get_mode(void) { return game_get_mode(&game); }
 #endif
