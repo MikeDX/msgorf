@@ -31,15 +31,16 @@
 #define FIRE_COOLDOWN (1.f / FIRE_ROUNDS_PER_SEC)
 #define PLAYER_DEATH_LINGER 2.5f /* continue play after ship destroyed */
 #define INTRO_BLACK_T 0.45f      /* black beat before field + galaxy */
-/* GUESS: L2+ gorf return fire — first shot 1–3s after play, then ~5–6s. */
-#define GORF_FIRE_FIRST_MIN 1.f
-#define GORF_FIRE_FIRST_MAX 3.f
-#define GORF_FIRE_PERIOD_MIN 5.f
-#define GORF_FIRE_PERIOD_MAX 6.f
-/* ~4 px/frame @ 60Hz present rate (GUESS from footage). */
-#define GORF_SHOT_SPEED (4.f * 60.f)
+/* GUESS: L2+ gorf return fire — first shot 5–6s after play, then every 1–3s. */
+#define GORF_FIRE_FIRST_MIN 5.f
+#define GORF_FIRE_FIRST_MAX 6.f
+#define GORF_FIRE_PERIOD_MIN 0.5f
+#define GORF_FIRE_PERIOD_MAX 2.f
+/* L2: 2 px/frame @ 60Hz; higher levels can ramp later. */
+#define GORF_SHOT_PPF_L2 2.f
 #define GORF_SHOT_HIT_R 3.f
-#define SMINE_SPAWN_T 6.f /* L2+: one SMINE once, ~6s into play */
+#define SMINE_SPAWN_T 2.f /* L2+: one SMINE from cloner ~2s into play */
+#define SMINE_ANIM_HZ 8.f
 #define CLONE_PROCESS_T 0.35f
 #define CLONE_EXIT_SPEED 55.f
 #define CLONE_COOL 0.75f
@@ -98,6 +99,7 @@ typedef struct {
   int hp;
   float r;
   float cool;
+  float anim; /* SMINE frame timer */
 } foe_t;
 
 typedef struct {
@@ -352,6 +354,7 @@ static void spawn_gorf(float x, float y, float vx, float vy, const char *kind, f
   f->hp = 1;
   f->r = GORF_R;
   f->cool = cool;
+  f->anim = 0;
 }
 
 /* Keep gorfs moving after wall/pair bounce (elastic swaps can kill speed). */
@@ -395,28 +398,29 @@ static void spawn_gorf_at_edge(int side) {
   spawn_gorf(x, y, vx, vy, "GORF_PAT", 0);
 }
 
-static void spawn_smine_at_edge(void) {
-  float x, y, vx, vy;
-  const float margin = 18.f;
-  int side = rand() % 4;
-  if (side == 0) {
-    x = margin + frand() * (FB_W - margin * 2);
-    y = margin + 22 + frand() * 20;
-  } else if (side == 1) {
-    x = margin + frand() * (FB_W - margin * 2);
-    y = FB_H - margin - frand() * 24;
-  } else if (side == 2) {
-    x = margin + frand() * 24;
-    y = margin + 28 + frand() * (FB_H - margin * 2 - 28);
-  } else {
-    x = FB_W - margin - frand() * 24;
-    y = margin + 28 + frand() * (FB_H - margin * 2 - 28);
-  }
-  rand_vel(&vx, &vy);
-  spawn_gorf(x, y, vx, vy, "SMINE0", 0);
+static int foe_is_gorf(const foe_t *f) { return name_eq(f->kind, "GORF_PAT"); }
+
+static int foe_is_smine(const foe_t *f) {
+  return name_eq(f->kind, "SMINE0") || name_eq(f->kind, "SMINE1") || name_eq(f->kind, "SMINE");
 }
 
-static int foe_is_gorf(const foe_t *f) { return name_eq(f->kind, "GORF_PAT"); }
+static const char *foe_draw_kind(const foe_t *f) {
+  if (!foe_is_smine(f)) return f->kind;
+  return (((int)(f->anim * SMINE_ANIM_HZ)) & 1) ? "SMINE1" : "SMINE0";
+}
+
+static int count_gorfs(void) {
+  int n = 0;
+  for (int i = 0; i < n_foes; i++)
+    if (foe_is_gorf(&foes[i])) n++;
+  return n;
+}
+
+static float gorf_shot_speed(void) {
+  float ppf = GORF_SHOT_PPF_L2;
+  if (level_num > 2) ppf += (float)(level_num - 2) * 0.5f; /* mild ramp later */
+  return ppf * 60.f;
+}
 
 static void place_clone_at_home(void) {
   clone_vis = 1;
@@ -840,6 +844,20 @@ static void emit_clones(int exit_port, const char *kind) {
   }
 }
 
+/* Timed L2+ SMINE: exits a yellow cloner port (same path as clone emit). */
+static void spawn_smine_from_cloner(void) {
+  if (!clone_vis || n_foes >= MAX_FOES) return;
+  port_t ports[2];
+  clone_yellow_ports(ports);
+  int exit_port = rand() & 1;
+  port_t *port = &ports[exit_port];
+  float mid_x = (port->x0 + port->x1) * 0.5f;
+  float mid_y = (port->y0 + port->y1) * 0.5f;
+  float ex = port->ex, ey = port->ey;
+  spawn_gorf(mid_x + ex * 10.f, mid_y + ey * 10.f, ex * CLONE_EXIT_SPEED, ey * CLONE_EXIT_SPEED,
+             "SMINE0", CLONE_COOL);
+}
+
 static void tick_clone_pose(float dt) {
   if (!clone_vis || burst.active) return;
   clone_frame = fmodf(clone_frame + dt * CLONE_ROT_RATE, (float)CLONE_CYCLE_N);
@@ -1094,6 +1112,7 @@ static void update_play(game_t *g, float dt) {
   for (int i = 0; i < n_foes; i++) {
     foe_t *f = &foes[i];
     if (f->cool > 0) f->cool -= dt;
+    if (foe_is_smine(f)) f->anim += dt;
     if (!burst.active) steer_gorf_to_clone_port(f);
     f->x += f->vx * dt;
     f->y += f->vy * dt;
@@ -1106,33 +1125,28 @@ static void update_play(game_t *g, float dt) {
     keep_gorf_speed(&foes[i]);
   }
 
-  /* L2+: first shot 1–3s after play starts, then ~5–6s; only gorfs shoot. */
+  /* L2+: first shot 5–6s after play, then every 0.5–2s from a random foe (gorf/SMINE). */
   if (level_num >= 2 && !burst.active && player_vis && death_linger <= 0.f) {
     play_age += dt;
     if (smine_armed && play_age >= SMINE_SPAWN_T) {
-      spawn_smine_at_edge();
+      spawn_smine_from_cloner();
       smine_armed = 0;
     }
     gorf_fire_cd -= dt;
     if (gorf_fire_cd <= 0.f && n_ebullets < MAX_EBULLETS && n_foes > 0) {
       gorf_fire_cd = GORF_FIRE_PERIOD_MIN + frand() * (GORF_FIRE_PERIOD_MAX - GORF_FIRE_PERIOD_MIN);
-      int gorf_idx[MAX_FOES];
-      int n_g = 0;
-      for (int i = 0; i < n_foes; i++)
-        if (foe_is_gorf(&foes[i])) gorf_idx[n_g++] = i;
-      if (n_g > 0) {
-        foe_t *shooter = &foes[gorf_idx[rand() % n_g]];
-        float dx = player_x - shooter->x;
-        float dy = player_y - shooter->y;
-        float len = hypotf(dx, dy);
-        if (len < 1.f) len = 1.f;
-        bullet_t *eb = &ebullets[n_ebullets++];
-        eb->x = shooter->x;
-        eb->y = shooter->y;
-        eb->vx = (dx / len) * GORF_SHOT_SPEED;
-        eb->vy = (dy / len) * GORF_SHOT_SPEED;
-        eb->life = 1.f;
-      }
+      foe_t *shooter = &foes[rand() % n_foes];
+      float dx = player_x - shooter->x;
+      float dy = player_y - shooter->y;
+      float len = hypotf(dx, dy);
+      if (len < 1.f) len = 1.f;
+      float sp = gorf_shot_speed();
+      bullet_t *eb = &ebullets[n_ebullets++];
+      eb->x = shooter->x;
+      eb->y = shooter->y;
+      eb->vx = (dx / len) * sp;
+      eb->vy = (dy / len) * sp;
+      eb->life = 1.f;
     }
   }
 
@@ -1151,6 +1165,7 @@ static void update_play(game_t *g, float dt) {
     for (int fi = 0; fi < n_foes; fi++) {
       foe_t *f = &foes[fi];
       if (f->hp <= 0) continue;
+      if (foe_is_smine(f)) continue; /* SMINE is shot-proof */
       if (hypotf(b->x - f->x, b->y - f->y) < f->r + 3) {
         f->hp = 0;
         b->life = 0;
@@ -1168,7 +1183,8 @@ static void update_play(game_t *g, float dt) {
     if (foes[i].hp > 0) foes[wf++] = foes[i];
   n_foes = wf;
 
-  if (!burst.active && player_vis && n_foes == 0 && clone_vis && n_clone_jobs == 0)
+  /* Level ends when gorfs are gone — SMINE does not block clear. */
+  if (!burst.active && player_vis && count_gorfs() == 0 && clone_vis && n_clone_jobs == 0)
     start_clear_burst();
 
   for (int i = 0; i < n_fx; i++) fx[i].hp -= dt;
@@ -1216,7 +1232,8 @@ static void draw_gorf_shot(uint8_t *rgb, int cx, int cy) {
 static void draw_world(uint8_t *rgb, int with_galaxy) {
   fb_clear(rgb);
   draw_burst_bg(rgb);
-  for (int i = 0; i < n_foes; i++) blit_named(rgb, foes[i].kind, pix(foes[i].x), pix(foes[i].y), 0);
+  for (int i = 0; i < n_foes; i++)
+    blit_named(rgb, foe_draw_kind(&foes[i]), pix(foes[i].x), pix(foes[i].y), 0);
   if (with_galaxy) draw_galaxy(rgb);
   for (int i = 0; i < n_fx; i++)
     blit_named(rgb, fx[i].hp > 0.22f ? "FBEXP5" : "FBEXP6", pix(fx[i].x), pix(fx[i].y), 0);
