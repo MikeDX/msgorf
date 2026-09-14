@@ -58,8 +58,8 @@
 #define KAMI_PAUSE_T 0.3f /* GUESS: brief stop before re-aim */
 #define KAMI_ARRIVE_R 6.f
 #define KAMI_SPEED_MULT 1.5f
-#define CLONE_PROCESS_T 0.35f
-#define CLONE_EMIT_GAP 1.f /* seconds between the two ejected clones */
+#define CLONE_PROCESS_T 1.f /* stop, wait 1s, eject first clone */
+#define CLONE_EMIT_GAP 1.f  /* then 1s later eject second, then spin again */
 #define CLONE_EXIT_SPEED 55.f
 #define CLONE_COOL 0.75f
 #define CLONE_SPAWN_CLEAR 48.f /* gorfs must spawn this far from cloner home */
@@ -1360,8 +1360,11 @@ static void spawn_extra_kind(int extra) {
 
 static void tick_clone_pose(float dt) {
   if (!clone_vis || burst.active) return;
-  clone_frame = fmodf(clone_frame + dt * CLONE_ROT_RATE, (float)CLONE_CYCLE_N);
-  if (clone_frame < 0) clone_frame += CLONE_CYCLE_N;
+  /* Spin only when not processing an absorb → eject sequence. */
+  if (n_clone_jobs == 0) {
+    clone_frame = fmodf(clone_frame + dt * CLONE_ROT_RATE, (float)CLONE_CYCLE_N);
+    if (clone_frame < 0) clone_frame += CLONE_CYCLE_N;
+  }
   clone_x = clone_home_x + CLONE_AMP_X * sinf(t_accum * CLONE_OMEGA_X + CLONE_PHASE_X);
   clone_y = clone_home_y + CLONE_AMP_Y * cosf(t_accum * CLONE_OMEGA_Y + CLONE_PHASE_Y);
   if (clone_x < 48.f) clone_x = 48.f;
@@ -1377,24 +1380,31 @@ static void process_clone_machine(float dt) {
 
   port_t ports[2];
   clone_yellow_ports(ports);
-  for (int i = 0; i < n_foes; i++) {
-    foe_t *f = &foes[i];
-    if (f->hp <= 0 || f->cool > 0) continue;
-    if (foe_is_special(f)) continue; /* timed extras do not enter cloner */
-    int hit = -1;
-    if (overlaps_port(f, &ports[0]))
-      hit = 0;
-    else if (overlaps_port(f, &ports[1]))
-      hit = 1;
-    if (hit < 0) continue;
-    f->hp = 0;
-    if (n_clone_jobs < MAX_CLONE_JOBS) {
-      clone_jobs[n_clone_jobs].t = CLONE_PROCESS_T;
-      clone_jobs[n_clone_jobs].exit_port = 1 - hit; /* opposite yellow */
-      clone_jobs[n_clone_jobs].kind = f->kind;
-      clone_jobs[n_clone_jobs].left = 2;
-      clone_jobs[n_clone_jobs].emit_i = 0;
-      n_clone_jobs++;
+  /* One job at a time: absorb only while idle (spinning). */
+  if (n_clone_jobs == 0) {
+    for (int i = 0; i < n_foes; i++) {
+      foe_t *f = &foes[i];
+      if (f->hp <= 0 || f->cool > 0) continue;
+      if (foe_is_special(f)) continue; /* timed extras do not enter cloner */
+      int hit = -1;
+      if (overlaps_port(f, &ports[0]))
+        hit = 0;
+      else if (overlaps_port(f, &ports[1]))
+        hit = 1;
+      if (hit < 0) continue;
+      f->hp = 0;
+      /* Freeze on current frame; 1s → eject → 1s → eject → resume spin. */
+      clone_frame = floorf(clone_frame);
+      if (clone_frame < 0) clone_frame = 0;
+      if (n_clone_jobs < MAX_CLONE_JOBS) {
+        clone_jobs[n_clone_jobs].t = CLONE_PROCESS_T;
+        clone_jobs[n_clone_jobs].exit_port = 1 - hit; /* opposite yellow */
+        clone_jobs[n_clone_jobs].kind = f->kind;
+        clone_jobs[n_clone_jobs].left = 2;
+        clone_jobs[n_clone_jobs].emit_i = 0;
+        n_clone_jobs++;
+      }
+      break; /* only one absorb per idle cycle */
     }
   }
 
@@ -1406,9 +1416,10 @@ static void process_clone_machine(float dt) {
       clone_jobs[i].emit_i++;
       clone_jobs[i].left--;
       if (clone_jobs[i].left > 0) {
-        clone_jobs[i].t = CLONE_EMIT_GAP; /* 1s between ejects */
+        clone_jobs[i].t = CLONE_EMIT_GAP;
         clone_jobs[w++] = clone_jobs[i];
       }
+      /* left==0: job done — spinning resumes next tick via n_clone_jobs==0 */
     } else {
       clone_jobs[w++] = clone_jobs[i];
     }
