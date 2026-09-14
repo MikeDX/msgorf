@@ -76,9 +76,12 @@ Side-by-side vs HUD guess:
 [`compare_digits.txt`](../../work/gorf_rom/font_dump/compare_digits.txt);
 [`fntsys_glyphs.json`](../../work/gorf_rom/font_dump/fntsys_glyphs.json).
 
-**Verdict:** Gorf’s own `CHRTBL` and the home `FNTSYS` are both known; neither matches Ms. Gorf’s
-6×10 marker digits. Keep the P1UP-sized cell; hunt `GFONTPAT` / application TERSE for the HUD
-atlas.
+Jay Fenton **ADDIN Mar1979** `LARGE`/`FNT57` listing matches this `FNTSYS` table
+byte-for-byte (vision-checked rows) — see [`addin-font.md`](addin-font.md).
+
+**Verdict:** Gorf’s own `CHRTBL` and the home `FNTSYS`/ADDIN `FNT57` are both known; neither
+matches Ms. Gorf’s 6×10 marker digits. Keep the P1UP-sized cell; hunt `GFONTPAT` / application
+TERSE for the HUD atlas.
 
 ## Ms. Gorf `GFONTPAT`
 

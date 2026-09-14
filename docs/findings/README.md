@@ -34,6 +34,7 @@ Working conclusions from the Ms. Gorf disks and references. Parent map: [`../REA
 - [`video-segments.md`](video-segments.md) — usable `gameplay.mp4` stretches for tracking
 - [`motion-fit-guess.md`](motion-fit-guess.md) — gorf/cloner motion params from tracks (GUESS)
 - [`hud-font.md`](hud-font.md) — HUD glyph size vs P1UP; Gorf/Astrocade font leads
+- [`addin-font.md`](addin-font.md) — ADDIN Mar1979 `FNT57` ≡ BIOS `FNTSYS` (scraped)
 - [`hud-layout-guess.md`](hud-layout-guess.md) — score right-align + fixed P1/lives (select = play chrome)
 - [`gorf-update-cadence.md`](gorf-update-cadence.md) — gorf step rate / odd-even test / cloner approach
 - [`gorf-motion-from-video.md`](gorf-motion-from-video.md) — earlier noisy yellow-blob probe
