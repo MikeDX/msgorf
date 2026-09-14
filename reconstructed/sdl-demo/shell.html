@@ -44,6 +44,24 @@
       padding: env(safe-area-inset-top) 0.75rem env(safe-area-inset-bottom);
       gap: 0.55rem;
     }
+    #app.pads-hidden {
+      grid-template-rows: auto 1fr auto;
+    }
+    #app.pads-hidden #pads {
+      display: none;
+    }
+    #app:fullscreen,
+    #app:-webkit-full-screen {
+      max-width: none;
+      width: 100%;
+      height: 100%;
+      padding: env(safe-area-inset-top) 1rem env(safe-area-inset-bottom);
+      background: var(--bg0);
+    }
+    #app:fullscreen.pads-hidden #stage,
+    #app:-webkit-full-screen.pads-hidden #stage {
+      border: none;
+    }
     header {
       text-align: center;
       padding-top: 0.35rem;
@@ -86,8 +104,27 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.75rem;
+      flex-wrap: wrap;
+      gap: 0.45rem 0.55rem;
       min-height: 2.4rem;
+    }
+    .hud-btn {
+      appearance: none;
+      border: 2px solid var(--line);
+      background: linear-gradient(180deg, #1a1e28, #10141c);
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.55rem;
+      letter-spacing: 0.14em;
+      padding: 0.45rem 0.7rem;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: transform 0.08s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease, opacity 0.2s ease;
+    }
+    .hud-btn:active { transform: scale(0.97); }
+    .hud-btn.on {
+      border-color: var(--amber-dim);
+      color: var(--amber);
     }
     #btn-start {
       appearance: none;
@@ -105,12 +142,41 @@
     }
     #btn-start:active { transform: scale(0.97); background: #3a3018; }
     #btn-start.hidden { opacity: 0; pointer-events: none; }
+    #btn-shield {
+      appearance: none;
+      border: 2px solid rgba(100, 180, 255, 0.45);
+      background: linear-gradient(180deg, #142030, #0a121c);
+      color: #8ec8ff;
+      font: inherit;
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      padding: 0.5rem 0.95rem;
+      cursor: pointer;
+      border-radius: 2px;
+      touch-action: none;
+      user-select: none;
+      transition: transform 0.08s ease, background 0.1s ease, box-shadow 0.1s ease;
+    }
+    #btn-shield:active,
+    #btn-shield.held {
+      transform: scale(0.97);
+      background: #1a3858;
+      box-shadow: 0 0 16px rgba(100, 180, 255, 0.25);
+    }
     #pads {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 0.5rem;
       padding: 0.15rem 0 0.5rem;
       align-items: end;
+    }
+    #pads .pad-col { min-width: 0; }
+    #pads .shield-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding-bottom: 1.35rem;
     }
     .stick {
       position: relative;
@@ -174,14 +240,20 @@
 
     <div id="controls">
       <div id="hud-bar">
+        <button type="button" class="hud-btn" id="btn-fs" title="Fullscreen">FULL</button>
+        <button type="button" class="hud-btn" id="btn-pads" title="Show or hide touch pads">PADS</button>
         <button type="button" id="btn-start">START</button>
       </div>
       <div id="pads">
-        <div>
+        <div class="pad-col">
           <div class="stick" id="stick-move" data-side="move"><div class="knob"></div></div>
           <div class="stick-label">MOVE</div>
         </div>
-        <div>
+        <div class="shield-col">
+          <button type="button" id="btn-shield" title="Hold to drop shields (first 2s)">SHIELD</button>
+          <div class="stick-label">HOLD · 2s</div>
+        </div>
+        <div class="pad-col">
           <div class="stick" id="stick-aim" data-side="aim"><div class="knob"></div></div>
           <div class="stick-label">AIM / FIRE</div>
         </div>
@@ -195,14 +267,23 @@
       canvas: document.getElementById("canvas"),
       onRuntimeInitialized: function () {
         document.getElementById("status").textContent =
-          "Left stick move · Right stick aim/fire · L/R triggers shields (first 2s) · A/Start";
+          "Move · Aim/fire · SHIELD hold (first 2s) · triggers on pad · A/Start";
         bindUi();
         setInterval(syncStartButton, 250);
       }
     };
 
+    var touchShieldDown = false;
+
     function ready() {
       return typeof Module._msgorf_pad_move === "function";
+    }
+
+    function setShield(down) {
+      touchShieldDown = !!down;
+      var btn = document.getElementById("btn-shield");
+      if (btn) btn.classList.toggle("held", touchShieldDown);
+      if (ready()) Module._msgorf_pad_shield(touchShieldDown ? 1 : 0);
     }
 
     function syncStartButton() {
@@ -218,6 +299,38 @@
       } else {
         btn.classList.add("hidden");
       }
+    }
+
+    function fsElement() {
+      return document.fullscreenElement || document.webkitFullscreenElement || null;
+    }
+
+    function syncFsButton() {
+      var btn = document.getElementById("btn-fs");
+      var on = !!fsElement();
+      btn.textContent = on ? "EXIT" : "FULL";
+      btn.classList.toggle("on", on);
+    }
+
+    function toggleFullscreen() {
+      var app = document.getElementById("app");
+      if (fsElement()) {
+        var exit = document.exitFullscreen || document.webkitExitFullscreen;
+        if (exit) exit.call(document);
+      } else {
+        var req = app.requestFullscreen || app.webkitRequestFullscreen;
+        if (req) req.call(app);
+      }
+    }
+
+    function setPadsVisible(show) {
+      var app = document.getElementById("app");
+      var btn = document.getElementById("btn-pads");
+      app.classList.toggle("pads-hidden", !show);
+      btn.textContent = show ? "PADS" : "PADS+";
+      btn.classList.toggle("on", show);
+      try { localStorage.setItem("msgorf_pads", show ? "1" : "0"); } catch (e) {}
+      if (!show) setShield(false);
     }
 
     function bindStick(el, onMove, onEnd) {
@@ -270,11 +383,54 @@
       el.addEventListener("pointercancel", up);
     }
 
+    function bindHoldButton(el, onDown, onUp) {
+      var pid = null;
+      function down(ev) {
+        if (pid !== null) return;
+        pid = ev.pointerId;
+        el.setPointerCapture(pid);
+        onDown();
+        ev.preventDefault();
+      }
+      function up(ev) {
+        if (ev.pointerId !== pid) return;
+        pid = null;
+        onUp();
+        ev.preventDefault();
+      }
+      el.addEventListener("pointerdown", down);
+      el.addEventListener("pointerup", up);
+      el.addEventListener("pointercancel", up);
+      el.addEventListener("lostpointercapture", function () {
+        if (pid === null) return;
+        pid = null;
+        onUp();
+      });
+    }
+
     function bindUi() {
       document.getElementById("btn-start").addEventListener("click", function () {
         if (!ready()) return;
         Module._msgorf_pad_start(1);
         syncStartButton();
+      });
+
+      document.getElementById("btn-fs").addEventListener("click", toggleFullscreen);
+      document.addEventListener("fullscreenchange", syncFsButton);
+      document.addEventListener("webkitfullscreenchange", syncFsButton);
+      syncFsButton();
+
+      var padsPref = "1";
+      try { padsPref = localStorage.getItem("msgorf_pads") || "1"; } catch (e) {}
+      setPadsVisible(padsPref !== "0");
+      document.getElementById("btn-pads").addEventListener("click", function () {
+        setPadsVisible(document.getElementById("app").classList.contains("pads-hidden"));
+      });
+
+      bindHoldButton(document.getElementById("btn-shield"), function () {
+        setShield(true);
+      }, function () {
+        setShield(false);
       });
 
       bindStick(document.getElementById("stick-move"), function (x, y) {
@@ -320,7 +476,8 @@
       Module._msgorf_pad_aim(rx, ry);
       var lt = gp.buttons[6] ? gp.buttons[6].value : 0;
       var rt = gp.buttons[7] ? gp.buttons[7].value : 0;
-      Module._msgorf_pad_shield(lt > 0.25 || rt > 0.25 ? 1 : 0);
+      var triggerShield = lt > 0.25 || rt > 0.25;
+      Module._msgorf_pad_shield(touchShieldDown || triggerShield ? 1 : 0);
       if (gp.buttons[9] && gp.buttons[9].pressed) Module._msgorf_pad_start(1);
       if (gp.buttons[0] && gp.buttons[0].pressed) Module._msgorf_pad_start(1);
     }

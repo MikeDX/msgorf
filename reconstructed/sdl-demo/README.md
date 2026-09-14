@@ -81,6 +81,8 @@ and reloads nginx.
 | **Web:** Start button | Begin / again |
 | **Web:** Left stick | Move |
 | **Web:** Right stick | Aim + fire (past deadzone) |
+| **Web:** SHIELD (hold) | Drop shields (first 2s of PLAY) |
+| **Web:** FULL / PADS | Fullscreen; show/hide touch sticks |
 
 ## Layout
 
