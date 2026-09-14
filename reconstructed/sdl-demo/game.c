@@ -49,7 +49,7 @@
 #define SPAWN_SMINE 1
 #define SPAWN_SHLD 2
 #define SPAWN_LAZON 3
-#define WAVE_EXTRAS_MAX 2
+#define WAVE_EXTRAS_MAX 3
 #define LAZON_BEAM_PPS 320.f /* GUESS: laser tip advance */
 #define LAZON_STOP_T 0.28f
 #define LAZON_HIT_R 7.f
@@ -143,16 +143,17 @@ typedef struct {
 
 static const wave_def_t WAVES[WAVE_COUNT] = {
     /* W1: gorfs only */
-    {4, 0, {{SPAWN_NONE, 0}, {SPAWN_NONE, 0}}, 2.5f, 3.0f, 0.50f, 2.00f, 2.0f, 1.00f},
+    {4, 0, {{SPAWN_NONE, 0}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}}, 2.5f, 3.0f, 0.50f, 2.00f, 2.0f, 1.00f},
     /* W2: SMINE */
-    {8, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_NONE, 0}}, 2.5f, 3.0f, 0.50f, 2.00f, 2.0f, 1.00f},
+    {8, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}}, 2.5f, 3.0f, 0.50f, 2.00f, 2.0f, 1.00f},
     /* W3: SMINE then SHLD-P */
-    {9, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_SHLD, 3.5f}}, 2.0f, 2.5f, 0.40f, 1.50f, 2.2f, 1.05f},
+    {9, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_SHLD, 3.5f}, {SPAWN_NONE, 0}}, 2.0f, 2.5f, 0.40f, 1.50f, 2.2f, 1.05f},
     /* W4: SHLD-P then LAZON */
-    {12, 1, {{SPAWN_SHLD, 2.f}, {SPAWN_LAZON, 3.5f}}, 1.5f, 2.0f, 0.35f, 1.20f, 2.4f, 1.10f},
-    /* W5+ TBD */
-    {14, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_NONE, 0}}, 1.25f, 1.75f, 0.30f, 1.00f, 2.6f, 1.15f},
-    {16, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_NONE, 0}}, 1.0f, 1.5f, 0.25f, 0.80f, 2.8f, 1.20f},
+    {12, 1, {{SPAWN_SHLD, 2.f}, {SPAWN_LAZON, 3.5f}, {SPAWN_NONE, 0}}, 1.5f, 2.0f, 0.35f, 1.20f, 2.4f, 1.10f},
+    /* W5: LAZON, SMINE, SHLD-P */
+    {14, 1, {{SPAWN_LAZON, 2.f}, {SPAWN_SMINE, 3.5f}, {SPAWN_SHLD, 7.f}}, 1.25f, 1.75f, 0.30f, 1.00f, 2.6f, 1.15f},
+    /* W6 TBD */
+    {16, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}}, 1.0f, 1.5f, 0.25f, 0.80f, 2.8f, 1.20f},
 };
 
 typedef struct {
@@ -748,14 +749,18 @@ static void update_lazon(foe_t *f, float dt) {
 
 static void draw_lazon_beam(uint8_t *rgb, const foe_t *f) {
   if (f->lazon_phase != 2 || f->lazon_beam < 1.f) return;
-  float tip_x = f->x + f->lazon_aim_dx * f->lazon_beam;
-  float tip_y = f->y + f->lazon_aim_dy * f->lazon_beam;
-  int x0 = pix(f->x), y0 = pix(f->y);
-  int x1 = pix(tip_x), y1 = pix(tip_y);
-  /* Continuous laser stream — bright core + warm fringe. */
-  draw_line(rgb, x0, y0, x1, y1, 255, 80, 60);
-  draw_line(rgb, x0 + 1, y0, x1 + 1, y1, 255, 220, 80);
-  draw_line(rgb, x0, y0 + 1, x1, y1 + 1, 255, 200, 60);
+  /* Same broken-dash style as cloner burst rays (BURST_DASH_ON / GAP). */
+  int len = (int)f->lazon_beam;
+  if (len < 1) return;
+  if (len > 400) len = 400;
+  int cx = pix(f->x), cy = pix(f->y);
+  float ca = f->lazon_aim_dx, sa = f->lazon_aim_dy;
+  int period = BURST_DASH_ON + BURST_DASH_GAP;
+  for (int d = 0; d < len; d++) {
+    int slot = d % period;
+    if (slot >= BURST_DASH_ON) continue;
+    put_px(rgb, cx + (int)(ca * d), cy + (int)(sa * d), 255, 220, 90);
+  }
 }
 
 static void draw_mine(uint8_t *rgb, float x, float y) {
