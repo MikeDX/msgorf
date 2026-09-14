@@ -1087,7 +1087,7 @@ static void update_play(game_t *g, float dt) {
     int fire = g->mouse_down || g->pad_fire || stick_aim || key_down(g, 44) || key_down(g, 14);
     if (fire && fire_cd <= 0 && n_bullets < MAX_BULLETS) {
       fire_cd = FIRE_COOLDOWN;
-      float sp = 160.f;
+      float sp = 320.f; /* was 160; +50% */
       float c = cosf(aim), s = sinf(aim);
       bullet_t *b = &bullets[n_bullets++];
       b->x = player_x + c * BULLET_MUZZLE;

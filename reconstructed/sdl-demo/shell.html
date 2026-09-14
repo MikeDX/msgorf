@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
   <title>Ms. Gorf</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -291,6 +293,14 @@
         Module._msgorf_pad_fire(0);
       });
     }
+  </script>
+  <!-- Cache bust: make web stamps MSGORF_BUILD_ID; locateFile covers .wasm/.data -->
+  <script>
+    var Module = typeof Module !== "undefined" ? Module : {};
+    Module["MSGORF_BUILD"] = "MSGORF_BUILD_ID";
+    Module["locateFile"] = function (path, prefix) {
+      return (prefix || "") + path + "?v=" + Module["MSGORF_BUILD"];
+    };
   </script>
   {{{ SCRIPT }}}
 </body>

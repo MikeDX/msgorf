@@ -53,7 +53,10 @@ rsync -avz --delete \
 ssh mike@192.168.68.105 'chmod 755 ~/msgorf'
 ```
 
-That updates `index.html` / `index.js` / `index.wasm` only. `--delete` drops leftover JS-proto files; `nginx` / `docker-compose.yml` on the host are kept via `--exclude`.
+That updates `index.html` / `index.js` / `index.wasm` / `index.data`, stamps a
+build id (`?v=…`) so browsers fetch fresh WASM/JS, syncs
+`deploy/nginx-default.conf` (HTML `no-store`, assets immutable by query URL),
+and reloads nginx.
 ## Controls
 
 | Input | Action |
