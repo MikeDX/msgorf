@@ -148,6 +148,7 @@
     #btn-start:active { transform: scale(0.97); background: #3a3018; }
     #btn-start.hidden { opacity: 0; pointer-events: none; }
     .hud-btn.hidden { display: none; }
+    .hidden { display: none !important; }
     #btn-shield {
       appearance: none;
       border: 2px solid rgba(100, 180, 255, 0.45);
@@ -320,9 +321,11 @@
       flex-direction: column;
       min-height: 0;
       gap: 0.75rem;
+      touch-action: pan-y;
     }
     #app.tab-scores {
       grid-template-rows: auto auto 1fr;
+      touch-action: pan-y;
     }
     #app.tab-scores #view-play { display: none; }
     #app.tab-scores #view-scores { display: flex; }
@@ -331,10 +334,20 @@
       justify-content: center;
       flex-wrap: wrap;
       gap: 0.45rem;
+      flex-shrink: 0;
     }
     .period-row .hud-btn {
       min-width: 5.5rem;
       font-size: clamp(0.78rem, 3.3vw, 0.9rem);
+    }
+    #scores-scroll {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,0.35);
+      border-radius: 2px;
+      overflow: hidden;
     }
     #scores-full {
       margin: 0;
@@ -343,13 +356,18 @@
       font-size: clamp(0.95rem, 4.2vw, 1.15rem);
       color: var(--muted);
       letter-spacing: 0.03em;
-      overflow: auto;
+      height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
       -webkit-overflow-scrolling: touch;
-      min-height: 0;
-      flex: 1;
-      border: 1px solid var(--line);
-      background: rgba(0,0,0,0.35);
-      border-radius: 2px;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
+      cursor: grab;
+    }
+    #scores-full.dragging {
+      cursor: grabbing;
+      user-select: none;
+      scroll-behavior: auto;
     }
     #scores-full li {
       display: grid;
@@ -360,6 +378,7 @@
       border-bottom: 1px solid rgba(240, 200, 32, 0.1);
       cursor: pointer;
       min-height: 3.1rem;
+      touch-action: pan-y;
     }
     #scores-full li:hover {
       background: rgba(240, 200, 32, 0.06);
@@ -374,11 +393,17 @@
       font-size: 1.05em;
     }
     #scores-empty {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       text-align: center;
       color: var(--muted);
       font-size: clamp(0.85rem, 3.5vw, 1rem);
       padding: 2rem 0.5rem;
       letter-spacing: 0.08em;
+      pointer-events: none;
     }
     #watch-panel {
       display: none;
@@ -504,8 +529,10 @@
         <button type="button" class="hud-btn" data-period="week">WEEK</button>
         <button type="button" class="hud-btn on" data-period="all">ALL TIME</button>
       </div>
-      <ul id="scores-full"></ul>
-      <div id="scores-empty" class="hidden">NO SCORES YET</div>
+      <div id="scores-scroll">
+        <ul id="scores-full"></ul>
+        <div id="scores-empty" class="hidden">NO SCORES YET</div>
+      </div>
     </div>
   </div>
 
@@ -807,6 +834,7 @@
         li.appendChild(sc);
         li.title = "Watch " + (r.name || "ANON") + " · $" + r.score;
         li.addEventListener("click", function () {
+          if (scoresDragMoved) return;
           var u = new URL(window.location.href);
           u.searchParams.set("r", r.id);
           history.replaceState(null, "", u.pathname + u.search + u.hash);
@@ -815,6 +843,46 @@
         });
         ul.appendChild(li);
       });
+    }
+
+    /* Mouse / finger drag-to-scroll on the scores list (wheel + swipe still work natively). */
+    var scoresDragMoved = false;
+    function bindScoresDragScroll() {
+      var el = document.getElementById("scores-full");
+      if (!el || el._dragBound) return;
+      el._dragBound = true;
+      var active = false;
+      var startY = 0;
+      var startScroll = 0;
+      var pointerId = null;
+
+      el.addEventListener("pointerdown", function (ev) {
+        if (ev.pointerType === "touch") return; /* native pan-y */
+        if (ev.button !== 0) return;
+        active = true;
+        scoresDragMoved = false;
+        pointerId = ev.pointerId;
+        startY = ev.clientY;
+        startScroll = el.scrollTop;
+        el.classList.add("dragging");
+        try { el.setPointerCapture(pointerId); } catch (e) {}
+      });
+      el.addEventListener("pointermove", function (ev) {
+        if (!active || ev.pointerId !== pointerId) return;
+        var dy = ev.clientY - startY;
+        if (Math.abs(dy) > 4) scoresDragMoved = true;
+        el.scrollTop = startScroll - dy;
+      });
+      function endDrag(ev) {
+        if (!active || (ev && ev.pointerId !== pointerId)) return;
+        active = false;
+        pointerId = null;
+        el.classList.remove("dragging");
+        setTimeout(function () { scoresDragMoved = false; }, 0);
+      }
+      el.addEventListener("pointerup", endDrag);
+      el.addEventListener("pointercancel", endDrag);
+      el.addEventListener("lostpointercapture", endDrag);
     }
 
     async function refreshScores() {
@@ -925,8 +993,8 @@
         document.getElementById("status").textContent =
           "Move · Aim/fire · SHIELD hold (first 2s) · triggers on pad · A/Start";
         bindUi();
+        bindScoresDragScroll();
         setInterval(syncStartButton, 250);
-        refreshScores();
         tryLoadReplayFromUrl();
       }
     };
