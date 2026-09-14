@@ -273,6 +273,7 @@ static burst_t burst;
 static burst_ray_t burst_rays[BURST_RAYS_MAX];
 static int n_burst_rays;
 static float burst_spawn_acc;
+static int replay_ff_held; /* UI fast-forward: hide burst flash (sim still runs) */
 
 static bullet_t bullets[MAX_BULLETS];
 static int n_bullets;
@@ -1733,7 +1734,8 @@ static void burst_flash_rgb(uint8_t *r, uint8_t *g, uint8_t *b) {
 }
 
 static void draw_burst_bg(uint8_t *rgb) {
-  if (!burst.active || !burst_flash_on()) return;
+  /* FF strobes badly through the pink/yellow fill — hide while speeding. */
+  if (!burst.active || replay_ff_held || !burst_flash_on()) return;
   uint8_t r, g, b;
   burst_flash_rgb(&r, &g, &b);
   for (int y = 0; y < FB_H; y++) {
@@ -1742,7 +1744,7 @@ static void draw_burst_bg(uint8_t *rgb) {
 }
 
 static void draw_burst_rays(uint8_t *rgb) {
-  if (!burst.active) return;
+  if (!burst.active || replay_ff_held) return;
   int flash = burst_flash_on();
   uint8_t rr, rg, rb;
   if (flash) {
@@ -2263,7 +2265,12 @@ int game_start_replay(game_t *g, const uint8_t *data, size_t len) {
 
 void game_stop_replay(game_t *g) {
   if (replay_playing()) replay_cancel();
+  replay_ff_held = 0;
   enter_select(g);
+}
+
+void game_set_replay_ff(int held) {
+  replay_ff_held = held ? 1 : 0;
 }
 
 void game_update(game_t *g, float dt) {

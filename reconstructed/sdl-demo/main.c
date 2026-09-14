@@ -117,6 +117,8 @@ static void poll_gamepad(void) {
 }
 
 #ifdef __EMSCRIPTEN__
+static int replay_ff_held;
+
 /* JS twin-stick / Start / replay → game (Module._msgorf_*) */
 EMSCRIPTEN_KEEPALIVE void msgorf_pad_move(float x, float y) {
   if (!replay_playing()) game_pad_move(&game, x, y);
@@ -140,9 +142,19 @@ EMSCRIPTEN_KEEPALIVE const uint8_t *msgorf_replay_ptr(void) { return replay_blob
 EMSCRIPTEN_KEEPALIVE void msgorf_set_build_id(const char *id) { replay_set_build_id(id); }
 EMSCRIPTEN_KEEPALIVE int msgorf_replay_play(const uint8_t *data, int len) {
   if (!data || len <= 0) return 0;
+  replay_ff_held = 0;
+  game_set_replay_ff(0);
   return game_start_replay(&game, data, (size_t)len);
 }
-EMSCRIPTEN_KEEPALIVE void msgorf_replay_stop(void) { game_stop_replay(&game); }
+EMSCRIPTEN_KEEPALIVE void msgorf_replay_stop(void) {
+  replay_ff_held = 0;
+  game_set_replay_ff(0);
+  game_stop_replay(&game);
+}
+EMSCRIPTEN_KEEPALIVE void msgorf_replay_ff(int held) {
+  replay_ff_held = (held && replay_playing()) ? 1 : 0;
+  game_set_replay_ff(replay_ff_held);
+}
 /* Copy recording into a JS-owned buffer (ptr from Module._malloc). */
 EMSCRIPTEN_KEEPALIVE int msgorf_replay_copy(uint8_t *dst, int max) {
   const uint8_t *src = replay_blob();
@@ -201,6 +213,15 @@ static void frame(void) {
   poll_gamepad();
   /* Fixed 60Hz tick — one sim step per paced frame (mines flash every tick). */
   game_update(&game, SIM_DT);
+#ifdef __EMSCRIPTEN__
+  /* Hold-to-FF during replay: +3 ticks/frame ≈ 4× while held. */
+  if (replay_ff_held && replay_playing()) {
+    for (int i = 0; i < 3; i++) {
+      if (game_get_mode(&game) == MODE_DEAD) break;
+      game_update(&game, SIM_DT);
+    }
+  }
+#endif
   game_render(&game);
 
   layout_present();

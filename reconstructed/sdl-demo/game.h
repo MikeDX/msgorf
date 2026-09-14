@@ -47,6 +47,8 @@ int game_get_score(game_t *g);
 uint32_t game_get_seed(game_t *g);
 int game_start_replay(game_t *g, const uint8_t *data, size_t len);
 void game_stop_replay(game_t *g);
+/* While held during replay FF: skip clear-burst full-screen flash draw. */
+void game_set_replay_ff(int held);
 void game_update(game_t *g, float dt);
 void game_render(game_t *g);
 

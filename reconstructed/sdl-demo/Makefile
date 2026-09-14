@@ -96,7 +96,7 @@ web: assets sync-sfx
 	    -sUSE_SDL=2 -sUSE_SDL_MIXER=2 -sSDL2_MIXER_FORMATS='\''["ogg"]'\'' \
 	    -sALLOW_MEMORY_GROWTH=1 -sMINIFY_HTML=0 \
 	    --preload-file $(SFX_DIR)@/sfx \
-	    -sEXPORTED_FUNCTIONS=_main,_malloc,_free,_msgorf_pad_move,_msgorf_pad_aim,_msgorf_pad_fire,_msgorf_pad_shield,_msgorf_pad_start,_msgorf_get_mode,_msgorf_get_score,_msgorf_replay_mode,_msgorf_replay_ready,_msgorf_replay_len,_msgorf_replay_ptr,_msgorf_replay_copy,_msgorf_replay_play,_msgorf_replay_stop,_msgorf_set_build_id \
+	    -sEXPORTED_FUNCTIONS=_main,_malloc,_free,_msgorf_pad_move,_msgorf_pad_aim,_msgorf_pad_fire,_msgorf_pad_shield,_msgorf_pad_start,_msgorf_get_mode,_msgorf_get_score,_msgorf_replay_mode,_msgorf_replay_ready,_msgorf_replay_len,_msgorf_replay_ptr,_msgorf_replay_copy,_msgorf_replay_play,_msgorf_replay_stop,_msgorf_replay_ff,_msgorf_set_build_id \
 	    -sEXPORTED_RUNTIME_METHODS=ccall,cwrap,UTF8ToString,stringToUTF8 \
 	    --shell-file shell.html \
 	    -o $(WEB_OUT)'

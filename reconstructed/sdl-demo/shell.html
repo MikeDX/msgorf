@@ -147,6 +147,11 @@
     }
     #btn-start:active { transform: scale(0.97); background: #3a3018; }
     #btn-start.hidden { opacity: 0; pointer-events: none; }
+    #btn-ff.held {
+      border-color: var(--amber);
+      color: var(--amber);
+      background: #2a2410;
+    }
     .hud-btn.hidden { display: none; }
     .hidden { display: none !important; }
     #btn-shield {
@@ -502,6 +507,8 @@
           <button type="button" class="hud-btn" id="btn-fs" title="Fullscreen">FULL</button>
           <button type="button" class="hud-btn" id="btn-pads" title="Show or hide touch pads">PADS</button>
           <button type="button" class="hud-btn on hidden" id="btn-watch" title="Watch loaded replay">WATCH</button>
+          <button type="button" class="hud-btn hidden" id="btn-ff" title="Hold to fast-forward">FF ▸▸</button>
+          <button type="button" class="hud-btn hidden" id="btn-restart" title="Restart replay">RESTART</button>
           <button type="button" class="hud-btn hidden" id="btn-stop" title="Stop replay and play yourself">EXIT REPLAY</button>
           <button type="button" id="btn-start">START</button>
         </div>
@@ -812,6 +819,17 @@
       refreshScores();
     }
 
+    function openScoreReplay(id) {
+      if (!id) return;
+      try {
+        var u = new URL(window.location.href);
+        u.searchParams.set("r", id);
+        history.replaceState(null, "", u.pathname + u.search + u.hash);
+      } catch (e) {}
+      setTab("play");
+      loadReplayById(id, false);
+    }
+
     function fillScoreList(ul, rows, emptyEl) {
       ul.innerHTML = "";
       if (!rows.length) {
@@ -820,7 +838,9 @@
       }
       if (emptyEl) emptyEl.classList.add("hidden");
       rows.forEach(function (r, i) {
+        if (!r || !r.id) return;
         var li = document.createElement("li");
+        li.dataset.runId = r.id;
         var rank = document.createElement("span");
         rank.textContent = String(i + 1) + ".";
         var nm = document.createElement("span");
@@ -833,20 +853,17 @@
         li.appendChild(nm);
         li.appendChild(sc);
         li.title = "Watch " + (r.name || "ANON") + " · $" + r.score;
-        li.addEventListener("click", function () {
-          if (scoresDragMoved) return;
-          var u = new URL(window.location.href);
-          u.searchParams.set("r", r.id);
-          history.replaceState(null, "", u.pathname + u.search + u.hash);
-          setTab("play");
-          loadReplayById(r.id, false);
-        });
         ul.appendChild(li);
       });
     }
 
-    /* Mouse / finger drag-to-scroll on the scores list (wheel + swipe still work natively). */
-    var scoresDragMoved = false;
+    /* Mouse drag-to-scroll; touch uses native pan-y.
+     * Do NOT capture the pointer until a real drag starts — early capture
+     * retargets click to the list and kills row activation. */
+    var scoresDragState = { dragged: false, armUntil: 0 };
+    function scoresListDidDrag() {
+      return scoresDragState.dragged || Date.now() < scoresDragState.armUntil;
+    }
     function bindScoresDragScroll() {
       var el = document.getElementById("scores-full");
       if (!el || el._dragBound) return;
@@ -855,30 +872,51 @@
       var startY = 0;
       var startScroll = 0;
       var pointerId = null;
+      var DRAG_PX = 12;
+
+      el.addEventListener("click", function (ev) {
+        if (scoresListDidDrag()) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          return;
+        }
+        var li = ev.target.closest("li");
+        if (!li || !el.contains(li) || !li.dataset.runId) return;
+        ev.preventDefault();
+        openScoreReplay(li.dataset.runId);
+      });
 
       el.addEventListener("pointerdown", function (ev) {
-        if (ev.pointerType === "touch") return; /* native pan-y */
+        if (ev.pointerType === "touch") return;
         if (ev.button !== 0) return;
         active = true;
-        scoresDragMoved = false;
+        scoresDragState.dragged = false;
         pointerId = ev.pointerId;
         startY = ev.clientY;
         startScroll = el.scrollTop;
-        el.classList.add("dragging");
-        try { el.setPointerCapture(pointerId); } catch (e) {}
       });
       el.addEventListener("pointermove", function (ev) {
         if (!active || ev.pointerId !== pointerId) return;
         var dy = ev.clientY - startY;
-        if (Math.abs(dy) > 4) scoresDragMoved = true;
+        if (!scoresDragState.dragged && Math.abs(dy) < DRAG_PX) return;
+        if (!scoresDragState.dragged) {
+          scoresDragState.dragged = true;
+          el.classList.add("dragging");
+          try { el.setPointerCapture(pointerId); } catch (e) {}
+        }
         el.scrollTop = startScroll - dy;
       });
       function endDrag(ev) {
         if (!active || (ev && ev.pointerId !== pointerId)) return;
+        var wasDrag = scoresDragState.dragged;
         active = false;
         pointerId = null;
         el.classList.remove("dragging");
-        setTimeout(function () { scoresDragMoved = false; }, 0);
+        if (wasDrag) {
+          /* Suppress the click that follows a drag. */
+          scoresDragState.armUntil = Date.now() + 350;
+        }
+        scoresDragState.dragged = false;
       }
       el.addEventListener("pointerup", endDrag);
       el.addEventListener("pointercancel", endDrag);
@@ -928,7 +966,7 @@
       var sc = pendingReplayMeta && pendingReplayMeta.score != null
         ? pendingReplayMeta.score : "?";
       document.getElementById("status").textContent =
-        "REPLAY · " + who + " · $" + sc + " · EXIT REPLAY to play yourself";
+        "REPLAY · " + who + " · $" + sc + " · hold FF · RESTART · EXIT";
     }
 
     function stopReplayToPlay() {
@@ -1019,16 +1057,28 @@
       var btn = document.getElementById("btn-start");
       var btnWatch = document.getElementById("btn-watch");
       var btnStop = document.getElementById("btn-stop");
+      var btnFf = document.getElementById("btn-ff");
+      var btnRestart = document.getElementById("btn-restart");
 
       btnWatch.classList.toggle("hidden", watching || !pendingReplayBytes);
       btnStop.classList.toggle("hidden", !watching);
+      btnFf.classList.toggle("hidden", !watching);
+      btnRestart.classList.toggle("hidden", !watching);
+      if (!watching) {
+        btnFf.classList.remove("held");
+        if (ready() && typeof Module._msgorf_replay_ff === "function")
+          Module._msgorf_replay_ff(0);
+      }
 
       if (watching) {
         btn.classList.add("hidden");
         showSharePanel(false);
         if (mode === 3 && lastShareMode !== 3) {
           document.getElementById("status").textContent =
-            "Replay finished · EXIT REPLAY or WATCH again";
+            "Replay finished · RESTART or EXIT REPLAY";
+          if (typeof Module._msgorf_replay_ff === "function")
+            Module._msgorf_replay_ff(0);
+          btnFf.classList.remove("held");
         }
       } else if (mode === 0) { /* SELECT */
         btn.textContent = "START";
@@ -1171,6 +1221,22 @@
       });
       document.getElementById("btn-stop").addEventListener("click", function () {
         stopReplayToPlay();
+      });
+      document.getElementById("btn-restart").addEventListener("click", function () {
+        if (!ready() || !pendingReplayBytes) return;
+        if (typeof Module._msgorf_replay_ff === "function") Module._msgorf_replay_ff(0);
+        document.getElementById("btn-ff").classList.remove("held");
+        startPendingReplay();
+        syncStartButton();
+      });
+      bindHoldButton(document.getElementById("btn-ff"), function () {
+        if (!ready() || Module._msgorf_replay_mode() !== 3) return;
+        document.getElementById("btn-ff").classList.add("held");
+        Module._msgorf_replay_ff(1);
+      }, function () {
+        document.getElementById("btn-ff").classList.remove("held");
+        if (ready() && typeof Module._msgorf_replay_ff === "function")
+          Module._msgorf_replay_ff(0);
       });
       document.getElementById("btn-watch-go").addEventListener("click", function () {
         startPendingReplay();
