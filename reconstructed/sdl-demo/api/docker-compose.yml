@@ -1,0 +1,18 @@
+# Ms. Gorf score/replay API — separate service on the webhosting LXC
+# Traefik routes https://msgorf.mikedx.co.uk/api → http://192.168.68.105:5022
+#
+# On the LXC:
+#   cd ~/msgorf-api && docker compose up -d --build
+
+services:
+  msgorf-api:
+    build: .
+    image: msgorf-api:latest
+    container_name: msgorf-api
+    restart: unless-stopped
+    ports:
+      - "5022:8091"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - MSGORF_SERVE_WEB=0

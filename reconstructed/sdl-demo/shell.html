@@ -221,6 +221,81 @@
       color: var(--muted);
       min-height: 1em;
     }
+    #share-panel {
+      display: none;
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      align-items: center;
+      justify-content: center;
+      background: rgba(6, 8, 12, 0.78);
+      padding: 1rem;
+    }
+    #share-panel.show { display: flex; }
+    #share-card {
+      width: min(100%, 22rem);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      padding: 1rem 1.1rem 1.15rem;
+      text-align: center;
+    }
+    #share-card h2 {
+      margin: 0;
+      font-size: 0.85rem;
+      letter-spacing: 0.16em;
+      color: var(--amber);
+    }
+    #share-card .score {
+      margin: 0.55rem 0 0.85rem;
+      font-size: 1.15rem;
+      letter-spacing: 0.08em;
+      color: var(--ink);
+    }
+    #share-card input {
+      width: 100%;
+      box-sizing: border-box;
+      margin: 0 0 0.75rem;
+      padding: 0.45rem 0.55rem;
+      border: 1px solid var(--line);
+      background: #0a0c10;
+      color: var(--ink);
+      font: inherit;
+      font-size: 0.55rem;
+      letter-spacing: 0.08em;
+      border-radius: 2px;
+    }
+    #share-card .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      justify-content: center;
+    }
+    #share-card .hint {
+      margin: 0.65rem 0 0;
+      font-size: 0.45rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      min-height: 1.2em;
+    }
+    #scores {
+      margin: 0.35rem 0 0;
+      padding: 0;
+      list-style: none;
+      font-size: 0.48rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      max-height: 4.5rem;
+      overflow: auto;
+    }
+    #scores li {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.12rem 0;
+      border-bottom: 1px solid rgba(240, 200, 32, 0.08);
+    }
+    #scores .sc { color: var(--amber); }
     @media (min-width: 700px) {
       #app { max-width: 840px; }
       .stick { width: 160px; }
@@ -236,6 +311,19 @@
 
     <div id="stage">
       <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+      <div id="share-panel" aria-hidden="true">
+        <div id="share-card">
+          <h2>GAME OVER</h2>
+          <div class="score" id="share-score">$0</div>
+          <input id="share-name" type="text" maxlength="24" placeholder="NAME (OPTIONAL)" autocomplete="off" />
+          <div class="row">
+            <button type="button" class="hud-btn on" id="btn-share">SHARE</button>
+            <button type="button" class="hud-btn" id="btn-copy">COPY LINK</button>
+            <button type="button" class="hud-btn" id="btn-share-close">CLOSE</button>
+          </div>
+          <p class="hint" id="share-hint"></p>
+        </div>
+      </div>
     </div>
 
     <div id="controls">
@@ -258,18 +346,192 @@
           <div class="stick-label">AIM / FIRE</div>
         </div>
       </div>
+      <ul id="scores"></ul>
       <div id="status">Loading…</div>
     </div>
   </div>
 
   <script>
+    var lastShareMode = -1;
+    var pendingReplayId = null;
+    var lastUploadedId = null;
+
+    function b64urlEncode(bytes) {
+      var bin = "";
+      for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+      return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+    }
+
+    function b64urlDecode(s) {
+      s = s.replace(/-/g, "+").replace(/_/g, "/");
+      while (s.length % 4) s += "=";
+      var bin = atob(s);
+      var out = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+      return out;
+    }
+
+    function getReplayBytes() {
+      var len = Module._msgorf_replay_len();
+      if (len <= 0) return null;
+      var ptr = Module._malloc(len);
+      var n = Module._msgorf_replay_copy(ptr, len);
+      if (n < 0) {
+        Module._free(ptr);
+        return null;
+      }
+      var bytes = Module.HEAPU8.slice(ptr, ptr + n);
+      Module._free(ptr);
+      return bytes;
+    }
+
+    async function uploadRun(bytes, name) {
+      var res = await fetch("/api/runs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          build_id: Module.MSGORF_BUILD || "dev",
+          score: Module._msgorf_get_score(),
+          name: name || "",
+          replay_b64: b64urlEncode(bytes)
+        })
+      });
+      if (!res.ok) throw new Error("upload " + res.status);
+      return res.json();
+    }
+
+    function replayUrl(id) {
+      var u = new URL(window.location.href);
+      u.search = "";
+      u.hash = "";
+      u.searchParams.set("r", id);
+      return u.toString();
+    }
+
+    async function shareReplay() {
+      var hint = document.getElementById("share-hint");
+      hint.textContent = "Uploading…";
+      try {
+        var bytes = getReplayBytes();
+        if (!bytes) throw new Error("no recording");
+        var name = document.getElementById("share-name").value.trim();
+        var data = await uploadRun(bytes, name);
+        lastUploadedId = data.id;
+        var url = replayUrl(data.id);
+        hint.textContent = url;
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: "Ms. Gorf",
+              text: "I scored $" + Module._msgorf_get_score() + " in Ms. Gorf",
+              url: url
+            });
+          } catch (e) {}
+        }
+        refreshScores();
+      } catch (e) {
+        hint.textContent = "Share failed — is /api up? " + (e.message || e);
+      }
+    }
+
+    async function copyReplayLink() {
+      var hint = document.getElementById("share-hint");
+      try {
+        var url = lastUploadedId ? replayUrl(lastUploadedId) : null;
+        if (!url) {
+          hint.textContent = "Uploading…";
+          var bytes = getReplayBytes();
+          if (!bytes) throw new Error("no recording");
+          var name = document.getElementById("share-name").value.trim();
+          var data = await uploadRun(bytes, name);
+          lastUploadedId = data.id;
+          url = replayUrl(data.id);
+          refreshScores();
+        }
+        await navigator.clipboard.writeText(url);
+        hint.textContent = "Copied: " + url;
+      } catch (e) {
+        hint.textContent = "Copy failed — " + (e.message || e);
+      }
+    }
+
+    function showSharePanel(show) {
+      var panel = document.getElementById("share-panel");
+      panel.classList.toggle("show", !!show);
+      panel.setAttribute("aria-hidden", show ? "false" : "true");
+      if (show) {
+        document.getElementById("share-score").textContent =
+          "$" + Module._msgorf_get_score();
+        document.getElementById("share-hint").textContent = "";
+        lastUploadedId = null;
+      }
+    }
+
+    async function refreshScores() {
+      var ul = document.getElementById("scores");
+      try {
+        var res = await fetch("/api/scores?limit=8");
+        if (!res.ok) throw new Error("scores");
+        var rows = await res.json();
+        ul.innerHTML = "";
+        rows.forEach(function (r, i) {
+          var li = document.createElement("li");
+          var left = document.createElement("span");
+          left.textContent = (i + 1) + ". " + (r.name || "ANON");
+          var right = document.createElement("span");
+          right.className = "sc";
+          right.textContent = "$" + r.score;
+          li.appendChild(left);
+          li.appendChild(right);
+          li.style.cursor = "pointer";
+          li.title = "Watch replay";
+          li.addEventListener("click", function () {
+            window.location.search = "?r=" + encodeURIComponent(r.id);
+          });
+          ul.appendChild(li);
+        });
+      } catch (e) {
+        ul.innerHTML = "";
+      }
+    }
+
+    async function tryLoadReplayFromUrl() {
+      var params = new URLSearchParams(window.location.search);
+      var id = params.get("r");
+      if (!id) return;
+      pendingReplayId = id;
+      document.getElementById("status").textContent = "Loading replay…";
+      try {
+        var res = await fetch("/api/runs/" + encodeURIComponent(id));
+        if (!res.ok) throw new Error("run " + res.status);
+        var data = await res.json();
+        var bytes = b64urlDecode(data.replay_b64);
+        var ptr = Module._malloc(bytes.length);
+        Module.HEAPU8.set(bytes, ptr);
+        var ok = Module._msgorf_replay_play(ptr, bytes.length);
+        Module._free(ptr);
+        if (!ok) throw new Error("bad replay");
+        document.getElementById("status").textContent =
+          "REPLAY · $" + (data.score || 0) + " · tap AGAIN to exit";
+        showSharePanel(false);
+      } catch (e) {
+        document.getElementById("status").textContent =
+          "Replay load failed: " + (e.message || e);
+      }
+    }
+
     var Module = {
       canvas: document.getElementById("canvas"),
       onRuntimeInitialized: function () {
+        if (Module.MSGORF_BUILD) {
+          Module.ccall("msgorf_set_build_id", null, ["string"], [Module.MSGORF_BUILD]);
+        }
         document.getElementById("status").textContent =
           "Move · Aim/fire · SHIELD hold (first 2s) · triggers on pad · A/Start";
         bindUi();
         setInterval(syncStartButton, 250);
+        refreshScores();
+        tryLoadReplayFromUrl();
       }
     };
 
@@ -293,12 +555,18 @@
       if (mode === 0) { /* SELECT */
         btn.textContent = "START";
         btn.classList.remove("hidden");
+        showSharePanel(false);
       } else if (mode === 3) { /* DEAD */
         btn.textContent = "AGAIN";
         btn.classList.remove("hidden");
+        if (Module._msgorf_replay_ready() && lastShareMode !== 3) {
+          showSharePanel(true);
+        }
       } else {
         btn.classList.add("hidden");
+        showSharePanel(false);
       }
+      lastShareMode = mode;
     }
 
     function fsElement() {
@@ -411,8 +679,15 @@
     function bindUi() {
       document.getElementById("btn-start").addEventListener("click", function () {
         if (!ready()) return;
+        showSharePanel(false);
         Module._msgorf_pad_start(1);
         syncStartButton();
+      });
+
+      document.getElementById("btn-share").addEventListener("click", shareReplay);
+      document.getElementById("btn-copy").addEventListener("click", copyReplayLink);
+      document.getElementById("btn-share-close").addEventListener("click", function () {
+        showSharePanel(false);
       });
 
       document.getElementById("btn-fs").addEventListener("click", toggleFullscreen);

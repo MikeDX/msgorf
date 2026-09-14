@@ -54,16 +54,33 @@ Ship **`reconstructed/sdl-demo/web/`** (not `video-demo/`):
 ```bash
 cd "/Users/mike/Documents/Ms GORF/reconstructed/sdl-demo"
 make web EMSDK=$HOME/src/emsdk
-rsync -avz --delete \
-  --exclude docker-compose.yml --exclude nginx \
-  web/ mike@192.168.68.105:~/msgorf/
-ssh mike@192.168.68.105 'chmod 755 ~/msgorf'
+make deploy-all   # LXC static+API + Traefik msgorf.yml
 ```
 
-That updates `index.html` / `index.js` / `index.wasm` / `index.data`, stamps a
-build id (`?v=…`) so browsers fetch fresh WASM/JS, syncs
-`deploy/nginx-default.conf` (HTML `no-store`, assets immutable by query URL),
-and reloads nginx.
+Or stepwise:
+
+```bash
+make deploy          # web → ~/msgorf (:5021), api → ~/msgorf-api (:5022)
+make deploy-traefik  # ~/src/traefik-config/config/msgorf.yml → 100.92.101.81
+```
+
+**Routing (Traefik file provider on `100.92.101.81`):**
+
+| Path | Backend |
+|------|---------|
+| `https://msgorf.mikedx.co.uk/api/…` | `http://192.168.68.105:5022` (FastAPI) |
+| `https://msgorf.mikedx.co.uk/…` | `http://192.168.68.105:5021` (nginx static) |
+
+No path strip — API routes are already under `/api/`.
+
+Local all-in-one (no Traefik):
+
+```bash
+./api/run.sh   # serves ../web + /api on :8091
+```
+
+Replay links look like `https://msgorf.mikedx.co.uk/?r=<id>`.
+
 ## Controls
 
 | Input | Action |
@@ -90,9 +107,12 @@ and reloads nginx.
 |------|------|
 | `main.c` | SDL/Emscripten host, nearest-neighbour scale |
 | `game.c` / `game.h` | 320×204 sim + render |
+| `rng.c` / `rng.h` | Portable xorshift32 (replay-stable) |
+| `replay.c` / `replay.h` | Tick-sparse input record / playback |
 | `sound.c` / `sound.h` | SDL_mixer SFX (title / startup / galaxy / shoot / die) |
 | `sfx/` | OGG cues (~100KB total; from `work/video_refs/audio/*.wav`) |
 | `font_gen.h` | HUD glyphs from `video-demo/font_guess.json` |
+| `api/` | FastAPI + SQLite score/replay store |
 | `Makefile` | `native` + `web` |
 
 Window presents the **320×204** buffer with an **integer** nearest-neighbour

@@ -1,12 +1,14 @@
 /* GUESS SDL host — simulate & paint only on 320×204, then integer-scale to window.
  * Never present fractional buffer→window mapping (that looks like “scaled pixel” motion). */
 #include "game.h"
+#include "replay.h"
 #include "sound.h"
 
 #include <SDL.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #ifndef VIEW_SCALE
 #define VIEW_SCALE 3
@@ -101,7 +103,7 @@ static void close_pad(void) {
 }
 
 static void poll_gamepad(void) {
-  if (!pad) return;
+  if (!pad || replay_playing()) return;
   /* Left stick = move; right stick = aim (game fires from aim past deadzone). */
   game_pad_move(&game, pad_axis(pad, SDL_CONTROLLER_AXIS_LEFTX),
                 pad_axis(pad, SDL_CONTROLLER_AXIS_LEFTY));
@@ -115,19 +117,42 @@ static void poll_gamepad(void) {
 }
 
 #ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-
-/* JS twin-stick / Start → game (Module._msgorf_*) */
-EMSCRIPTEN_KEEPALIVE void msgorf_pad_move(float x, float y) { game_pad_move(&game, x, y); }
-EMSCRIPTEN_KEEPALIVE void msgorf_pad_aim(float x, float y) { game_pad_aim(&game, x, y); }
-EMSCRIPTEN_KEEPALIVE void msgorf_pad_fire(int down) { game_pad_fire(&game, down); }
-EMSCRIPTEN_KEEPALIVE void msgorf_pad_shield(int down) { game_pad_shield(&game, down); }
+/* JS twin-stick / Start / replay → game (Module._msgorf_*) */
+EMSCRIPTEN_KEEPALIVE void msgorf_pad_move(float x, float y) {
+  if (!replay_playing()) game_pad_move(&game, x, y);
+}
+EMSCRIPTEN_KEEPALIVE void msgorf_pad_aim(float x, float y) {
+  if (!replay_playing()) game_pad_aim(&game, x, y);
+}
+EMSCRIPTEN_KEEPALIVE void msgorf_pad_fire(int down) {
+  if (!replay_playing()) game_pad_fire(&game, down);
+}
+EMSCRIPTEN_KEEPALIVE void msgorf_pad_shield(int down) {
+  if (!replay_playing()) game_pad_shield(&game, down);
+}
 EMSCRIPTEN_KEEPALIVE void msgorf_pad_start(int players) { game_pad_start(&game, players); }
 EMSCRIPTEN_KEEPALIVE int msgorf_get_mode(void) { return game_get_mode(&game); }
+EMSCRIPTEN_KEEPALIVE int msgorf_get_score(void) { return game_get_score(&game); }
+EMSCRIPTEN_KEEPALIVE int msgorf_replay_mode(void) { return (int)replay_mode(); }
+EMSCRIPTEN_KEEPALIVE int msgorf_replay_ready(void) { return replay_ready(); }
+EMSCRIPTEN_KEEPALIVE int msgorf_replay_len(void) { return (int)replay_blob_len(); }
+EMSCRIPTEN_KEEPALIVE const uint8_t *msgorf_replay_ptr(void) { return replay_blob(); }
+EMSCRIPTEN_KEEPALIVE void msgorf_set_build_id(const char *id) { replay_set_build_id(id); }
+EMSCRIPTEN_KEEPALIVE int msgorf_replay_play(const uint8_t *data, int len) {
+  if (!data || len <= 0) return 0;
+  return game_start_replay(&game, data, (size_t)len);
+}
+/* Copy recording into a JS-owned buffer (ptr from Module._malloc). */
+EMSCRIPTEN_KEEPALIVE int msgorf_replay_copy(uint8_t *dst, int max) {
+  const uint8_t *src = replay_blob();
+  size_t n = replay_blob_len();
+  if (!src || !dst || max < (int)n) return -1;
+  memcpy(dst, src, n);
+  return (int)n;
+}
 #endif
 
 static void frame(void) {
-  Uint64 freq = SDL_GetPerformanceFrequency();
   H.frame_start = SDL_GetPerformanceCounter();
 
   SDL_Event e;
@@ -139,17 +164,23 @@ static void frame(void) {
     } else if (e.type == SDL_KEYUP) {
       game_keyup(&game, (int)e.key.keysym.scancode);
     } else if (e.type == SDL_MOUSEMOTION) {
-      int mx, my;
-      map_mouse(e.motion.x, e.motion.y, &mx, &my);
-      game_mouse(&game, mx, my, -1);
+      if (!replay_playing()) {
+        int mx, my;
+        map_mouse(e.motion.x, e.motion.y, &mx, &my);
+        game_mouse(&game, mx, my, -1);
+      }
     } else if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
-      int mx, my;
-      map_mouse(e.button.x, e.button.y, &mx, &my);
-      game_mouse(&game, mx, my, 1);
+      if (!replay_playing()) {
+        int mx, my;
+        map_mouse(e.button.x, e.button.y, &mx, &my);
+        game_mouse(&game, mx, my, 1);
+      }
     } else if (e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_LEFT) {
-      int mx, my;
-      map_mouse(e.button.x, e.button.y, &mx, &my);
-      game_mouse(&game, mx, my, 0);
+      if (!replay_playing()) {
+        int mx, my;
+        map_mouse(e.button.x, e.button.y, &mx, &my);
+        game_mouse(&game, mx, my, 0);
+      }
     } else if (e.type == SDL_CONTROLLERDEVICEADDED) {
       open_pad_index(e.cdevice.which);
     } else if (e.type == SDL_CONTROLLERDEVICEREMOVED) {
@@ -182,6 +213,7 @@ static void frame(void) {
 #ifndef __EMSCRIPTEN__
   /* Pace to 60Hz when vsync is off or display is faster than 60. */
   {
+    Uint64 freq = SDL_GetPerformanceFrequency();
     Uint64 elapsed = SDL_GetPerformanceCounter() - H.frame_start;
     Uint64 budget = freq / (Uint64)SIM_HZ;
     if (elapsed < budget) {

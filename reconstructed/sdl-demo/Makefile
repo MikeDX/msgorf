@@ -17,7 +17,7 @@ VIEW_SCALE ?= 3
 DRAW_TILE_SNAP ?= 0
 CFLAGS     ?= -O2 -Wall -Wextra -std=c11
 INCLUDES   := -I. -I$(RUNTIME)
-SRCS       := main.c game.c sound.c $(ASSETS_C)
+SRCS       := main.c game.c sound.c rng.c replay.c $(ASSETS_C)
 
 # --- native ---
 SDL_CFLAGS := $(shell sdl2-config --cflags 2>/dev/null)
@@ -61,9 +61,9 @@ font_gen.h: ../video-demo/font_guess.json
 
 native: assets sync-sfx $(NATIVE_BIN)
 
-$(NATIVE_BIN): main.c game.c sound.c sound.h game.h font_gen.h $(ASSETS_C) $(ASSETS_H) $(SFX_FILES)
+$(NATIVE_BIN): main.c game.c sound.c rng.c replay.c sound.h game.h rng.h replay.h font_gen.h $(ASSETS_C) $(ASSETS_H) $(SFX_FILES)
 	$(CC) $(CFLAGS) -DVIEW_SCALE=$(VIEW_SCALE) -DDRAW_TILE_SNAP=$(DRAW_TILE_SNAP) $(INCLUDES) $(SDL_CFLAGS) $(MIX_CFLAGS) \
-	  -o $@ main.c game.c sound.c $(ASSETS_C) $(SDL_LIBS) -lSDL2_mixer -lm
+	  -o $@ main.c game.c sound.c rng.c replay.c $(ASSETS_C) $(SDL_LIBS) -lSDL2_mixer -lm
 
 run: native
 	./$(NATIVE_BIN)
@@ -76,12 +76,12 @@ web: assets sync-sfx
 	}
 	bash -lc 'source "$(EMSDK)/emsdk_env.sh" >/dev/null && \
 	  emcc -O1 -Wall -std=c11 -DVIEW_SCALE=$(VIEW_SCALE) -DDRAW_TILE_SNAP=$(DRAW_TILE_SNAP) $(INCLUDES) \
-	    main.c game.c sound.c $(ASSETS_C) \
+	    main.c game.c sound.c rng.c replay.c $(ASSETS_C) \
 	    -sUSE_SDL=2 -sUSE_SDL_MIXER=2 -sSDL2_MIXER_FORMATS='\''["ogg"]'\'' \
 	    -sALLOW_MEMORY_GROWTH=1 -sMINIFY_HTML=0 \
 	    --preload-file $(SFX_DIR)@/sfx \
-	    -sEXPORTED_FUNCTIONS=_main,_msgorf_pad_move,_msgorf_pad_aim,_msgorf_pad_fire,_msgorf_pad_shield,_msgorf_pad_start,_msgorf_get_mode \
-	    -sEXPORTED_RUNTIME_METHODS=ccall,cwrap \
+	    -sEXPORTED_FUNCTIONS=_main,_malloc,_free,_msgorf_pad_move,_msgorf_pad_aim,_msgorf_pad_fire,_msgorf_pad_shield,_msgorf_pad_start,_msgorf_get_mode,_msgorf_get_score,_msgorf_replay_mode,_msgorf_replay_ready,_msgorf_replay_len,_msgorf_replay_ptr,_msgorf_replay_copy,_msgorf_replay_play,_msgorf_set_build_id \
+	    -sEXPORTED_RUNTIME_METHODS=ccall,cwrap,UTF8ToString,stringToUTF8 \
 	    --shell-file shell.html \
 	    -o $(WEB_OUT)'
 	@$(MAKE) stamp-web
@@ -97,14 +97,31 @@ stamp-web:
 # Optional: DEPLOY_HOST=mike@192.168.68.105 DEPLOY_PATH=~/msgorf
 DEPLOY_HOST ?= mike@192.168.68.105
 DEPLOY_PATH ?= ~/msgorf
+DEPLOY_API_PATH ?= ~/msgorf-api
+TRAEFIK_HOST ?= mike@100.92.101.81
+TRAEFIK_CONFIG ?= $(HOME)/src/traefik-config
 
 deploy: web
 	rsync -avz --delete \
-	  --exclude docker-compose.yml --exclude nginx \
+	  --exclude docker-compose.yml --exclude nginx --exclude api-data \
 	  $(WEB_DIR)/ $(DEPLOY_HOST):$(DEPLOY_PATH)/
 	rsync -avz deploy/nginx-default.conf $(DEPLOY_HOST):$(DEPLOY_PATH)/nginx/default.conf
-	ssh $(DEPLOY_HOST) 'chmod 755 $(DEPLOY_PATH); docker exec msgorf nginx -s reload 2>/dev/null || true'
-	@echo "Deployed with cache-busting; nginx reloaded."
+	rsync -avz deploy/docker-compose.yml $(DEPLOY_HOST):$(DEPLOY_PATH)/docker-compose.yml
+	rsync -avz api/ $(DEPLOY_HOST):$(DEPLOY_API_PATH)/ \
+	  --exclude .venv --exclude data --exclude __pycache__ --exclude .gitignore
+	ssh $(DEPLOY_HOST) 'chmod 755 $(DEPLOY_PATH); \
+	  docker exec msgorf nginx -s reload 2>/dev/null || \
+	  (cd $(DEPLOY_PATH) && docker compose up -d); \
+	  cd $(DEPLOY_API_PATH) && docker compose up -d --build'
+	@echo "Static + API deployed on LXC (5021 / 5022)."
+
+# Push Traefik file-provider config (msgorf.yml /api → :5022).
+deploy-traefik:
+	rsync -avz $(TRAEFIK_CONFIG)/config/msgorf.yml $(TRAEFIK_HOST):~/traefik/config/msgorf.yml
+	@echo "Traefik msgorf.yml synced — file provider reloads automatically (or: ssh $(TRAEFIK_HOST) 'cd ~/traefik && docker compose up -d')"
+
+deploy-all: deploy deploy-traefik
+
 
 clean:
 	rm -f $(NATIVE_BIN)

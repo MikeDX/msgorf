@@ -4,6 +4,8 @@
 #include "font_gen.h"
 #include "assets_gen.h"
 #include "sound.h"
+#include "rng.h"
+#include "replay.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -246,6 +248,9 @@ static int ships_left; /* reserve ships in HUD; spent on respawn, not on death *
 static int out_of_ships; /* set when retry with ships_left==0 → game over */
 static float t_accum;
 static unsigned frame_n; /* increments once per update tick */
+static unsigned run_tick; /* ticks since begin_level (replay timeline) */
+static uint32_t run_seed;
+static int record_finalized;
 static float fire_cd;
 static float player_x, player_y;
 static int player_vis;
@@ -449,7 +454,7 @@ static void build_galaxy(void) {
   }
 }
 
-static float frand(void) { return (float)(rand() % 10000) / 10000.f; }
+static float frand(void) { return rng_frand(); }
 
 static int wave_index(void) {
   int i = (level_num - 1) % WAVE_COUNT;
@@ -688,11 +693,11 @@ static void pick_shld_leg(foe_t *f) {
   static const int dirs[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
   float sp = wave_gorf_speed() * SHLD_SPEED_MULT;
   for (int attempt = 0; attempt < 24; attempt++) {
-    int d = rand() % 4;
+    int d = rng_int(4);
     int dx = dirs[d][0], dy = dirs[d][1];
     int max_t = shld_max_tiles(f->x, f->y, dx, dy);
     if (max_t < 2) continue;
-    int want = 2 + rand() % 9; /* GUESS: 2–10 tiles */
+    int want = 2 + rng_int(9); /* GUESS: 2–10 tiles */
     if (want > max_t) want = max_t;
     f->shld_dx = dx;
     f->shld_dy = dy;
@@ -903,7 +908,7 @@ static void mite_pick_target(foe_t *f) {
     f->kami_ty = f->y;
     return;
   }
-  int i = idx[rand() % n];
+  int i = idx[rng_int(n)];
   f->kami_tx = mines[i].x;
   f->kami_ty = mines[i].y;
   float dx = f->kami_tx - f->x;
@@ -1064,8 +1069,8 @@ static void apply_wave_flags(void) {
 
 static void pick_clone_home(void) {
   /* Four homes: 1/3 or 2/3 across × 1/3 or 2/3 down. */
-  clone_home_x = FB_W * ((rand() & 1) ? (2.f / 3.f) : (1.f / 3.f));
-  clone_home_y = FB_H * ((rand() & 1) ? (2.f / 3.f) : (1.f / 3.f));
+  clone_home_x = FB_W * ((rng_int(2)) ? (2.f / 3.f) : (1.f / 3.f));
+  clone_home_y = FB_H * ((rng_int(2)) ? (2.f / 3.f) : (1.f / 3.f));
 }
 
 static void place_clone_at_home(void) {
@@ -1137,6 +1142,10 @@ static void try_respawn_or_gameover(void) {
     out_of_ships = 1;
     sound_play_gameover();
     G->mode = MODE_DEAD;
+    if (!record_finalized && replay_mode() == REPLAY_RECORDING) {
+      replay_end_record((uint32_t)score, run_tick);
+      record_finalized = 1;
+    }
     return;
   }
   ships_left -= 1;
@@ -1192,6 +1201,16 @@ static void end_clear_burst(void) {
 
 static void begin_level(game_t *g) {
   (void)g;
+  if (replay_playing()) {
+    run_seed = replay_seed();
+    replay_begin_play();
+  } else {
+    run_seed = rng_fresh_seed();
+    replay_begin_record(run_seed);
+  }
+  rng_seed(run_seed);
+  run_tick = 0;
+  record_finalized = 0;
   sound_stop_title();
   sound_play_startup();
   score = 0;
@@ -1207,6 +1226,7 @@ static void begin_level(game_t *g) {
 }
 
 static void enter_select(game_t *g) {
+  if (replay_playing()) replay_cancel();
   g->mode = MODE_SELECT;
   sound_play_title();
 }
@@ -1546,7 +1566,7 @@ static void spawn_extra_kind(int extra) {
     kind = "MITE-P";
   port_t ports[2];
   clone_yellow_ports(ports);
-  int exit_port = rand() & 1;
+  int exit_port = rng_int(2);
   port_t *port = &ports[exit_port];
   float mid_x = (port->x0 + port->x1) * 0.5f;
   float mid_y = (port->y0 + port->y1) * 0.5f;
@@ -1918,7 +1938,7 @@ static void update_play(game_t *g, float dt) {
         for (int i = 0; i < n_foes; i++)
           if (foe_is_gorf(&foes[i])) gorf_idx[n_g++] = i;
         if (n_g > 0) {
-          foe_t *shooter = &foes[gorf_idx[rand() % n_g]];
+          foe_t *shooter = &foes[gorf_idx[rng_int(n_g)]];
           float dx = player_x - shooter->x;
           float dy = player_y - shooter->y;
           float len = hypotf(dx, dy);
@@ -2151,11 +2171,18 @@ void game_init(game_t *g, uint8_t *rgb) {
   g->mouse_y = FB_H / 2;
   G = g;
   build_galaxy();
-  srand(1);
+  rng_seed(1);
+  replay_reset();
   sound_play_title();
 }
 
 void game_keydown(game_t *g, int scancode) {
+  if (replay_playing()) {
+    if (g->mode == MODE_DEAD && (scancode == 40 || scancode == 30)) {
+      enter_select(g);
+    }
+    return; /* ignore live keys while replaying */
+  }
   if (scancode >= 0 && scancode < 512) g->keys[scancode] = 1;
   if (g->mode == MODE_SELECT) {
     if (scancode == 30 || scancode == 31) { /* 1 / 2 */
@@ -2168,6 +2195,7 @@ void game_keydown(game_t *g, int scancode) {
 }
 
 void game_keyup(game_t *g, int scancode) {
+  if (replay_playing()) return;
   if (scancode >= 0 && scancode < 512) g->keys[scancode] = 0;
 }
 
@@ -2198,6 +2226,13 @@ void game_pad_fire(game_t *g, int down) { g->pad_fire = down ? 1 : 0; }
 void game_pad_shield(game_t *g, int down) { g->pad_shield = down ? 1 : 0; }
 
 void game_pad_start(game_t *g, int players) {
+  if (replay_playing()) {
+    /* Cancel playback and return to select (same as AGAIN). */
+    if (g->mode == MODE_DEAD || g->mode == MODE_PLAY || g->mode == MODE_INTRO) {
+      enter_select(g);
+      return;
+    }
+  }
   if (players < 1) players = 1;
   if (players > 2) players = 2;
   if (g->mode == MODE_SELECT) {
@@ -2210,9 +2245,29 @@ void game_pad_start(game_t *g, int players) {
 
 int game_get_mode(game_t *g) { return (int)g->mode; }
 
+int game_get_score(game_t *g) {
+  (void)g;
+  return (int)score;
+}
+
+uint32_t game_get_seed(game_t *g) {
+  (void)g;
+  return run_seed;
+}
+
+int game_start_replay(game_t *g, const uint8_t *data, size_t len) {
+  if (!replay_load(data, len)) return 0;
+  begin_level(g);
+  return 1;
+}
+
 void game_update(game_t *g, float dt) {
   if (dt > 0.05f) dt = 0.05f;
   frame_n++;
+  if (g->mode == MODE_INTRO || g->mode == MODE_PLAY) {
+    replay_before_update(g, run_tick);
+    run_tick++;
+  }
   if (g->mode == MODE_INTRO) update_intro(dt);
   else if (g->mode == MODE_PLAY) update_play(g, dt);
 }

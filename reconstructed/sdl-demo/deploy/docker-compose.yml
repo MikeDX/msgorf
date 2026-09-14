@@ -1,0 +1,15 @@
+# Ms. Gorf — static nginx only (port 5021)
+# Traefik (file provider on 100.92.101.81) routes Host → :5021;
+# /api is a separate service on :5022 (see api/docker-compose.yml).
+# On the LXC: cd ~/msgorf && docker compose up -d
+
+services:
+  msgorf:
+    image: nginx:alpine
+    container_name: msgorf
+    restart: unless-stopped
+    ports:
+      - "5021:80"
+    volumes:
+      - ./:/usr/share/nginx/html:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro

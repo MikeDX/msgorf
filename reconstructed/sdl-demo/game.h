@@ -7,6 +7,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 #define FB_W 320
@@ -42,6 +43,9 @@ void game_pad_fire(game_t *g, int down);
 void game_pad_shield(game_t *g, int down);
 void game_pad_start(game_t *g, int players);
 int game_get_mode(game_t *g);
+int game_get_score(game_t *g);
+uint32_t game_get_seed(game_t *g);
+int game_start_replay(game_t *g, const uint8_t *data, size_t len);
 void game_update(game_t *g, float dt);
 void game_render(game_t *g);
 
