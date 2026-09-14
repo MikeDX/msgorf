@@ -24,6 +24,7 @@
 #define MAX_FOES 64
 #define MAX_BULLETS 48
 #define MAX_EBULLETS 24
+#define MAX_MINES 192
 #define MAX_FX 16
 #define MAX_CLONE_JOBS 16
 #define MAX_GALAXY_STARS 512
@@ -41,8 +42,12 @@
 #define WAVE_COUNT 6
 #define WAVE_GORF_CAP 16 /* hard cap on gorfs per wave */
 #define GORF_SHOT_HIT_R 3.f
-#define SMINE_SPAWN_T 2.f /* timed SMINE from cloner when wave.spawn_smine */
+#define SMINE_SPAWN_T 2.f /* timed SMINE/SHLD from cloner */
 #define SMINE_ANIM_HZ 2.5f
+#define MINE_TILE 8.f /* SHLD step / laid mine cell */
+#define SPAWN_NONE 0
+#define SPAWN_SMINE 1
+#define SPAWN_SHLD 2
 #define CLONE_PROCESS_T 0.35f
 #define CLONE_EXIT_SPEED 55.f
 #define CLONE_COOL 0.75f
@@ -103,13 +108,18 @@ typedef struct {
   float r;
   float cool;
   float anim; /* SMINE frame timer */
+  /* SHLD-P: cardinal tile runs laying mines */
+  int shld_dx, shld_dy;
+  int shld_tiles_left;
+  float shld_acc;
+  float shld_pause; /* GUESS: brief stop between legs */
 } foe_t;
 
 /* GUESS wave table — loops after 6; cycle bumps speeds / fire rate. */
 typedef struct {
   int gorfs;
   int can_fire;
-  int spawn_smine;
+  int spawn_extra; /* SPAWN_NONE / SPAWN_SMINE / SPAWN_SHLD */
   float fire_first_min, fire_first_max;   /* delay after PLAY before first shot */
   float fire_period_min, fire_period_max; /* between shots */
   float shot_ppf;                         /* enemy bullet px/frame @ 60Hz */
@@ -117,15 +127,19 @@ typedef struct {
 } wave_def_t;
 
 static const wave_def_t WAVES[WAVE_COUNT] = {
-    /* gorfs fire smine  first_lo/hi   period_lo/hi   shot_ppf  speed */
-    /* W1: no fire on first loop; timings used from round 2 onward. */
-    {4, 0, 0, 2.5f, 3.0f, 0.50f, 2.00f, 2.0f, 1.00f},
-    {8, 1, 1, 2.5f, 3.0f, 0.50f, 2.00f, 2.0f, 1.00f},  /* first-shot times halved */
-    {10, 1, 1, 2.0f, 2.5f, 0.40f, 1.50f, 2.2f, 1.05f},
-    {12, 1, 1, 1.5f, 2.0f, 0.35f, 1.20f, 2.4f, 1.10f},
-    {14, 1, 1, 1.25f, 1.75f, 0.30f, 1.00f, 2.6f, 1.15f},
-    {16, 1, 1, 1.0f, 1.5f, 0.25f, 0.80f, 2.8f, 1.20f},
+    /* gorfs fire extra  first_lo/hi   period_lo/hi   shot_ppf  speed */
+    {4, 0, SPAWN_NONE, 2.5f, 3.0f, 0.50f, 2.00f, 2.0f, 1.00f},  /* W1 */
+    {8, 1, SPAWN_SMINE, 2.5f, 3.0f, 0.50f, 2.00f, 2.0f, 1.00f}, /* W2: SMINE */
+    {9, 1, SPAWN_SHLD, 2.0f, 2.5f, 0.40f, 1.50f, 2.2f, 1.05f},  /* W3: SHLD-P */
+    {12, 1, SPAWN_SMINE, 1.5f, 2.0f, 0.35f, 1.20f, 2.4f, 1.10f}, /* W4+ TBD */
+    {14, 1, SPAWN_SMINE, 1.25f, 1.75f, 0.30f, 1.00f, 2.6f, 1.15f},
+    {16, 1, SPAWN_SMINE, 1.0f, 1.5f, 0.25f, 0.80f, 2.8f, 1.20f},
 };
+
+typedef struct {
+  float x, y; /* centre of 8×8 cell */
+  int alive;
+} mine_t;
 
 typedef struct {
   float x, y, hp;
@@ -174,6 +188,7 @@ static game_t *G;
 static float score;
 static int ships_left;
 static float t_accum;
+static unsigned frame_n; /* increments once per update tick */
 static float fire_cd;
 static float player_x, player_y;
 static int player_vis;
@@ -183,7 +198,7 @@ static int level_num;       /* 1-based; indexes WAVES with wrap */
 static int wave_gorf_count; /* gorfs at this wave's start */
 static float gorf_fire_cd;  /* countdown to next enemy volley */
 static float play_age;      /* time in PLAY this wave (player live) */
-static int smine_armed;     /* pending timed SMINE; cleared on death */
+static int smine_armed;     /* pending timed SMINE/SHLD; cleared on death */
 static int pending_lastship; /* play lastship.wav when PLAY starts after last-life respawn */
 static float intro_black; /* >0: full black before frozen field + galaxy */
 static float clone_x, clone_y, clone_frame;
@@ -198,6 +213,8 @@ static bullet_t bullets[MAX_BULLETS];
 static int n_bullets;
 static bullet_t ebullets[MAX_EBULLETS];
 static int n_ebullets;
+static mine_t mines[MAX_MINES];
+static int n_mines;
 static foe_t foes[MAX_FOES];
 static int n_foes;
 static fx_t fx[MAX_FX];
@@ -415,6 +432,10 @@ static void rand_vel(float *vx, float *vy) {
   *vy = sinf(a) * s;
 }
 
+static int foe_is_smine(const foe_t *f);
+static int foe_is_shld(const foe_t *f);
+static void pick_shld_leg(foe_t *f);
+
 static void spawn_gorf(float x, float y, float vx, float vy, const char *kind, float cool) {
   if (n_foes >= MAX_FOES) return;
   foe_t *f = &foes[n_foes++];
@@ -427,6 +448,11 @@ static void spawn_gorf(float x, float y, float vx, float vy, const char *kind, f
   f->r = GORF_R;
   f->cool = cool;
   f->anim = 0;
+  f->shld_dx = f->shld_dy = 0;
+  f->shld_tiles_left = 0;
+  f->shld_acc = 0;
+  f->shld_pause = 0;
+  if (foe_is_shld(f)) pick_shld_leg(f);
 }
 
 /* Keep gorfs moving after wall/pair bounce (elastic swaps can kill speed). */
@@ -477,9 +503,138 @@ static int foe_is_smine(const foe_t *f) {
   return name_eq(f->kind, "SMINE0") || name_eq(f->kind, "SMINE1") || name_eq(f->kind, "SMINE");
 }
 
+static int foe_is_shld(const foe_t *f) {
+  return name_eq(f->kind, "SHLD_P") || name_eq(f->kind, "SHLD-P");
+}
+
+/* SMINE / SHLD-P: pass through foes, skip cloner absorb. SMINE is shot-proof. */
+static int foe_is_special(const foe_t *f) { return foe_is_smine(f) || foe_is_shld(f); }
+
 static const char *foe_draw_kind(const foe_t *f) {
   if (!foe_is_smine(f)) return f->kind;
   return (((int)(f->anim * SMINE_ANIM_HZ)) & 1) ? "SMINE1" : "SMINE0";
+}
+
+/* GUESS: SHLD stays inside playfield margins (same spirit as bounce_walls). */
+#define SHLD_MARGIN_L 16.f
+#define SHLD_MARGIN_R (FB_W - 16.f)
+#define SHLD_MARGIN_T 32.f
+#define SHLD_MARGIN_B (FB_H - 16.f)
+#define SHLD_LEG_PAUSE 0.35f /* GUESS: brief stop at end of each run */
+
+static int shld_max_tiles(float x, float y, int dx, int dy) {
+  float room = 0.f;
+  if (dx > 0)
+    room = SHLD_MARGIN_R - x;
+  else if (dx < 0)
+    room = x - SHLD_MARGIN_L;
+  else if (dy > 0)
+    room = SHLD_MARGIN_B - y;
+  else if (dy < 0)
+    room = y - SHLD_MARGIN_T;
+  if (room < MINE_TILE) return 0;
+  return (int)(room / MINE_TILE);
+}
+
+static void lay_mine_at(float x, float y) {
+  if (n_mines >= MAX_MINES) return;
+  int tx = ((int)floorf(x / MINE_TILE)) * (int)MINE_TILE;
+  int ty = ((int)floorf(y / MINE_TILE)) * (int)MINE_TILE;
+  float cx = (float)tx + MINE_TILE * 0.5f;
+  float cy = (float)ty + MINE_TILE * 0.5f;
+  for (int i = 0; i < n_mines; i++) {
+    if (!mines[i].alive) continue;
+    if (fabsf(mines[i].x - cx) < 1.f && fabsf(mines[i].y - cy) < 1.f) return;
+  }
+  mines[n_mines].x = cx;
+  mines[n_mines].y = cy;
+  mines[n_mines].alive = 1;
+  n_mines++;
+}
+
+static void pick_shld_leg(foe_t *f) {
+  static const int dirs[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+  float sp = wave_gorf_speed();
+  for (int attempt = 0; attempt < 24; attempt++) {
+    int d = rand() % 4;
+    int dx = dirs[d][0], dy = dirs[d][1];
+    int max_t = shld_max_tiles(f->x, f->y, dx, dy);
+    if (max_t < 2) continue;
+    int want = 2 + rand() % 9; /* GUESS: 2–10 tiles */
+    if (want > max_t) want = max_t;
+    f->shld_dx = dx;
+    f->shld_dy = dy;
+    f->shld_tiles_left = want;
+    f->shld_acc = 0;
+    f->shld_pause = 0;
+    f->vx = (float)dx * sp;
+    f->vy = (float)dy * sp;
+    return;
+  }
+  /* Cornered: sit still until a direction opens (rare). */
+  f->shld_dx = f->shld_dy = 0;
+  f->shld_tiles_left = 0;
+  f->vx = f->vy = 0;
+  f->shld_pause = SHLD_LEG_PAUSE;
+}
+
+static void shld_end_leg(foe_t *f) {
+  f->shld_dx = f->shld_dy = 0;
+  f->shld_tiles_left = 0;
+  f->shld_acc = 0;
+  f->vx = f->vy = 0;
+  f->shld_pause = SHLD_LEG_PAUSE;
+}
+
+static void update_shld(foe_t *f, float dt) {
+  if (f->shld_pause > 0.f) {
+    f->shld_pause -= dt;
+    f->vx = f->vy = 0;
+    if (f->shld_pause > 0.f) return;
+    f->shld_pause = 0;
+    pick_shld_leg(f);
+    return;
+  }
+
+  float sp = wave_gorf_speed();
+  if (f->shld_tiles_left <= 0 || (f->shld_dx == 0 && f->shld_dy == 0)) {
+    pick_shld_leg(f);
+    if (f->shld_tiles_left <= 0) return;
+  }
+  f->vx = (float)f->shld_dx * sp;
+  f->vy = (float)f->shld_dy * sp;
+  f->x += f->vx * dt;
+  f->y += f->vy * dt;
+  if (f->x < SHLD_MARGIN_L) f->x = SHLD_MARGIN_L;
+  if (f->x > SHLD_MARGIN_R) f->x = SHLD_MARGIN_R;
+  if (f->y < SHLD_MARGIN_T) f->y = SHLD_MARGIN_T;
+  if (f->y > SHLD_MARGIN_B) f->y = SHLD_MARGIN_B;
+
+  f->shld_acc += sp * dt;
+  while (f->shld_acc >= MINE_TILE && f->shld_tiles_left > 0) {
+    f->shld_acc -= MINE_TILE;
+    lay_mine_at(f->x, f->y);
+    f->shld_tiles_left--;
+  }
+  if (f->shld_tiles_left <= 0 || shld_max_tiles(f->x, f->y, f->shld_dx, f->shld_dy) < 1)
+    shld_end_leg(f);
+}
+
+static void draw_mine(uint8_t *rgb, float x, float y) {
+  /* GUESS: 8×8 box with corners removed; flash red ↔ yellow every frame. */
+  static const char mask[8][8] = {
+      {0, 1, 1, 1, 1, 1, 1, 0}, {1, 1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1}, {0, 1, 1, 1, 1, 1, 1, 0},
+  };
+  int on = (int)(frame_n & 1u);
+  uint8_t r = 255;
+  uint8_t g = on ? 40 : 220;
+  uint8_t b = on ? 40 : 40;
+  int cx = pix(x), cy = pix(y);
+  for (int dy = 0; dy < 8; dy++)
+    for (int dx = 0; dx < 8; dx++)
+      if (mask[dy][dx]) put_px(rgb, cx - 4 + dx, cy - 4 + dy, r, g, b);
 }
 
 static int count_gorfs(void) {
@@ -526,7 +681,7 @@ static int gorfs_for_level(int level) {
 
 static void apply_wave_flags(void) {
   const wave_def_t *w = current_wave();
-  smine_armed = w->spawn_smine ? 1 : 0;
+  smine_armed = (w->spawn_extra != SPAWN_NONE) ? 1 : 0;
   wave_gorf_count = gorfs_for_level(level_num);
 }
 
@@ -552,6 +707,7 @@ static void reveal_player_center(void) {
 static void start_wave_intro(int gorf_count, int show_clone_in_intro) {
   n_bullets = 0;
   n_ebullets = 0;
+  n_mines = 0;
   n_fx = 0;
   n_clone_jobs = 0;
   n_foes = 0;
@@ -584,7 +740,7 @@ static void start_wave_intro(int gorf_count, int show_clone_in_intro) {
 }
 
 static void start_respawn_intro(void) {
-  smine_armed = 0; /* SMINE does not return after death / wave restart */
+  smine_armed = 0; /* SMINE/SHLD do not return after death / wave restart */
   pending_lastship = (ships_left == 1) ? 1 : 0;
   start_wave_intro(respawn_gorf_count, 1); /* cloner stays visible through galaxy */
 }
@@ -610,7 +766,7 @@ static void player_destroyed(void) {
 
   ships_left -= 1;
   death_linger = PLAYER_DEATH_LINGER;
-  /* Remaining gorfs only — SMINEs do not carry into respawn count. */
+  /* Remaining gorfs only — SMINE/SHLD do not carry into respawn count. */
   respawn_gorf_count = 0;
   for (int i = 0; i < n_foes; i++)
     if (foe_is_gorf(&foes[i])) respawn_gorf_count++;
@@ -954,9 +1110,12 @@ static void emit_clones(int exit_port, const char *kind) {
   }
 }
 
-/* Timed L2+ SMINE: exits a yellow cloner port (same path as clone emit). */
-static void spawn_smine_from_cloner(void) {
+/* Timed extra: SMINE or SHLD-P exits a yellow cloner port. */
+static void spawn_extra_from_cloner(void) {
   if (!clone_vis || n_foes >= MAX_FOES) return;
+  int extra = current_wave()->spawn_extra;
+  if (extra == SPAWN_NONE) return;
+  const char *kind = (extra == SPAWN_SHLD) ? "SHLD-P" : "SMINE0";
   port_t ports[2];
   clone_yellow_ports(ports);
   int exit_port = rand() & 1;
@@ -965,7 +1124,7 @@ static void spawn_smine_from_cloner(void) {
   float mid_y = (port->y0 + port->y1) * 0.5f;
   float ex = port->ex, ey = port->ey;
   spawn_gorf(mid_x + ex * 10.f, mid_y + ey * 10.f, ex * CLONE_EXIT_SPEED, ey * CLONE_EXIT_SPEED,
-             "SMINE0", CLONE_COOL);
+             kind, CLONE_COOL);
 }
 
 static void tick_clone_pose(float dt) {
@@ -990,6 +1149,7 @@ static void process_clone_machine(float dt) {
   for (int i = 0; i < n_foes; i++) {
     foe_t *f = &foes[i];
     if (f->hp <= 0 || f->cool > 0) continue;
+    if (foe_is_special(f)) continue; /* SMINE/SHLD do not enter cloner */
     int hit = -1;
     if (overlaps_port(f, &ports[0]))
       hit = 0;
@@ -1230,6 +1390,10 @@ static void update_play(game_t *g, float dt) {
     foe_t *f = &foes[i];
     if (f->cool > 0) f->cool -= dt;
     if (foe_is_smine(f)) f->anim += dt;
+    if (foe_is_shld(f)) {
+      if (!burst.active) update_shld(f, dt);
+      continue;
+    }
     if (!burst.active) steer_gorf_to_clone_port(f);
     f->x += f->vx * dt;
     f->y += f->vy * dt;
@@ -1237,20 +1401,21 @@ static void update_play(game_t *g, float dt) {
   }
   for (int i = 0; i < n_foes; i++)
     for (int j = i + 1; j < n_foes; j++) {
-      /* SMINEs pass through other foes (no bounce). */
-      if (foe_is_smine(&foes[i]) || foe_is_smine(&foes[j])) continue;
+      /* SMINE/SHLD pass through other foes (no bounce). */
+      if (foe_is_special(&foes[i]) || foe_is_special(&foes[j])) continue;
       bounce_pair(&foes[i], &foes[j]);
     }
   for (int i = 0; i < n_foes; i++) {
+    if (foe_is_special(&foes[i])) continue;
     bounce_walls(&foes[i]);
     keep_gorf_speed(&foes[i]);
   }
 
-  /* Wave table: fire / SMINE when current_wave allows; delays shrink each cycle. */
+  /* Wave table: fire / timed SMINE|SHLD when current_wave allows. */
   if (!burst.active && player_vis && death_linger <= 0.f) {
     play_age += dt;
     if (smine_armed && play_age >= SMINE_SPAWN_T) {
-      spawn_smine_from_cloner();
+      spawn_extra_from_cloner();
       smine_armed = 0;
     }
     if (wave_can_fire()) {
@@ -1300,7 +1465,7 @@ static void update_play(game_t *g, float dt) {
     for (int fi = 0; fi < n_foes; fi++) {
       foe_t *f = &foes[fi];
       if (f->hp <= 0) continue;
-      if (foe_is_smine(f)) continue; /* SMINE is shot-proof */
+      if (foe_is_smine(f)) continue; /* SMINE is shot-proof; SHLD-P is not */
       if (hypotf(b->x - f->x, b->y - f->y) < f->r + 3) {
         f->hp = 0;
         b->life = 0;
@@ -1308,17 +1473,36 @@ static void update_play(game_t *g, float dt) {
         spawn_bang(f->x, f->y);
       }
     }
+    /* Laid shield mines: destroyable by player bullets. */
+    if (b->life > 0) {
+      for (int mi = 0; mi < n_mines; mi++) {
+        if (!mines[mi].alive) continue;
+        if (hypotf(b->x - mines[mi].x, b->y - mines[mi].y) < MINE_TILE * 0.5f + 2.f) {
+          mines[mi].alive = 0;
+          b->life = 0;
+          score += 100;
+          /* No bang — shield drops vanish without FBEXP. */
+          break;
+        }
+      }
+    }
   }
   wb = 0;
   for (int i = 0; i < n_bullets; i++)
     if (bullets[i].life > 0) bullets[wb++] = bullets[i];
   n_bullets = wb;
+  {
+    int wm = 0;
+    for (int i = 0; i < n_mines; i++)
+      if (mines[i].alive) mines[wm++] = mines[i];
+    n_mines = wm;
+  }
   int wf = 0;
   for (int i = 0; i < n_foes; i++)
     if (foes[i].hp > 0) foes[wf++] = foes[i];
   n_foes = wf;
 
-  /* Level ends when gorfs are gone — SMINE does not block clear. */
+  /* Level ends when gorfs are gone — SMINE/SHLD do not block clear. */
   if (!burst.active && player_vis && count_gorfs() == 0 && clone_vis && n_clone_jobs == 0)
     start_clear_burst();
 
@@ -1343,6 +1527,15 @@ static void update_play(game_t *g, float dt) {
     if (player_vis && clone_vis &&
         hypotf(clone_x - player_x, clone_y - player_y) < CLONE_BODY_R + 8.f) {
       player_destroyed();
+    }
+    if (player_vis) {
+      for (int i = 0; i < n_mines; i++) {
+        if (!mines[i].alive) continue;
+        if (hypotf(mines[i].x - player_x, mines[i].y - player_y) < MINE_TILE * 0.5f + 6.f) {
+          player_destroyed();
+          break;
+        }
+      }
     }
     if (player_vis) {
       for (int i = 0; i < n_ebullets; i++) {
@@ -1379,6 +1572,8 @@ static void draw_gorf_shot(uint8_t *rgb, int cx, int cy) {
 static void draw_world(uint8_t *rgb, int with_galaxy) {
   fb_clear(rgb);
   draw_burst_bg(rgb);
+  for (int i = 0; i < n_mines; i++)
+    if (mines[i].alive) draw_mine(rgb, mines[i].x, mines[i].y);
   for (int i = 0; i < n_foes; i++)
     blit_named(rgb, foe_draw_kind(&foes[i]), pix_draw(foes[i].x), pix_draw(foes[i].y), 0);
   if (with_galaxy) draw_galaxy(rgb);
@@ -1474,6 +1669,7 @@ int game_get_mode(game_t *g) { return (int)g->mode; }
 
 void game_update(game_t *g, float dt) {
   if (dt > 0.05f) dt = 0.05f;
+  frame_n++;
   if (g->mode == MODE_INTRO) update_intro(dt);
   else if (g->mode == MODE_PLAY) update_play(g, dt);
 }
