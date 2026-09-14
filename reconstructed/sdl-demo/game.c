@@ -49,10 +49,15 @@
 #define SPAWN_SMINE 1
 #define SPAWN_SHLD 2
 #define SPAWN_LAZON 3
-#define WAVE_EXTRAS_MAX 3
+#define SPAWN_KAMI 4
+#define WAVE_EXTRAS_MAX 4
 #define LAZON_BEAM_PPS 320.f /* GUESS: laser tip advance */
 #define LAZON_STOP_T 0.28f
 #define LAZON_HIT_R 7.f
+#define KAMI_ANIM_HZ 10.f /* 4-frame spin */
+#define KAMI_PAUSE_T 0.3f /* GUESS: brief stop before re-aim */
+#define KAMI_ARRIVE_R 6.f
+#define KAMI_SPEED_MULT 1.5f
 #define CLONE_PROCESS_T 0.35f
 #define CLONE_EXIT_SPEED 55.f
 #define CLONE_COOL 0.75f
@@ -123,6 +128,9 @@ typedef struct {
   float lazon_timer;
   float lazon_aim_dx, lazon_aim_dy;
   float lazon_beam;
+  /* KAMI: fly to locked player pos; pause; re-aim */
+  float kami_tx, kami_ty;
+  float kami_pause;
 } foe_t;
 
 typedef struct {
@@ -143,17 +151,23 @@ typedef struct {
 
 static const wave_def_t WAVES[WAVE_COUNT] = {
     /* W1: gorfs only */
-    {4, 0, {{SPAWN_NONE, 0}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}}, 2.5f, 3.0f, 0.50f, 2.00f, 2.0f, 1.00f},
+    {4, 0, {{SPAWN_NONE, 0}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}}, 2.5f, 3.0f, 0.50f, 2.00f, 2.0f,
+     1.00f},
     /* W2: SMINE */
-    {8, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}}, 2.5f, 3.0f, 0.50f, 2.00f, 2.0f, 1.00f},
+    {8, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}}, 2.5f, 3.0f, 0.50f, 2.00f, 2.0f,
+     1.00f},
     /* W3: SMINE then SHLD-P */
-    {9, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_SHLD, 3.5f}, {SPAWN_NONE, 0}}, 2.0f, 2.5f, 0.40f, 1.50f, 2.2f, 1.05f},
-    /* W4: SHLD-P then LAZON */
-    {12, 1, {{SPAWN_SHLD, 2.f}, {SPAWN_LAZON, 3.5f}, {SPAWN_NONE, 0}}, 1.5f, 2.0f, 0.35f, 1.20f, 2.4f, 1.10f},
-    /* W5: LAZON, SMINE, SHLD-P */
-    {14, 1, {{SPAWN_LAZON, 2.f}, {SPAWN_SMINE, 3.5f}, {SPAWN_SHLD, 7.f}}, 1.25f, 1.75f, 0.30f, 1.00f, 2.6f, 1.15f},
-    /* W6 TBD */
-    {16, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}}, 1.0f, 1.5f, 0.25f, 0.80f, 2.8f, 1.20f},
+    {9, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_SHLD, 3.5f}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}}, 2.0f, 2.5f, 0.40f, 1.50f, 2.2f,
+     1.05f},
+    /* W4: SHLD-P, LAZON, KAMI */
+    {12, 1, {{SPAWN_SHLD, 2.f}, {SPAWN_LAZON, 3.5f}, {SPAWN_KAMI, 5.f}, {SPAWN_NONE, 0}}, 1.5f, 2.0f, 0.35f, 1.20f,
+     2.4f, 1.10f},
+    /* W5: LAZON, SMINE, KAMI, SHLD-P */
+    {14, 1, {{SPAWN_LAZON, 2.f}, {SPAWN_SMINE, 3.5f}, {SPAWN_KAMI, 5.f}, {SPAWN_SHLD, 7.f}}, 1.25f, 1.75f, 0.30f,
+     1.00f, 2.6f, 1.15f},
+    /* W6 TBD (+ KAMI @ 5s) */
+    {16, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_KAMI, 5.f}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}}, 1.0f, 1.5f, 0.25f, 0.80f, 2.8f,
+     1.20f},
 };
 
 typedef struct {
@@ -456,8 +470,10 @@ static void rand_vel(float *vx, float *vy) {
 static int foe_is_smine(const foe_t *f);
 static int foe_is_shld(const foe_t *f);
 static int foe_is_lazon(const foe_t *f);
+static int foe_is_kami(const foe_t *f);
 static void pick_shld_leg(foe_t *f);
 static void lazon_start_move(foe_t *f);
+static void kami_aim(foe_t *f);
 static void player_destroyed(void);
 
 static void spawn_gorf(float x, float y, float vx, float vy, const char *kind, float cool) {
@@ -481,8 +497,12 @@ static void spawn_gorf(float x, float y, float vx, float vy, const char *kind, f
   f->lazon_aim_dx = 1.f;
   f->lazon_aim_dy = 0.f;
   f->lazon_beam = 0;
+  f->kami_tx = x;
+  f->kami_ty = y;
+  f->kami_pause = 0;
   if (foe_is_shld(f)) pick_shld_leg(f);
   if (foe_is_lazon(f)) lazon_start_move(f);
+  if (foe_is_kami(f)) kami_aim(f);
 }
 
 /* Keep gorfs moving after wall/pair bounce (elastic swaps can kill speed). */
@@ -539,14 +559,26 @@ static int foe_is_shld(const foe_t *f) {
 
 static int foe_is_lazon(const foe_t *f) { return name_eq(f->kind, "LAZON"); }
 
+static int foe_is_kami(const foe_t *f) {
+  return name_eq(f->kind, "KAMI") || name_eq(f->kind, "COMC5") || name_eq(f->kind, "COMC5A") ||
+         name_eq(f->kind, "COMC5B") || name_eq(f->kind, "COMC6") || name_eq(f->kind, "SPINV");
+}
+
 /* Timed extras: pass through foes, skip cloner. SMINE is shot-proof. */
 static int foe_is_special(const foe_t *f) {
-  return foe_is_smine(f) || foe_is_shld(f) || foe_is_lazon(f);
+  return foe_is_smine(f) || foe_is_shld(f) || foe_is_lazon(f) || foe_is_kami(f);
 }
 
 static const char *foe_draw_kind(const foe_t *f) {
-  if (!foe_is_smine(f)) return f->kind;
-  return (((int)(f->anim * SMINE_ANIM_HZ)) & 1) ? "SMINE1" : "SMINE0";
+  if (foe_is_smine(f))
+    return (((int)(f->anim * SMINE_ANIM_HZ)) & 1) ? "SMINE1" : "SMINE0";
+  if (foe_is_kami(f)) {
+    static const char *const frames[4] = {"COMC5", "COMC5A", "COMC5B", "COMC6"};
+    int i = (int)(f->anim * KAMI_ANIM_HZ) % 4;
+    if (i < 0) i = 0;
+    return frames[i];
+  }
+  return f->kind;
 }
 
 /* GUESS: SHLD stays inside playfield margins (same spirit as bounce_walls). */
@@ -744,6 +776,41 @@ static void update_lazon(foe_t *f, float dt) {
       return;
     }
     if (lazon_tip_out(tip_x, tip_y)) lazon_start_move(f);
+  }
+}
+
+static void kami_aim(foe_t *f) {
+  f->kami_tx = player_x;
+  f->kami_ty = player_y;
+  f->kami_pause = 0;
+  float dx = f->kami_tx - f->x;
+  float dy = f->kami_ty - f->y;
+  float len = hypotf(dx, dy);
+  float sp = wave_gorf_speed() * KAMI_SPEED_MULT;
+  if (len < KAMI_ARRIVE_R) {
+    f->vx = f->vy = 0;
+    f->kami_pause = KAMI_PAUSE_T;
+    return;
+  }
+  f->vx = (dx / len) * sp;
+  f->vy = (dy / len) * sp;
+}
+
+static void update_kami(foe_t *f, float dt) {
+  f->anim += dt;
+  if (f->kami_pause > 0.f) {
+    f->vx = f->vy = 0;
+    f->kami_pause -= dt;
+    if (f->kami_pause <= 0.f) kami_aim(f);
+    return;
+  }
+  f->x += f->vx * dt;
+  f->y += f->vy * dt;
+  if (hypotf(f->x - f->kami_tx, f->y - f->kami_ty) <= KAMI_ARRIVE_R) {
+    f->x = f->kami_tx;
+    f->y = f->kami_ty;
+    f->vx = f->vy = 0;
+    f->kami_pause = KAMI_PAUSE_T;
   }
 }
 
@@ -1259,7 +1326,7 @@ static void emit_clones(int exit_port, const char *kind) {
   }
 }
 
-/* Timed extra: SMINE / SHLD-P / LAZON exits a yellow cloner port. */
+/* Timed extra: SMINE / SHLD-P / LAZON / KAMI exits a yellow cloner port. */
 static void spawn_extra_kind(int extra) {
   if (!clone_vis || n_foes >= MAX_FOES || extra == SPAWN_NONE) return;
   const char *kind = "SMINE0";
@@ -1267,6 +1334,8 @@ static void spawn_extra_kind(int extra) {
     kind = "SHLD-P";
   else if (extra == SPAWN_LAZON)
     kind = "LAZON";
+  else if (extra == SPAWN_KAMI)
+    kind = "KAMI";
   port_t ports[2];
   clone_yellow_ports(ports);
   int exit_port = rand() & 1;
@@ -1547,6 +1616,10 @@ static void update_play(game_t *g, float dt) {
     }
     if (foe_is_lazon(f)) {
       if (!burst.active) update_lazon(f, dt);
+      continue;
+    }
+    if (foe_is_kami(f)) {
+      if (!burst.active) update_kami(f, dt);
       continue;
     }
     if (!burst.active) steer_gorf_to_clone_port(f);
