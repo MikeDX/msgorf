@@ -40,12 +40,15 @@
       max-width: 720px;
       margin: 0 auto;
       display: grid;
-      grid-template-rows: auto 1fr auto;
+      grid-template-rows: auto auto 1fr;
       padding: env(safe-area-inset-top) 0.75rem env(safe-area-inset-bottom);
       gap: 0.55rem;
     }
-    #app.pads-hidden {
-      grid-template-rows: auto 1fr auto;
+    #view-play {
+      display: grid;
+      grid-template-rows: 1fr auto;
+      min-height: 0;
+      gap: 0.55rem;
     }
     #app.pads-hidden #pads {
       display: none;
@@ -293,24 +296,132 @@
       letter-spacing: 0.06em;
       min-height: 1.2em;
     }
-    #scores {
+    #nav {
+      display: flex;
+      justify-content: center;
+      gap: 0.35rem;
+    }
+    #nav .hud-btn.on {
+      border-color: var(--amber);
+      color: var(--amber);
+    }
+    #view-scores {
+      display: none;
+      flex-direction: column;
+      min-height: 0;
+      gap: 0.55rem;
+    }
+    #app.tab-scores {
+      grid-template-rows: auto auto 1fr;
+    }
+    #app.tab-scores #view-play { display: none; }
+    #app.tab-scores #view-scores { display: flex; }
+    #app.tab-scores #nav { /* stay */ }
+    .period-row {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+    #scores-full {
+      margin: 0;
+      padding: 0 0.15rem;
+      list-style: none;
+      font-size: 0.55rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      overflow: auto;
+      min-height: 0;
+      flex: 1;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,0.35);
+      border-radius: 2px;
+    }
+    #scores-full li,
+    #scores-teaser li {
+      display: grid;
+      grid-template-columns: 2rem 1fr auto;
+      gap: 0.5rem;
+      align-items: center;
+      padding: 0.45rem 0.55rem;
+      border-bottom: 1px solid rgba(240, 200, 32, 0.08);
+      cursor: pointer;
+    }
+    #scores-full li:hover,
+    #scores-teaser li:hover {
+      background: rgba(240, 200, 32, 0.06);
+      color: var(--ink);
+    }
+    #scores-full .sc,
+    #scores-teaser .sc { color: var(--amber); }
+    #scores-full .nm,
+    #scores-teaser .nm {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--ink);
+    }
+    #scores-teaser {
       margin: 0.35rem 0 0;
       padding: 0;
       list-style: none;
       font-size: 0.48rem;
       color: var(--muted);
       letter-spacing: 0.04em;
-      max-height: 4.5rem;
+      max-height: 4.8rem;
       overflow: auto;
     }
-    #scores li {
-      display: flex;
-      justify-content: space-between;
-      gap: 0.75rem;
-      padding: 0.12rem 0;
-      border-bottom: 1px solid rgba(240, 200, 32, 0.08);
+    #scores-empty {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.5rem;
+      padding: 1.5rem 0.5rem;
+      letter-spacing: 0.08em;
     }
-    #scores .sc { color: var(--amber); }
+    #watch-panel {
+      display: none;
+      position: absolute;
+      inset: 0;
+      z-index: 6;
+      align-items: center;
+      justify-content: center;
+      background: rgba(6, 8, 12, 0.82);
+      padding: 1rem;
+      touch-action: auto;
+    }
+    #watch-panel.show { display: flex; }
+    #watch-card {
+      width: min(100%, 22rem);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      padding: 1rem 1.1rem 1.15rem;
+      text-align: center;
+    }
+    #watch-card h2 {
+      margin: 0;
+      font-size: 0.72rem;
+      letter-spacing: 0.16em;
+      color: var(--amber);
+    }
+    #watch-card .who {
+      margin: 0.65rem 0 0.15rem;
+      font-size: 0.85rem;
+      color: var(--ink);
+      letter-spacing: 0.08em;
+    }
+    #watch-card .score {
+      margin: 0 0 0.9rem;
+      font-size: 1.25rem;
+      color: var(--amber);
+      letter-spacing: 0.06em;
+    }
+    #watch-card .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      justify-content: center;
+    }
     @media (min-width: 700px) {
       #app { max-width: 840px; }
       .stick { width: 160px; }
@@ -324,48 +435,76 @@
       <p>GUESS REMAKE · DISK PATTERNS · NOT XC.LOGIC</p>
     </header>
 
-    <div id="stage">
-      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
-      <div id="share-panel" aria-hidden="true">
-        <div id="share-card">
-          <h2>GAME OVER</h2>
-          <div class="score" id="share-score">$0</div>
-          <input id="share-name" type="text" maxlength="24" placeholder="NAME (OPTIONAL)" autocomplete="nickname" enterkeyhint="done" />
-          <div class="row">
-            <button type="button" class="hud-btn on" id="btn-submit">SUBMIT SCORE</button>
-            <button type="button" class="hud-btn" id="btn-share" disabled>SHARE</button>
-            <button type="button" class="hud-btn" id="btn-copy" disabled>COPY LINK</button>
-            <button type="button" class="hud-btn" id="btn-share-close">CLOSE</button>
+    <div id="nav">
+      <button type="button" class="hud-btn on" id="tab-play" data-tab="play">PLAY</button>
+      <button type="button" class="hud-btn" id="tab-scores" data-tab="scores">SCORES</button>
+    </div>
+
+    <div id="view-play">
+      <div id="stage">
+        <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+        <div id="share-panel" aria-hidden="true">
+          <div id="share-card">
+            <h2>GAME OVER</h2>
+            <div class="score" id="share-score">$0</div>
+            <input id="share-name" type="text" maxlength="24" placeholder="NAME (OPTIONAL)" autocomplete="nickname" enterkeyhint="done" inputmode="text" />
+            <div class="row">
+              <button type="button" class="hud-btn on" id="btn-submit">SUBMIT SCORE</button>
+              <button type="button" class="hud-btn" id="btn-share" disabled>SHARE</button>
+              <button type="button" class="hud-btn" id="btn-copy" disabled>COPY LINK</button>
+              <button type="button" class="hud-btn" id="btn-share-close">CLOSE</button>
+            </div>
+            <p class="hint" id="share-hint"></p>
           </div>
-          <p class="hint" id="share-hint"></p>
         </div>
+        <div id="watch-panel" aria-hidden="true">
+          <div id="watch-card">
+            <h2>REPLAY</h2>
+            <div class="who" id="watch-who">ANON</div>
+            <div class="score" id="watch-score">$0</div>
+            <div class="row">
+              <button type="button" class="hud-btn on" id="btn-watch-go">WATCH</button>
+              <button type="button" class="hud-btn" id="btn-watch-cancel">CANCEL</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="controls">
+        <div id="hud-bar">
+          <button type="button" class="hud-btn" id="btn-fs" title="Fullscreen">FULL</button>
+          <button type="button" class="hud-btn" id="btn-pads" title="Show or hide touch pads">PADS</button>
+          <button type="button" class="hud-btn on hidden" id="btn-watch" title="Watch loaded replay">WATCH</button>
+          <button type="button" class="hud-btn hidden" id="btn-stop" title="Stop replay and play yourself">EXIT REPLAY</button>
+          <button type="button" id="btn-start">START</button>
+        </div>
+        <div id="pads">
+          <div class="pad-col">
+            <div class="stick" id="stick-move" data-side="move"><div class="knob"></div></div>
+            <div class="stick-label">MOVE</div>
+          </div>
+          <div class="shield-col">
+            <button type="button" id="btn-shield" title="Hold to drop shields (first 2s)">SHIELD</button>
+            <div class="stick-label">HOLD · 2s</div>
+          </div>
+          <div class="pad-col">
+            <div class="stick" id="stick-aim" data-side="aim"><div class="knob"></div></div>
+            <div class="stick-label">AIM / FIRE</div>
+          </div>
+        </div>
+        <ul id="scores-teaser"></ul>
+        <div id="status">Loading…</div>
       </div>
     </div>
 
-    <div id="controls">
-      <div id="hud-bar">
-        <button type="button" class="hud-btn" id="btn-fs" title="Fullscreen">FULL</button>
-        <button type="button" class="hud-btn" id="btn-pads" title="Show or hide touch pads">PADS</button>
-        <button type="button" class="hud-btn on hidden" id="btn-watch" title="Watch loaded replay">WATCH</button>
-        <button type="button" class="hud-btn hidden" id="btn-stop" title="Stop replay and play yourself">EXIT REPLAY</button>
-        <button type="button" id="btn-start">START</button>
+    <div id="view-scores">
+      <div class="period-row">
+        <button type="button" class="hud-btn" data-period="day">DAY</button>
+        <button type="button" class="hud-btn" data-period="week">WEEK</button>
+        <button type="button" class="hud-btn on" data-period="all">ALL TIME</button>
       </div>
-      <div id="pads">
-        <div class="pad-col">
-          <div class="stick" id="stick-move" data-side="move"><div class="knob"></div></div>
-          <div class="stick-label">MOVE</div>
-        </div>
-        <div class="shield-col">
-          <button type="button" id="btn-shield" title="Hold to drop shields (first 2s)">SHIELD</button>
-          <div class="stick-label">HOLD · 2s</div>
-        </div>
-        <div class="pad-col">
-          <div class="stick" id="stick-aim" data-side="aim"><div class="knob"></div></div>
-          <div class="stick-label">AIM / FIRE</div>
-        </div>
-      </div>
-      <ul id="scores"></ul>
-      <div id="status">Loading…</div>
+      <ul id="scores-full"></ul>
+      <div id="scores-empty" class="hidden">NO SCORES YET</div>
     </div>
   </div>
 
@@ -375,6 +514,8 @@
     var pendingReplayBytes = null;
     var pendingReplayMeta = null; /* { score, name } */
     var lastUploadedId = null;
+    var scoresPeriod = "all";
+    var currentTab = "play";
 
     function b64urlEncode(bytes) {
       var bin = "";
@@ -442,17 +583,85 @@
       return document.getElementById("share-panel").classList.contains("show");
     }
 
-    /* SDL steals desktop key events — block them while the name field is up. */
+    function watchPanelOpen() {
+      return document.getElementById("watch-panel").classList.contains("show");
+    }
+
+    /*
+     * SDL registers key handlers in capture phase and steals keys even when an
+     * <input> is focused. We register on window first and, while the share
+     * panel is open, stop SDL then apply keys to the name field ourselves.
+     */
+    function applyShareNameKey(e) {
+      var input = document.getElementById("share-name");
+      if (!input) return;
+      if (document.activeElement !== input) input.focus();
+      var start = input.selectionStart|0;
+      var end = input.selectionEnd|0;
+      var val = input.value;
+      if (e.key === "Enter") {
+        submitScore();
+        return;
+      }
+      if (e.key === "Escape") {
+        showSharePanel(false);
+        return;
+      }
+      if (e.key === "Backspace") {
+        if (start !== end) {
+          input.value = val.slice(0, start) + val.slice(end);
+          input.setSelectionRange(start, start);
+        } else if (start > 0) {
+          input.value = val.slice(0, start - 1) + val.slice(end);
+          input.setSelectionRange(start - 1, start - 1);
+        }
+        return;
+      }
+      if (e.key === "Delete") {
+        if (start !== end) {
+          input.value = val.slice(0, start) + val.slice(end);
+          input.setSelectionRange(start, start);
+        } else if (start < val.length) {
+          input.value = val.slice(0, start) + val.slice(end + 1);
+          input.setSelectionRange(start, start);
+        }
+        return;
+      }
+      if (e.key === "ArrowLeft") {
+        var p = Math.max(0, start - (start === end ? 1 : 0));
+        if (start !== end) p = start;
+        else p = Math.max(0, start - 1);
+        input.setSelectionRange(p, p);
+        return;
+      }
+      if (e.key === "ArrowRight") {
+        var q = start !== end ? end : Math.min(val.length, start + 1);
+        input.setSelectionRange(q, q);
+        return;
+      }
+      if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        if (val.length >= 24 && start === end) return;
+        var next = val.slice(0, start) + e.key + val.slice(end);
+        if (next.length > 24) next = next.slice(0, 24);
+        input.value = next;
+        var caret = Math.min(24, start + e.key.length);
+        input.setSelectionRange(caret, caret);
+      }
+    }
+
     function blockGameKeysWhileSharing(e) {
       if (!sharePanelOpen()) return;
-      var t = e.target;
-      if (t && (t.id === "share-name" || t.tagName === "INPUT" || t.tagName === "TEXTAREA"))
-        return;
       e.stopImmediatePropagation();
+      if (e.type === "keydown") {
+        e.preventDefault();
+        applyShareNameKey(e);
+      } else {
+        e.preventDefault();
+      }
     }
-    document.addEventListener("keydown", blockGameKeysWhileSharing, true);
-    document.addEventListener("keyup", blockGameKeysWhileSharing, true);
-    document.addEventListener("keypress", blockGameKeysWhileSharing, true);
+    window.addEventListener("keydown", blockGameKeysWhileSharing, true);
+    window.addEventListener("keyup", blockGameKeysWhileSharing, true);
+    window.addEventListener("keypress", blockGameKeysWhileSharing, true);
 
     async function submitScore() {
       var hint = document.getElementById("share-hint");
@@ -526,6 +735,7 @@
       panel.setAttribute("aria-hidden", show ? "false" : "true");
       stage.classList.toggle("share-open", !!show);
       if (show) {
+        showWatchPanel(false);
         document.getElementById("share-score").textContent =
           "$" + Module._msgorf_get_score();
         document.getElementById("share-hint").textContent =
@@ -536,38 +746,98 @@
         var canvas = document.getElementById("canvas");
         if (canvas) canvas.blur();
         var name = document.getElementById("share-name");
-        setTimeout(function () { name.focus(); name.select(); }, 50);
+        name.value = name.value || "";
+        setTimeout(function () { name.focus(); name.select(); }, 30);
       }
     }
 
+    function showWatchPanel(show) {
+      var panel = document.getElementById("watch-panel");
+      panel.classList.toggle("show", !!show);
+      panel.setAttribute("aria-hidden", show ? "false" : "true");
+      if (show && pendingReplayMeta) {
+        showSharePanel(false);
+        setTab("play");
+        document.getElementById("watch-who").textContent =
+          pendingReplayMeta.name || "ANON";
+        document.getElementById("watch-score").textContent =
+          "$" + (pendingReplayMeta.score != null ? pendingReplayMeta.score : 0);
+        var canvas = document.getElementById("canvas");
+        if (canvas) canvas.blur();
+      }
+    }
+
+    function setTab(tab) {
+      currentTab = tab === "scores" ? "scores" : "play";
+      var app = document.getElementById("app");
+      app.classList.toggle("tab-scores", currentTab === "scores");
+      document.getElementById("tab-play").classList.toggle("on", currentTab === "play");
+      document.getElementById("tab-scores").classList.toggle("on", currentTab === "scores");
+      if (currentTab === "scores") refreshScores();
+    }
+
+    function setScoresPeriod(period) {
+      scoresPeriod = period || "all";
+      document.querySelectorAll("[data-period]").forEach(function (btn) {
+        btn.classList.toggle("on", btn.getAttribute("data-period") === scoresPeriod);
+      });
+      refreshScores();
+    }
+
+    function fillScoreList(ul, rows, emptyEl) {
+      ul.innerHTML = "";
+      if (!rows.length) {
+        if (emptyEl) emptyEl.classList.remove("hidden");
+        return;
+      }
+      if (emptyEl) emptyEl.classList.add("hidden");
+      rows.forEach(function (r, i) {
+        var li = document.createElement("li");
+        var rank = document.createElement("span");
+        rank.textContent = String(i + 1) + ".";
+        var nm = document.createElement("span");
+        nm.className = "nm";
+        nm.textContent = r.name || "ANON";
+        var sc = document.createElement("span");
+        sc.className = "sc";
+        sc.textContent = "$" + r.score;
+        li.appendChild(rank);
+        li.appendChild(nm);
+        li.appendChild(sc);
+        li.title = "Watch " + (r.name || "ANON") + " · $" + r.score;
+        li.addEventListener("click", function () {
+          var u = new URL(window.location.href);
+          u.searchParams.set("r", r.id);
+          history.replaceState(null, "", u.pathname + u.search + u.hash);
+          setTab("play");
+          loadReplayById(r.id, false);
+        });
+        ul.appendChild(li);
+      });
+    }
+
     async function refreshScores() {
-      var ul = document.getElementById("scores");
+      var teaser = document.getElementById("scores-teaser");
+      var full = document.getElementById("scores-full");
+      var empty = document.getElementById("scores-empty");
       try {
-        var res = await fetch("/api/scores?limit=8");
+        var q = "/api/scores?limit=" + (currentTab === "scores" ? "50" : "5") +
+          "&period=" + encodeURIComponent(scoresPeriod);
+        var res = await fetch(q);
         if (!res.ok) throw new Error("scores");
         var rows = await res.json();
-        ul.innerHTML = "";
-        rows.forEach(function (r, i) {
-          var li = document.createElement("li");
-          var left = document.createElement("span");
-          left.textContent = (i + 1) + ". " + (r.name || "ANON");
-          var right = document.createElement("span");
-          right.className = "sc";
-          right.textContent = "$" + r.score;
-          li.appendChild(left);
-          li.appendChild(right);
-          li.style.cursor = "pointer";
-          li.title = "Watch replay";
-          li.addEventListener("click", function () {
-            var u = new URL(window.location.href);
-            u.searchParams.set("r", r.id);
-            history.replaceState(null, "", u.pathname + u.search + u.hash);
-            loadReplayById(r.id, false);
-          });
-          ul.appendChild(li);
-        });
+        if (currentTab === "scores") {
+          fillScoreList(full, rows, empty);
+        } else {
+          /* Play tab teaser always shows all-time top 5 */
+          var tres = await fetch("/api/scores?limit=5&period=all");
+          var trows = tres.ok ? await tres.json() : rows.slice(0, 5);
+          fillScoreList(teaser, trows, null);
+        }
       } catch (e) {
-        ul.innerHTML = "";
+        if (teaser) teaser.innerHTML = "";
+        if (full) full.innerHTML = "";
+        if (empty) empty.classList.remove("hidden");
       }
     }
 
@@ -583,6 +853,8 @@
     function startPendingReplay() {
       if (!ready() || !pendingReplayBytes) return;
       showSharePanel(false);
+      showWatchPanel(false);
+      setTab("play");
       var bytes = pendingReplayBytes;
       var ptr = Module._malloc(bytes.length);
       Module.HEAPU8.set(bytes, ptr);
@@ -592,22 +864,26 @@
         document.getElementById("status").textContent = "Replay start failed";
         return;
       }
+      var who = (pendingReplayMeta && pendingReplayMeta.name) || "ANON";
       var sc = pendingReplayMeta && pendingReplayMeta.score != null
         ? pendingReplayMeta.score : "?";
       document.getElementById("status").textContent =
-        "REPLAY · $" + sc + " · EXIT REPLAY to play yourself";
+        "REPLAY · " + who + " · $" + sc + " · EXIT REPLAY to play yourself";
     }
 
     function stopReplayToPlay() {
       if (!ready()) return;
       showSharePanel(false);
+      showWatchPanel(false);
       Module._msgorf_replay_stop();
       clearReplayQuery();
       if (pendingReplayBytes) {
+        var who = (pendingReplayMeta && pendingReplayMeta.name) || "ANON";
         var sc = pendingReplayMeta && pendingReplayMeta.score != null
           ? pendingReplayMeta.score : "?";
         document.getElementById("status").textContent =
-          "Replay ready · $" + sc + " · WATCH or START your own";
+          "Replay ready · " + who + " · $" + sc;
+        showWatchPanel(true);
       } else {
         document.getElementById("status").textContent =
           "Move · Aim/fire · SHIELD hold (first 2s) · triggers on pad · A/Start";
@@ -625,15 +901,16 @@
         pendingReplayBytes = b64urlDecode(data.replay_b64);
         pendingReplayMeta = { score: data.score || 0, name: data.name || "" };
         document.getElementById("status").textContent =
-          "Replay ready · $" + pendingReplayMeta.score +
-          (pendingReplayMeta.name ? (" · " + pendingReplayMeta.name) : "") +
-          " · WATCH or START your own";
+          "Replay ready · " + (pendingReplayMeta.name || "ANON") +
+          " · $" + pendingReplayMeta.score;
         showSharePanel(false);
         syncStartButton();
         if (autoplay) startPendingReplay();
+        else showWatchPanel(true);
       } catch (e) {
         pendingReplayBytes = null;
         pendingReplayMeta = null;
+        showWatchPanel(false);
         document.getElementById("status").textContent =
           "Replay load failed: " + (e.message || e);
         syncStartButton();
@@ -830,11 +1107,35 @@
       });
 
       document.getElementById("btn-watch").addEventListener("click", function () {
-        startPendingReplay();
-        syncStartButton();
+        if (pendingReplayBytes) showWatchPanel(true);
       });
       document.getElementById("btn-stop").addEventListener("click", function () {
         stopReplayToPlay();
+      });
+      document.getElementById("btn-watch-go").addEventListener("click", function () {
+        startPendingReplay();
+        syncStartButton();
+      });
+      document.getElementById("btn-watch-cancel").addEventListener("click", function () {
+        showWatchPanel(false);
+        clearReplayQuery();
+        document.getElementById("status").textContent =
+          pendingReplayBytes
+            ? ("Replay ready · " + ((pendingReplayMeta && pendingReplayMeta.name) || "ANON") +
+               " · $" + ((pendingReplayMeta && pendingReplayMeta.score) || 0))
+            : "Move · Aim/fire · SHIELD hold (first 2s) · triggers on pad · A/Start";
+      });
+
+      document.getElementById("tab-play").addEventListener("click", function () {
+        setTab("play");
+      });
+      document.getElementById("tab-scores").addEventListener("click", function () {
+        setTab("scores");
+      });
+      document.querySelectorAll("[data-period]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          setScoresPeriod(btn.getAttribute("data-period"));
+        });
       });
 
       document.getElementById("btn-submit").addEventListener("click", submitScore);
@@ -842,12 +1143,6 @@
       document.getElementById("btn-copy").addEventListener("click", copyReplayLink);
       document.getElementById("btn-share-close").addEventListener("click", function () {
         showSharePanel(false);
-      });
-      document.getElementById("share-name").addEventListener("keydown", function (e) {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          submitScore();
-        }
       });
 
       document.getElementById("btn-fs").addEventListener("click", toggleFullscreen);
@@ -885,7 +1180,7 @@
 
     /* Physical gamepad on web: right stick aim/fire; L/R triggers = shields. */
     function pollWebGamepad() {
-      if (!ready() || !navigator.getGamepads || sharePanelOpen()) return;
+      if (!ready() || !navigator.getGamepads || sharePanelOpen() || watchPanelOpen()) return;
       var pads = navigator.getGamepads();
       var gp = null;
       for (var i = 0; i < pads.length; i++) {

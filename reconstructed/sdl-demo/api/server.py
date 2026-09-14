@@ -316,29 +316,40 @@ def get_run(run_id: str) -> dict[str, Any]:
 
 
 @app.get("/api/scores")
-def scores(limit: int = 20, build_id: str | None = None) -> list[dict[str, Any]]:
-    limit = max(1, min(limit, 50))
+def scores(
+    limit: int = 20,
+    build_id: str | None = None,
+    period: str = "all",
+) -> list[dict[str, Any]]:
+    limit = max(1, min(limit, 100))
+    period = (period or "all").lower()
+    now = time.time()
+    since: float | None
+    if period in ("day", "today", "d"):
+        since = now - 86400.0
+    elif period in ("week", "w"):
+        since = now - 86400.0 * 7
+    else:
+        since = None
+
+    clauses: list[str] = []
+    args: list[Any] = []
+    if build_id:
+        clauses.append("build_id = ?")
+        args.append(build_id[:64])
+    if since is not None:
+        clauses.append("created_at >= ?")
+        args.append(since)
+    where = (" WHERE " + " AND ".join(clauses)) if clauses else ""
+    args.append(limit)
+    sql = f"""
+        SELECT id, name, score, build_id, created_at
+        FROM runs{where}
+        ORDER BY score DESC, created_at ASC
+        LIMIT ?
+    """
     with _db() as conn:
-        if build_id:
-            rows = conn.execute(
-                """
-                SELECT id, name, score, build_id, created_at
-                FROM runs WHERE build_id = ?
-                ORDER BY score DESC, created_at ASC
-                LIMIT ?
-                """,
-                (build_id[:64], limit),
-            ).fetchall()
-        else:
-            rows = conn.execute(
-                """
-                SELECT id, name, score, build_id, created_at
-                FROM runs
-                ORDER BY score DESC, created_at ASC
-                LIMIT ?
-                """,
-                (limit,),
-            ).fetchall()
+        rows = conn.execute(sql, tuple(args)).fetchall()
     return [
         {
             "id": r["id"],
