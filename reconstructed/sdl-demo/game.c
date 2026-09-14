@@ -42,12 +42,17 @@
 #define WAVE_COUNT 6
 #define WAVE_GORF_CAP 16 /* hard cap on gorfs per wave */
 #define GORF_SHOT_HIT_R 3.f
-#define SMINE_SPAWN_T 2.f /* timed SMINE/SHLD from cloner */
+#define SMINE_SPAWN_T 2.f /* first timed extra from cloner (typical) */
 #define SMINE_ANIM_HZ 2.5f
 #define MINE_TILE 8.f /* SHLD step / laid mine cell */
 #define SPAWN_NONE 0
 #define SPAWN_SMINE 1
 #define SPAWN_SHLD 2
+#define SPAWN_LAZON 3
+#define WAVE_EXTRAS_MAX 2
+#define LAZON_BEAM_PPS 320.f /* GUESS: laser tip advance */
+#define LAZON_STOP_T 0.28f
+#define LAZON_HIT_R 7.f
 #define CLONE_PROCESS_T 0.35f
 #define CLONE_EXIT_SPEED 55.f
 #define CLONE_COOL 0.75f
@@ -113,13 +118,23 @@ typedef struct {
   int shld_tiles_left;
   float shld_acc;
   float shld_pause; /* GUESS: brief stop between legs */
+  /* LAZON: move → stop → beam toward player → repeat */
+  int lazon_phase; /* 0 move, 1 stop, 2 shoot */
+  float lazon_timer;
+  float lazon_aim_dx, lazon_aim_dy;
+  float lazon_beam;
 } foe_t;
+
+typedef struct {
+  int kind; /* SPAWN_* */
+  float at; /* seconds after PLAY starts */
+} wave_spawn_t;
 
 /* GUESS wave table — loops after 6; cycle bumps speeds / fire rate. */
 typedef struct {
   int gorfs;
   int can_fire;
-  int spawn_extra; /* SPAWN_NONE / SPAWN_SMINE / SPAWN_SHLD */
+  wave_spawn_t extras[WAVE_EXTRAS_MAX];
   float fire_first_min, fire_first_max;   /* delay after PLAY before first shot */
   float fire_period_min, fire_period_max; /* between shots */
   float shot_ppf;                         /* enemy bullet px/frame @ 60Hz */
@@ -127,13 +142,17 @@ typedef struct {
 } wave_def_t;
 
 static const wave_def_t WAVES[WAVE_COUNT] = {
-    /* gorfs fire extra  first_lo/hi   period_lo/hi   shot_ppf  speed */
-    {4, 0, SPAWN_NONE, 2.5f, 3.0f, 0.50f, 2.00f, 2.0f, 1.00f},  /* W1 */
-    {8, 1, SPAWN_SMINE, 2.5f, 3.0f, 0.50f, 2.00f, 2.0f, 1.00f}, /* W2: SMINE */
-    {9, 1, SPAWN_SHLD, 2.0f, 2.5f, 0.40f, 1.50f, 2.2f, 1.05f},  /* W3: SHLD-P */
-    {12, 1, SPAWN_SMINE, 1.5f, 2.0f, 0.35f, 1.20f, 2.4f, 1.10f}, /* W4+ TBD */
-    {14, 1, SPAWN_SMINE, 1.25f, 1.75f, 0.30f, 1.00f, 2.6f, 1.15f},
-    {16, 1, SPAWN_SMINE, 1.0f, 1.5f, 0.25f, 0.80f, 2.8f, 1.20f},
+    /* W1: gorfs only */
+    {4, 0, {{SPAWN_NONE, 0}, {SPAWN_NONE, 0}}, 2.5f, 3.0f, 0.50f, 2.00f, 2.0f, 1.00f},
+    /* W2: SMINE */
+    {8, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_NONE, 0}}, 2.5f, 3.0f, 0.50f, 2.00f, 2.0f, 1.00f},
+    /* W3: SMINE then SHLD-P */
+    {9, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_SHLD, 3.5f}}, 2.0f, 2.5f, 0.40f, 1.50f, 2.2f, 1.05f},
+    /* W4: SHLD-P then LAZON */
+    {12, 1, {{SPAWN_SHLD, 2.f}, {SPAWN_LAZON, 3.5f}}, 1.5f, 2.0f, 0.35f, 1.20f, 2.4f, 1.10f},
+    /* W5+ TBD */
+    {14, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_NONE, 0}}, 1.25f, 1.75f, 0.30f, 1.00f, 2.6f, 1.15f},
+    {16, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_NONE, 0}}, 1.0f, 1.5f, 0.25f, 0.80f, 2.8f, 1.20f},
 };
 
 typedef struct {
@@ -198,7 +217,8 @@ static int level_num;       /* 1-based; indexes WAVES with wrap */
 static int wave_gorf_count; /* gorfs at this wave's start */
 static float gorf_fire_cd;  /* countdown to next enemy volley */
 static float play_age;      /* time in PLAY this wave (player live) */
-static int smine_armed;     /* pending timed SMINE/SHLD; cleared on death */
+static wave_spawn_t extra_queue[WAVE_EXTRAS_MAX];
+static int extra_qn, extra_qi; /* armed timed extras; cleared on death */
 static int pending_lastship; /* play lastship.wav when PLAY starts after last-life respawn */
 static float intro_black; /* >0: full black before frozen field + galaxy */
 static float clone_x, clone_y, clone_frame;
@@ -434,7 +454,10 @@ static void rand_vel(float *vx, float *vy) {
 
 static int foe_is_smine(const foe_t *f);
 static int foe_is_shld(const foe_t *f);
+static int foe_is_lazon(const foe_t *f);
 static void pick_shld_leg(foe_t *f);
+static void lazon_start_move(foe_t *f);
+static void player_destroyed(void);
 
 static void spawn_gorf(float x, float y, float vx, float vy, const char *kind, float cool) {
   if (n_foes >= MAX_FOES) return;
@@ -452,7 +475,13 @@ static void spawn_gorf(float x, float y, float vx, float vy, const char *kind, f
   f->shld_tiles_left = 0;
   f->shld_acc = 0;
   f->shld_pause = 0;
+  f->lazon_phase = 0;
+  f->lazon_timer = 0;
+  f->lazon_aim_dx = 1.f;
+  f->lazon_aim_dy = 0.f;
+  f->lazon_beam = 0;
   if (foe_is_shld(f)) pick_shld_leg(f);
+  if (foe_is_lazon(f)) lazon_start_move(f);
 }
 
 /* Keep gorfs moving after wall/pair bounce (elastic swaps can kill speed). */
@@ -507,8 +536,12 @@ static int foe_is_shld(const foe_t *f) {
   return name_eq(f->kind, "SHLD_P") || name_eq(f->kind, "SHLD-P");
 }
 
-/* SMINE / SHLD-P: pass through foes, skip cloner absorb. SMINE is shot-proof. */
-static int foe_is_special(const foe_t *f) { return foe_is_smine(f) || foe_is_shld(f); }
+static int foe_is_lazon(const foe_t *f) { return name_eq(f->kind, "LAZON"); }
+
+/* Timed extras: pass through foes, skip cloner. SMINE is shot-proof. */
+static int foe_is_special(const foe_t *f) {
+  return foe_is_smine(f) || foe_is_shld(f) || foe_is_lazon(f);
+}
 
 static const char *foe_draw_kind(const foe_t *f) {
   if (!foe_is_smine(f)) return f->kind;
@@ -620,6 +653,111 @@ static void update_shld(foe_t *f, float dt) {
     shld_end_leg(f);
 }
 
+static void lazon_start_move(foe_t *f) {
+  float ang = frand() * (float)(2.0 * M_PI);
+  float sp = wave_gorf_speed() * 0.95f;
+  f->vx = cosf(ang) * sp;
+  f->vy = sinf(ang) * sp;
+  f->lazon_phase = 0;
+  f->lazon_timer = 0.4f + frand() * 0.55f; /* GUESS: move duration */
+  f->lazon_beam = 0;
+}
+
+static void lazon_start_stop(foe_t *f) {
+  f->vx = f->vy = 0;
+  f->lazon_phase = 1;
+  f->lazon_timer = LAZON_STOP_T;
+  f->lazon_beam = 0;
+}
+
+static void lazon_start_shoot(foe_t *f) {
+  float dx = player_x - f->x;
+  float dy = player_y - f->y;
+  float len = hypotf(dx, dy);
+  if (len < 1.f) {
+    dx = 1.f;
+    dy = 0.f;
+    len = 1.f;
+  }
+  f->lazon_aim_dx = dx / len;
+  f->lazon_aim_dy = dy / len;
+  f->lazon_beam = 0;
+  f->vx = f->vy = 0;
+  f->lazon_phase = 2;
+  f->lazon_timer = 0;
+}
+
+/* Distance from point P to segment AB. */
+static float dist_point_seg(float px, float py, float ax, float ay, float bx, float by) {
+  float abx = bx - ax, aby = by - ay;
+  float apx = px - ax, apy = py - ay;
+  float ab2 = abx * abx + aby * aby;
+  float t = 0.f;
+  if (ab2 > 1e-6f) {
+    t = (apx * abx + apy * aby) / ab2;
+    if (t < 0.f) t = 0.f;
+    if (t > 1.f) t = 1.f;
+  }
+  float cx = ax + abx * t, cy = ay + aby * t;
+  return hypotf(px - cx, py - cy);
+}
+
+static int lazon_tip_out(float x, float y) {
+  return x < 2.f || x > FB_W - 2.f || y < 20.f || y > FB_H - 2.f;
+}
+
+static void update_lazon(foe_t *f, float dt) {
+  if (f->lazon_phase == 0) {
+    f->x += f->vx * dt;
+    f->y += f->vy * dt;
+    /* Soft walls — reverse component instead of random bounce. */
+    if (f->x < SHLD_MARGIN_L) {
+      f->x = SHLD_MARGIN_L;
+      f->vx = fabsf(f->vx);
+    } else if (f->x > SHLD_MARGIN_R) {
+      f->x = SHLD_MARGIN_R;
+      f->vx = -fabsf(f->vx);
+    }
+    if (f->y < SHLD_MARGIN_T) {
+      f->y = SHLD_MARGIN_T;
+      f->vy = fabsf(f->vy);
+    } else if (f->y > SHLD_MARGIN_B) {
+      f->y = SHLD_MARGIN_B;
+      f->vy = -fabsf(f->vy);
+    }
+    f->lazon_timer -= dt;
+    if (f->lazon_timer <= 0.f) lazon_start_stop(f);
+  } else if (f->lazon_phase == 1) {
+    f->vx = f->vy = 0;
+    f->lazon_timer -= dt;
+    if (f->lazon_timer <= 0.f) lazon_start_shoot(f);
+  } else {
+    f->vx = f->vy = 0;
+    f->lazon_beam += LAZON_BEAM_PPS * dt;
+    float tip_x = f->x + f->lazon_aim_dx * f->lazon_beam;
+    float tip_y = f->y + f->lazon_aim_dy * f->lazon_beam;
+    if (player_vis && death_linger <= 0.f &&
+        dist_point_seg(player_x, player_y, f->x, f->y, tip_x, tip_y) < LAZON_HIT_R) {
+      player_destroyed();
+      lazon_start_move(f);
+      return;
+    }
+    if (lazon_tip_out(tip_x, tip_y)) lazon_start_move(f);
+  }
+}
+
+static void draw_lazon_beam(uint8_t *rgb, const foe_t *f) {
+  if (f->lazon_phase != 2 || f->lazon_beam < 1.f) return;
+  float tip_x = f->x + f->lazon_aim_dx * f->lazon_beam;
+  float tip_y = f->y + f->lazon_aim_dy * f->lazon_beam;
+  int x0 = pix(f->x), y0 = pix(f->y);
+  int x1 = pix(tip_x), y1 = pix(tip_y);
+  /* Continuous laser stream — bright core + warm fringe. */
+  draw_line(rgb, x0, y0, x1, y1, 255, 80, 60);
+  draw_line(rgb, x0 + 1, y0, x1 + 1, y1, 255, 220, 80);
+  draw_line(rgb, x0, y0 + 1, x1, y1 + 1, 255, 200, 60);
+}
+
 static void draw_mine(uint8_t *rgb, float x, float y) {
   /* GUESS: 8×8 box with corners removed; flash red ↔ yellow every frame. */
   static const char mask[8][8] = {
@@ -681,8 +819,13 @@ static int gorfs_for_level(int level) {
 
 static void apply_wave_flags(void) {
   const wave_def_t *w = current_wave();
-  smine_armed = (w->spawn_extra != SPAWN_NONE) ? 1 : 0;
   wave_gorf_count = gorfs_for_level(level_num);
+  extra_qn = 0;
+  extra_qi = 0;
+  for (int i = 0; i < WAVE_EXTRAS_MAX; i++) {
+    if (w->extras[i].kind == SPAWN_NONE) continue;
+    extra_queue[extra_qn++] = w->extras[i];
+  }
 }
 
 static void place_clone_at_home(void) {
@@ -740,7 +883,8 @@ static void start_wave_intro(int gorf_count, int show_clone_in_intro) {
 }
 
 static void start_respawn_intro(void) {
-  smine_armed = 0; /* SMINE/SHLD do not return after death / wave restart */
+  extra_qn = 0; /* extras do not return after death / wave restart */
+  extra_qi = 0;
   pending_lastship = (ships_left == 1) ? 1 : 0;
   start_wave_intro(respawn_gorf_count, 1); /* cloner stays visible through galaxy */
 }
@@ -1110,12 +1254,14 @@ static void emit_clones(int exit_port, const char *kind) {
   }
 }
 
-/* Timed extra: SMINE or SHLD-P exits a yellow cloner port. */
-static void spawn_extra_from_cloner(void) {
-  if (!clone_vis || n_foes >= MAX_FOES) return;
-  int extra = current_wave()->spawn_extra;
-  if (extra == SPAWN_NONE) return;
-  const char *kind = (extra == SPAWN_SHLD) ? "SHLD-P" : "SMINE0";
+/* Timed extra: SMINE / SHLD-P / LAZON exits a yellow cloner port. */
+static void spawn_extra_kind(int extra) {
+  if (!clone_vis || n_foes >= MAX_FOES || extra == SPAWN_NONE) return;
+  const char *kind = "SMINE0";
+  if (extra == SPAWN_SHLD)
+    kind = "SHLD-P";
+  else if (extra == SPAWN_LAZON)
+    kind = "LAZON";
   port_t ports[2];
   clone_yellow_ports(ports);
   int exit_port = rand() & 1;
@@ -1149,7 +1295,7 @@ static void process_clone_machine(float dt) {
   for (int i = 0; i < n_foes; i++) {
     foe_t *f = &foes[i];
     if (f->hp <= 0 || f->cool > 0) continue;
-    if (foe_is_special(f)) continue; /* SMINE/SHLD do not enter cloner */
+    if (foe_is_special(f)) continue; /* timed extras do not enter cloner */
     int hit = -1;
     if (overlaps_port(f, &ports[0]))
       hit = 0;
@@ -1394,6 +1540,10 @@ static void update_play(game_t *g, float dt) {
       if (!burst.active) update_shld(f, dt);
       continue;
     }
+    if (foe_is_lazon(f)) {
+      if (!burst.active) update_lazon(f, dt);
+      continue;
+    }
     if (!burst.active) steer_gorf_to_clone_port(f);
     f->x += f->vx * dt;
     f->y += f->vy * dt;
@@ -1401,7 +1551,7 @@ static void update_play(game_t *g, float dt) {
   }
   for (int i = 0; i < n_foes; i++)
     for (int j = i + 1; j < n_foes; j++) {
-      /* SMINE/SHLD pass through other foes (no bounce). */
+      /* Timed extras pass through other foes (no bounce). */
       if (foe_is_special(&foes[i]) || foe_is_special(&foes[j])) continue;
       bounce_pair(&foes[i], &foes[j]);
     }
@@ -1411,12 +1561,12 @@ static void update_play(game_t *g, float dt) {
     keep_gorf_speed(&foes[i]);
   }
 
-  /* Wave table: fire / timed SMINE|SHLD when current_wave allows. */
+  /* Wave table: fire / timed extras when current_wave allows. */
   if (!burst.active && player_vis && death_linger <= 0.f) {
     play_age += dt;
-    if (smine_armed && play_age >= SMINE_SPAWN_T) {
-      spawn_extra_from_cloner();
-      smine_armed = 0;
+    while (extra_qi < extra_qn && play_age >= extra_queue[extra_qi].at) {
+      spawn_extra_kind(extra_queue[extra_qi].kind);
+      extra_qi++;
     }
     if (wave_can_fire()) {
       gorf_fire_cd -= dt;
@@ -1502,7 +1652,7 @@ static void update_play(game_t *g, float dt) {
     if (foes[i].hp > 0) foes[wf++] = foes[i];
   n_foes = wf;
 
-  /* Level ends when gorfs are gone — SMINE/SHLD do not block clear. */
+  /* Level ends when gorfs are gone — timed extras do not block clear. */
   if (!burst.active && player_vis && count_gorfs() == 0 && clone_vis && n_clone_jobs == 0)
     start_clear_burst();
 
@@ -1574,8 +1724,10 @@ static void draw_world(uint8_t *rgb, int with_galaxy) {
   draw_burst_bg(rgb);
   for (int i = 0; i < n_mines; i++)
     if (mines[i].alive) draw_mine(rgb, mines[i].x, mines[i].y);
-  for (int i = 0; i < n_foes; i++)
+  for (int i = 0; i < n_foes; i++) {
+    if (foe_is_lazon(&foes[i])) draw_lazon_beam(rgb, &foes[i]);
     blit_named(rgb, foe_draw_kind(&foes[i]), pix_draw(foes[i].x), pix_draw(foes[i].y), 0);
+  }
   if (with_galaxy) draw_galaxy(rgb);
   for (int i = 0; i < n_fx; i++)
     blit_named(rgb, fx[i].hp > 0.22f ? "FBEXP5" : "FBEXP6", pix(fx[i].x), pix(fx[i].y), 0);
