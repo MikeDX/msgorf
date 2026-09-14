@@ -1,8 +1,8 @@
 """Ms. Gorf score + replay API (SQLite).
 
 Validates each submission by re-simulating the replay with msgorf_verify
-(headless game tick loop). Duplicate replays (same blob hash) are rejected
-as new rows and return the existing run id.
+(headless game tick loop). Duplicate replays (same blob hash) return the
+existing run id. Bad payloads are rejected with cheap checks before verify.
 """
 from __future__ import annotations
 
@@ -12,8 +12,10 @@ import os
 import re
 import secrets
 import sqlite3
+import struct
 import subprocess
 import tempfile
+import threading
 import time
 from pathlib import Path
 from typing import Any
@@ -25,13 +27,28 @@ from pydantic import BaseModel, Field
 
 DATA_DIR = Path(__file__).resolve().parent / "data"
 DB_PATH = DATA_DIR / "msgorf.sqlite3"
-MAX_REPLAY_BYTES = 512 * 1024
+
+# Hard limits — fail fast before spawning the verifier.
+MAX_REPLAY_BYTES = 192 * 1024
+MIN_REPLAY_BYTES = 32  # magic + minimal header
 MAX_NAME_LEN = 24
-RATE_WINDOW_S = 60.0
-RATE_MAX_POSTS = 20
+MAX_SCORE = 5_000_000
+MAX_TICKS = 60 * 60 * 30  # 30 minutes @ 60Hz
+MIN_TICKS = 30  # ~0.5s — reject empty/trivial blobs
+MAX_EVENTS = 20000
+
+# Rate limits (per client IP)
+RATE_POST_WINDOW_S = 60.0
+RATE_POST_MAX = 4
+RATE_HOUR_WINDOW_S = 3600.0
+RATE_HOUR_MAX = 20
+RATE_FAIL_WINDOW_S = 300.0
+RATE_FAIL_MAX = 8  # bad verifies / junk → temporary cooldown
+
 VERIFY_BIN = os.environ.get("MSGORF_VERIFY", "/usr/local/bin/msgorf_verify")
 VERIFY_SCRIPT = os.environ.get("MSGORF_VERIFY_SCRIPT", "")
-VERIFY_TIMEOUT_S = float(os.environ.get("MSGORF_VERIFY_TIMEOUT", "120"))
+VERIFY_TIMEOUT_S = float(os.environ.get("MSGORF_VERIFY_TIMEOUT", "20"))
+VERIFY_SLOTS = int(os.environ.get("MSGORF_VERIFY_SLOTS", "2"))
 
 app = FastAPI(title="Ms. Gorf API", version="1")
 app.add_middleware(
@@ -41,12 +58,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-_rate: dict[str, list[float]] = {}
+_rate_post: dict[str, list[float]] = {}
+_rate_hour: dict[str, list[float]] = {}
+_rate_fail: dict[str, list[float]] = {}
+_verify_sem = threading.Semaphore(max(1, VERIFY_SLOTS))
 
 
 def _db() -> sqlite3.Connection:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=10)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -71,13 +91,11 @@ def _init_db() -> None:
         cols = {r[1] for r in conn.execute("PRAGMA table_info(runs)").fetchall()}
         if "replay_hash" not in cols:
             conn.execute("ALTER TABLE runs ADD COLUMN replay_hash TEXT")
-        # Backfill hashes for older rows
         for row in conn.execute(
             "SELECT id, replay FROM runs WHERE replay_hash IS NULL OR replay_hash = ''"
         ).fetchall():
             h = hashlib.sha256(row["replay"]).hexdigest()
             conn.execute("UPDATE runs SET replay_hash = ? WHERE id = ?", (h, row["id"]))
-        # Drop duplicate replays (keep earliest) before unique index
         dupes = conn.execute(
             """
             SELECT replay_hash FROM runs
@@ -101,6 +119,9 @@ def _init_db() -> None:
         conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_runs_score ON runs(score DESC, created_at DESC)"
         )
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_runs_created ON runs(created_at DESC)"
+        )
 
 
 @app.on_event("startup")
@@ -109,6 +130,8 @@ def startup() -> None:
 
 
 def _b64url_decode(s: str) -> bytes:
+    if len(s) > MAX_REPLAY_BYTES * 2 + 64:
+        raise HTTPException(413, "replay too large")
     s = s.replace("-", "+").replace("_", "/")
     pad = (-len(s)) % 4
     if pad:
@@ -133,24 +156,92 @@ def _clean_name(name: str | None) -> str:
 def _client_ip(req: Request) -> str:
     xff = req.headers.get("x-forwarded-for")
     if xff:
-        return xff.split(",")[0].strip()
+        return xff.split(",")[0].strip()[:64]
     if req.client:
         return req.client.host
     return "unknown"
 
 
-def _rate_ok(ip: str) -> bool:
+def _prune(bucket: list[float], window: float, now: float) -> None:
+    bucket[:] = [t for t in bucket if now - t < window]
+
+
+def _hit(store: dict[str, list[float]], ip: str, window: float, limit: int) -> bool:
+    """Return True if under limit (and record a hit)."""
     now = time.time()
-    bucket = _rate.setdefault(ip, [])
-    bucket[:] = [t for t in bucket if now - t < RATE_WINDOW_S]
-    if len(bucket) >= RATE_MAX_POSTS:
+    bucket = store.setdefault(ip, [])
+    _prune(bucket, window, now)
+    if len(bucket) >= limit:
         return False
     bucket.append(now)
     return True
 
 
+def _fail_hit(ip: str) -> None:
+    now = time.time()
+    bucket = _rate_fail.setdefault(ip, [])
+    _prune(bucket, RATE_FAIL_WINDOW_S, now)
+    bucket.append(now)
+
+
+def _fail_blocked(ip: str) -> bool:
+    now = time.time()
+    bucket = _rate_fail.setdefault(ip, [])
+    _prune(bucket, RATE_FAIL_WINDOW_S, now)
+    return len(bucket) >= RATE_FAIL_MAX
+
+
+def _u32(buf: bytes, off: int) -> int:
+    return struct.unpack_from("<I", buf, off)[0]
+
+
+def _parse_replay_header(raw: bytes) -> dict[str, Any]:
+    """Cheap structural checks before spawning the WASM verifier."""
+    if len(raw) < MIN_REPLAY_BYTES or len(raw) > MAX_REPLAY_BYTES:
+        raise HTTPException(400, "replay size out of range")
+    if raw[:4] != b"MGR1":
+        raise HTTPException(400, "not an Ms. Gorf replay")
+    if len(raw) < 7:
+        raise HTTPException(400, "truncated replay")
+    ver = raw[4]
+    if ver != 1:
+        raise HTTPException(400, "unsupported replay version")
+    bid_len = raw[6]
+    if bid_len > 64:
+        raise HTTPException(400, "bad build id")
+    off = 7
+    if off + bid_len + 16 > len(raw):
+        raise HTTPException(400, "truncated replay header")
+    build_id = raw[off : off + bid_len].decode("ascii", errors="replace")
+    off += bid_len
+    seed = _u32(raw, off)
+    score = _u32(raw, off + 4)
+    ticks = _u32(raw, off + 8)
+    nevents = _u32(raw, off + 12)
+    off += 16
+    if score > MAX_SCORE:
+        raise HTTPException(400, "score too high")
+    if ticks < MIN_TICKS or ticks > MAX_TICKS:
+        raise HTTPException(400, "tick count out of range")
+    if nevents > MAX_EVENTS:
+        raise HTTPException(400, "too many input events")
+    # Each event is 4 (tick) + 14 (snap) = 18 bytes
+    need = off + nevents * 18
+    if need > len(raw):
+        raise HTTPException(400, "truncated event stream")
+    if need < len(raw) - 32:
+        # Trailing junk is suspicious but allow a little padding
+        raise HTTPException(400, "replay has trailing junk")
+    return {
+        "build_id": build_id,
+        "seed": seed,
+        "score": score,
+        "ticks": ticks,
+        "nevents": nevents,
+    }
+
+
 def _verify_cmd() -> list[str]:
-    """Return argv prefix for the headless verifier."""
     if VERIFY_BIN == "node" or VERIFY_BIN.endswith("node"):
         script = VERIFY_SCRIPT or str(Path(__file__).resolve().parent / "msgorf_verify.js")
         return ["node", script]
@@ -171,6 +262,9 @@ def _verify_replay(raw: bytes) -> int:
             return -1
         raise HTTPException(503, "score verifier unavailable")
 
+    if not _verify_sem.acquire(blocking=False):
+        raise HTTPException(503, "verifier busy — try again shortly")
+
     fd, path = tempfile.mkstemp(prefix="msgorf_", suffix=".mgr1")
     os.close(fd)
     try:
@@ -185,6 +279,7 @@ def _verify_replay(raw: bytes) -> int:
     except subprocess.TimeoutExpired as exc:
         raise HTTPException(400, "replay verification timed out") from exc
     finally:
+        _verify_sem.release()
         try:
             os.unlink(path)
         except OSError:
@@ -201,9 +296,9 @@ def _verify_replay(raw: bytes) -> int:
 
 class RunIn(BaseModel):
     build_id: str = Field(default="dev", max_length=64)
-    score: int = Field(ge=0, le=99_999_999)
+    score: int = Field(ge=0, le=MAX_SCORE)
     name: str = Field(default="", max_length=64)
-    replay_b64: str = Field(min_length=8, max_length=MAX_REPLAY_BYTES * 2)
+    replay_b64: str = Field(min_length=8, max_length=MAX_REPLAY_BYTES * 2 + 8)
     seed: int | None = None
     ticks: int | None = None
 
@@ -219,13 +314,28 @@ def health() -> dict[str, Any]:
 @app.post("/api/runs")
 def create_run(body: RunIn, request: Request) -> dict[str, Any]:
     ip = _client_ip(request)
-    if not _rate_ok(ip):
+    if _fail_blocked(ip):
+        raise HTTPException(429, "too many rejected submissions")
+    if not _hit(_rate_post, ip, RATE_POST_WINDOW_S, RATE_POST_MAX):
         raise HTTPException(429, "slow down")
-    raw = _b64url_decode(body.replay_b64)
-    if len(raw) > MAX_REPLAY_BYTES:
+    if not _hit(_rate_hour, ip, RATE_HOUR_WINDOW_S, RATE_HOUR_MAX):
+        raise HTTPException(429, "hourly limit reached")
+
+    # Fast rejects before base64 decode of huge payloads
+    if len(body.replay_b64) > MAX_REPLAY_BYTES * 2 + 8:
+        _fail_hit(ip)
         raise HTTPException(413, "replay too large")
-    if len(raw) < 8 or raw[:4] != b"MGR1":
-        raise HTTPException(400, "not an Ms. Gorf replay")
+
+    try:
+        raw = _b64url_decode(body.replay_b64)
+        header = _parse_replay_header(raw)
+        if body.score != int(header["score"]):
+            raise HTTPException(400, "score does not match replay header")
+        if body.ticks is not None and int(body.ticks) != int(header["ticks"]):
+            raise HTTPException(400, "ticks do not match replay header")
+    except HTTPException:
+        _fail_hit(ip)
+        raise
 
     replay_hash = hashlib.sha256(raw).hexdigest()
     with _db() as conn:
@@ -242,8 +352,14 @@ def create_run(body: RunIn, request: Request) -> dict[str, Any]:
             "verified": True,
         }
 
-    verified = _verify_replay(raw)
+    try:
+        verified = _verify_replay(raw)
+    except HTTPException:
+        _fail_hit(ip)
+        raise
+
     if verified >= 0 and verified != int(body.score):
+        _fail_hit(ip)
         raise HTTPException(
             400,
             f"score mismatch: client={body.score} verified={verified}",
@@ -252,7 +368,7 @@ def create_run(body: RunIn, request: Request) -> dict[str, Any]:
 
     run_id = secrets.token_urlsafe(8)
     name = _clean_name(body.name)
-    build_id = (body.build_id or "dev")[:64]
+    build_id = (body.build_id or header.get("build_id") or "dev")[:64]
     with _db() as conn:
         try:
             conn.execute(
@@ -265,9 +381,9 @@ def create_run(body: RunIn, request: Request) -> dict[str, Any]:
                     run_id,
                     time.time(),
                     build_id,
-                    body.seed,
+                    header["seed"] if body.seed is None else body.seed,
                     score,
-                    body.ticks,
+                    header["ticks"] if body.ticks is None else body.ticks,
                     name,
                     raw,
                     replay_hash,
@@ -299,6 +415,8 @@ def create_run(body: RunIn, request: Request) -> dict[str, Any]:
 
 @app.get("/api/runs/{run_id}")
 def get_run(run_id: str) -> dict[str, Any]:
+    if not re.fullmatch(r"[\w\-]{6,32}", run_id or ""):
+        raise HTTPException(404, "run not found")
     with _db() as conn:
         row = conn.execute("SELECT * FROM runs WHERE id = ?", (run_id,)).fetchone()
     if not row:

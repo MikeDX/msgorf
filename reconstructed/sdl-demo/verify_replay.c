@@ -9,7 +9,7 @@
 #include <stdlib.h>
 
 #define SIM_DT (1.f / 60.f)
-#define MAX_TICKS (60 * 60 * 45) /* 45 minutes of sim */
+#define MAX_TICKS (60 * 60 * 30) /* 30 minutes of sim */
 
 int main(int argc, char **argv) {
   if (argc != 2) {
