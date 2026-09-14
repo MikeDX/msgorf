@@ -2,3 +2,6 @@ data/
 .venv/
 __pycache__/
 *.pyc
+verify_src/
+msgorf_verify.js
+msgorf_verify.wasm

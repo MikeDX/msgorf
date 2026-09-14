@@ -36,7 +36,8 @@ EMCC ?= emcc
 WEB_DIR := web
 WEB_OUT := $(WEB_DIR)/index.html
 
-.PHONY: all native run web deploy clean assets font sync-sfx stamp-web
+.PHONY: all native run web deploy clean assets font sync-sfx stamp-web \
+	verify prepare-verify deploy-traefik deploy-all
 
 all: native
 
@@ -65,6 +66,21 @@ $(NATIVE_BIN): main.c game.c sound.c rng.c replay.c sound.h game.h rng.h replay.
 	$(CC) $(CFLAGS) -DVIEW_SCALE=$(VIEW_SCALE) -DDRAW_TILE_SNAP=$(DRAW_TILE_SNAP) $(INCLUDES) $(SDL_CFLAGS) $(MIX_CFLAGS) \
 	  -o $@ main.c game.c sound.c rng.c replay.c $(ASSETS_C) $(SDL_LIBS) -lSDL2_mixer -lm
 
+# Headless score verifier — native (local) + WASM/node (API docker, matches web floats).
+VERIFY_BIN := msgorf_verify
+verify: assets $(VERIFY_BIN)
+$(VERIFY_BIN): verify_replay.c sound_stub.c game.c rng.c replay.c game.h rng.h replay.h sound.h font_gen.h $(ASSETS_C) $(ASSETS_H)
+	$(CC) $(CFLAGS) $(INCLUDES) -o $@ verify_replay.c game.c rng.c replay.c sound_stub.c $(ASSETS_C) -lm
+
+# WASM verifier for the API image (same ISA/floats as the browser game).
+prepare-verify: assets font_gen.h
+	@command -v emcc >/dev/null 2>&1 || { . "$(EMSDK)/emsdk_env.sh"; }
+	bash -lc 'source "$(EMSDK)/emsdk_env.sh" >/dev/null && \
+	  emcc -O2 -std=c11 $(INCLUDES) \
+	    verify_replay.c game.c rng.c replay.c sound_stub.c $(ASSETS_C) \
+	    -o api/msgorf_verify.js -sNODERAWFS=1 -sENVIRONMENT=node -sEXIT_RUNTIME=1'
+	@echo "wrote api/msgorf_verify.js (+ .wasm)"
+
 run: native
 	./$(NATIVE_BIN)
 
@@ -80,7 +96,7 @@ web: assets sync-sfx
 	    -sUSE_SDL=2 -sUSE_SDL_MIXER=2 -sSDL2_MIXER_FORMATS='\''["ogg"]'\'' \
 	    -sALLOW_MEMORY_GROWTH=1 -sMINIFY_HTML=0 \
 	    --preload-file $(SFX_DIR)@/sfx \
-	    -sEXPORTED_FUNCTIONS=_main,_malloc,_free,_msgorf_pad_move,_msgorf_pad_aim,_msgorf_pad_fire,_msgorf_pad_shield,_msgorf_pad_start,_msgorf_get_mode,_msgorf_get_score,_msgorf_replay_mode,_msgorf_replay_ready,_msgorf_replay_len,_msgorf_replay_ptr,_msgorf_replay_copy,_msgorf_replay_play,_msgorf_set_build_id \
+	    -sEXPORTED_FUNCTIONS=_main,_malloc,_free,_msgorf_pad_move,_msgorf_pad_aim,_msgorf_pad_fire,_msgorf_pad_shield,_msgorf_pad_start,_msgorf_get_mode,_msgorf_get_score,_msgorf_replay_mode,_msgorf_replay_ready,_msgorf_replay_len,_msgorf_replay_ptr,_msgorf_replay_copy,_msgorf_replay_play,_msgorf_replay_stop,_msgorf_set_build_id \
 	    -sEXPORTED_RUNTIME_METHODS=ccall,cwrap,UTF8ToString,stringToUTF8 \
 	    --shell-file shell.html \
 	    -o $(WEB_OUT)'
@@ -101,7 +117,7 @@ DEPLOY_API_PATH ?= ~/msgorf-api
 TRAEFIK_HOST ?= mike@100.92.101.81
 TRAEFIK_CONFIG ?= $(HOME)/src/traefik-config
 
-deploy: web
+deploy: web prepare-verify
 	rsync -avz --delete \
 	  --exclude docker-compose.yml --exclude nginx --exclude api-data \
 	  $(WEB_DIR)/ $(DEPLOY_HOST):$(DEPLOY_PATH)/
@@ -124,5 +140,5 @@ deploy-all: deploy deploy-traefik
 
 
 clean:
-	rm -f $(NATIVE_BIN)
-	rm -rf $(WEB_DIR)
+	rm -f $(NATIVE_BIN) $(VERIFY_BIN)
+	rm -rf $(WEB_DIR) api/verify_src api/msgorf_verify.js api/msgorf_verify.wasm

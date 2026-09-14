@@ -2261,6 +2261,11 @@ int game_start_replay(game_t *g, const uint8_t *data, size_t len) {
   return 1;
 }
 
+void game_stop_replay(game_t *g) {
+  if (replay_playing()) replay_cancel();
+  enter_select(g);
+}
+
 void game_update(game_t *g, float dt) {
   if (dt > 0.05f) dt = 0.05f;
   frame_n++;

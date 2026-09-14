@@ -142,6 +142,7 @@
     }
     #btn-start:active { transform: scale(0.97); background: #3a3018; }
     #btn-start.hidden { opacity: 0; pointer-events: none; }
+    .hud-btn.hidden { display: none; }
     #btn-shield {
       appearance: none;
       border: 2px solid rgba(100, 180, 255, 0.45);
@@ -230,8 +231,14 @@
       justify-content: center;
       background: rgba(6, 8, 12, 0.78);
       padding: 1rem;
+      touch-action: auto;
+      user-select: text;
+      -webkit-user-select: text;
     }
     #share-panel.show { display: flex; }
+    #stage.share-open canvas.emscripten {
+      pointer-events: none;
+    }
     #share-card {
       width: min(100%, 22rem);
       background: var(--panel);
@@ -264,12 +271,20 @@
       font-size: 0.55rem;
       letter-spacing: 0.08em;
       border-radius: 2px;
+      touch-action: manipulation;
+      user-select: text;
+      -webkit-user-select: text;
+      pointer-events: auto;
     }
     #share-card .row {
       display: flex;
       flex-wrap: wrap;
       gap: 0.4rem;
       justify-content: center;
+    }
+    #share-card .row .hud-btn:disabled {
+      opacity: 0.35;
+      pointer-events: none;
     }
     #share-card .hint {
       margin: 0.65rem 0 0;
@@ -315,10 +330,11 @@
         <div id="share-card">
           <h2>GAME OVER</h2>
           <div class="score" id="share-score">$0</div>
-          <input id="share-name" type="text" maxlength="24" placeholder="NAME (OPTIONAL)" autocomplete="off" />
+          <input id="share-name" type="text" maxlength="24" placeholder="NAME (OPTIONAL)" autocomplete="nickname" enterkeyhint="done" />
           <div class="row">
-            <button type="button" class="hud-btn on" id="btn-share">SHARE</button>
-            <button type="button" class="hud-btn" id="btn-copy">COPY LINK</button>
+            <button type="button" class="hud-btn on" id="btn-submit">SUBMIT SCORE</button>
+            <button type="button" class="hud-btn" id="btn-share" disabled>SHARE</button>
+            <button type="button" class="hud-btn" id="btn-copy" disabled>COPY LINK</button>
             <button type="button" class="hud-btn" id="btn-share-close">CLOSE</button>
           </div>
           <p class="hint" id="share-hint"></p>
@@ -330,6 +346,8 @@
       <div id="hud-bar">
         <button type="button" class="hud-btn" id="btn-fs" title="Fullscreen">FULL</button>
         <button type="button" class="hud-btn" id="btn-pads" title="Show or hide touch pads">PADS</button>
+        <button type="button" class="hud-btn on hidden" id="btn-watch" title="Watch loaded replay">WATCH</button>
+        <button type="button" class="hud-btn hidden" id="btn-stop" title="Stop replay and play yourself">EXIT REPLAY</button>
         <button type="button" id="btn-start">START</button>
       </div>
       <div id="pads">
@@ -354,6 +372,8 @@
   <script>
     var lastShareMode = -1;
     var pendingReplayId = null;
+    var pendingReplayBytes = null;
+    var pendingReplayMeta = null; /* { score, name } */
     var lastUploadedId = null;
 
     function b64urlEncode(bytes) {
@@ -396,8 +416,13 @@
           replay_b64: b64urlEncode(bytes)
         })
       });
-      if (!res.ok) throw new Error("upload " + res.status);
-      return res.json();
+      var body = null;
+      try { body = await res.json(); } catch (e) {}
+      if (!res.ok) {
+        var detail = (body && (body.detail || body.message)) || ("HTTP " + res.status);
+        throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
+      }
+      return body;
     }
 
     function replayUrl(id) {
@@ -408,46 +433,85 @@
       return u.toString();
     }
 
-    async function shareReplay() {
+    function setShareActionsEnabled(on) {
+      document.getElementById("btn-share").disabled = !on;
+      document.getElementById("btn-copy").disabled = !on;
+    }
+
+    function sharePanelOpen() {
+      return document.getElementById("share-panel").classList.contains("show");
+    }
+
+    /* SDL steals desktop key events — block them while the name field is up. */
+    function blockGameKeysWhileSharing(e) {
+      if (!sharePanelOpen()) return;
+      var t = e.target;
+      if (t && (t.id === "share-name" || t.tagName === "INPUT" || t.tagName === "TEXTAREA"))
+        return;
+      e.stopImmediatePropagation();
+    }
+    document.addEventListener("keydown", blockGameKeysWhileSharing, true);
+    document.addEventListener("keyup", blockGameKeysWhileSharing, true);
+    document.addEventListener("keypress", blockGameKeysWhileSharing, true);
+
+    async function submitScore() {
       var hint = document.getElementById("share-hint");
-      hint.textContent = "Uploading…";
+      var btn = document.getElementById("btn-submit");
+      hint.textContent = "Checking replay…";
+      btn.disabled = true;
       try {
         var bytes = getReplayBytes();
         if (!bytes) throw new Error("no recording");
         var name = document.getElementById("share-name").value.trim();
         var data = await uploadRun(bytes, name);
         lastUploadedId = data.id;
-        var url = replayUrl(data.id);
-        hint.textContent = url;
-        if (navigator.share) {
-          try {
-            await navigator.share({
-              title: "Ms. Gorf",
-              text: "I scored $" + Module._msgorf_get_score() + " in Ms. Gorf",
-              url: url
-            });
-          } catch (e) {}
+        setShareActionsEnabled(true);
+        if (data.duplicate) {
+          hint.textContent = "Already on the board · $" + data.score;
+        } else {
+          hint.textContent = "Submitted · $" + data.score + " (verified)";
         }
         refreshScores();
       } catch (e) {
-        hint.textContent = "Share failed — is /api up? " + (e.message || e);
+        hint.textContent = "Submit failed — " + (e.message || e);
+        btn.disabled = false;
+      }
+    }
+
+    async function shareReplay() {
+      var hint = document.getElementById("share-hint");
+      if (!lastUploadedId) {
+        hint.textContent = "Submit your score first";
+        return;
+      }
+      var url = replayUrl(lastUploadedId);
+      hint.textContent = url;
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: "Ms. Gorf",
+            text: "I scored $" + Module._msgorf_get_score() + " in Ms. Gorf",
+            url: url
+          });
+        } catch (e) {}
+      } else {
+        try {
+          await navigator.clipboard.writeText(url);
+          hint.textContent = "Copied: " + url;
+        } catch (e) {
+          hint.textContent = url;
+        }
       }
     }
 
     async function copyReplayLink() {
       var hint = document.getElementById("share-hint");
+      if (!lastUploadedId) {
+        hint.textContent = "Submit your score first";
+        return;
+      }
       try {
-        var url = lastUploadedId ? replayUrl(lastUploadedId) : null;
-        if (!url) {
-          hint.textContent = "Uploading…";
-          var bytes = getReplayBytes();
-          if (!bytes) throw new Error("no recording");
-          var name = document.getElementById("share-name").value.trim();
-          var data = await uploadRun(bytes, name);
-          lastUploadedId = data.id;
-          url = replayUrl(data.id);
-          refreshScores();
-        }
+        var url = replayUrl(lastUploadedId);
         await navigator.clipboard.writeText(url);
         hint.textContent = "Copied: " + url;
       } catch (e) {
@@ -457,13 +521,22 @@
 
     function showSharePanel(show) {
       var panel = document.getElementById("share-panel");
+      var stage = document.getElementById("stage");
       panel.classList.toggle("show", !!show);
       panel.setAttribute("aria-hidden", show ? "false" : "true");
+      stage.classList.toggle("share-open", !!show);
       if (show) {
         document.getElementById("share-score").textContent =
           "$" + Module._msgorf_get_score();
-        document.getElementById("share-hint").textContent = "";
+        document.getElementById("share-hint").textContent =
+          "Enter a name, then SUBMIT SCORE";
         lastUploadedId = null;
+        setShareActionsEnabled(false);
+        document.getElementById("btn-submit").disabled = false;
+        var canvas = document.getElementById("canvas");
+        if (canvas) canvas.blur();
+        var name = document.getElementById("share-name");
+        setTimeout(function () { name.focus(); name.select(); }, 50);
       }
     }
 
@@ -486,7 +559,10 @@
           li.style.cursor = "pointer";
           li.title = "Watch replay";
           li.addEventListener("click", function () {
-            window.location.search = "?r=" + encodeURIComponent(r.id);
+            var u = new URL(window.location.href);
+            u.searchParams.set("r", r.id);
+            history.replaceState(null, "", u.pathname + u.search + u.hash);
+            loadReplayById(r.id, false);
           });
           ul.appendChild(li);
         });
@@ -495,29 +571,80 @@
       }
     }
 
-    async function tryLoadReplayFromUrl() {
-      var params = new URLSearchParams(window.location.search);
-      var id = params.get("r");
-      if (!id) return;
+    function clearReplayQuery() {
+      try {
+        var u = new URL(window.location.href);
+        if (!u.searchParams.has("r")) return;
+        u.searchParams.delete("r");
+        history.replaceState(null, "", u.pathname + u.search + u.hash);
+      } catch (e) {}
+    }
+
+    function startPendingReplay() {
+      if (!ready() || !pendingReplayBytes) return;
+      showSharePanel(false);
+      var bytes = pendingReplayBytes;
+      var ptr = Module._malloc(bytes.length);
+      Module.HEAPU8.set(bytes, ptr);
+      var ok = Module._msgorf_replay_play(ptr, bytes.length);
+      Module._free(ptr);
+      if (!ok) {
+        document.getElementById("status").textContent = "Replay start failed";
+        return;
+      }
+      var sc = pendingReplayMeta && pendingReplayMeta.score != null
+        ? pendingReplayMeta.score : "?";
+      document.getElementById("status").textContent =
+        "REPLAY · $" + sc + " · EXIT REPLAY to play yourself";
+    }
+
+    function stopReplayToPlay() {
+      if (!ready()) return;
+      showSharePanel(false);
+      Module._msgorf_replay_stop();
+      clearReplayQuery();
+      if (pendingReplayBytes) {
+        var sc = pendingReplayMeta && pendingReplayMeta.score != null
+          ? pendingReplayMeta.score : "?";
+        document.getElementById("status").textContent =
+          "Replay ready · $" + sc + " · WATCH or START your own";
+      } else {
+        document.getElementById("status").textContent =
+          "Move · Aim/fire · SHIELD hold (first 2s) · triggers on pad · A/Start";
+      }
+      syncStartButton();
+    }
+
+    async function loadReplayById(id, autoplay) {
       pendingReplayId = id;
       document.getElementById("status").textContent = "Loading replay…";
       try {
         var res = await fetch("/api/runs/" + encodeURIComponent(id));
         if (!res.ok) throw new Error("run " + res.status);
         var data = await res.json();
-        var bytes = b64urlDecode(data.replay_b64);
-        var ptr = Module._malloc(bytes.length);
-        Module.HEAPU8.set(bytes, ptr);
-        var ok = Module._msgorf_replay_play(ptr, bytes.length);
-        Module._free(ptr);
-        if (!ok) throw new Error("bad replay");
+        pendingReplayBytes = b64urlDecode(data.replay_b64);
+        pendingReplayMeta = { score: data.score || 0, name: data.name || "" };
         document.getElementById("status").textContent =
-          "REPLAY · $" + (data.score || 0) + " · tap AGAIN to exit";
+          "Replay ready · $" + pendingReplayMeta.score +
+          (pendingReplayMeta.name ? (" · " + pendingReplayMeta.name) : "") +
+          " · WATCH or START your own";
         showSharePanel(false);
+        syncStartButton();
+        if (autoplay) startPendingReplay();
       } catch (e) {
+        pendingReplayBytes = null;
+        pendingReplayMeta = null;
         document.getElementById("status").textContent =
           "Replay load failed: " + (e.message || e);
+        syncStartButton();
       }
+    }
+
+    async function tryLoadReplayFromUrl() {
+      var params = new URLSearchParams(window.location.search);
+      var id = params.get("r");
+      if (!id) return;
+      await loadReplayById(id, false);
     }
 
     var Module = {
@@ -551,12 +678,26 @@
     function syncStartButton() {
       if (!ready()) return;
       var mode = Module._msgorf_get_mode();
+      var watching = Module._msgorf_replay_mode() === 3; /* PLAYING */
       var btn = document.getElementById("btn-start");
-      if (mode === 0) { /* SELECT */
+      var btnWatch = document.getElementById("btn-watch");
+      var btnStop = document.getElementById("btn-stop");
+
+      btnWatch.classList.toggle("hidden", watching || !pendingReplayBytes);
+      btnStop.classList.toggle("hidden", !watching);
+
+      if (watching) {
+        btn.classList.add("hidden");
+        showSharePanel(false);
+        if (mode === 3 && lastShareMode !== 3) {
+          document.getElementById("status").textContent =
+            "Replay finished · EXIT REPLAY or WATCH again";
+        }
+      } else if (mode === 0) { /* SELECT */
         btn.textContent = "START";
         btn.classList.remove("hidden");
         showSharePanel(false);
-      } else if (mode === 3) { /* DEAD */
+      } else if (mode === 3) { /* DEAD — own run */
         btn.textContent = "AGAIN";
         btn.classList.remove("hidden");
         if (Module._msgorf_replay_ready() && lastShareMode !== 3) {
@@ -680,14 +821,33 @@
       document.getElementById("btn-start").addEventListener("click", function () {
         if (!ready()) return;
         showSharePanel(false);
+        if (Module._msgorf_replay_mode() === 3) {
+          stopReplayToPlay();
+          return;
+        }
         Module._msgorf_pad_start(1);
         syncStartButton();
       });
 
+      document.getElementById("btn-watch").addEventListener("click", function () {
+        startPendingReplay();
+        syncStartButton();
+      });
+      document.getElementById("btn-stop").addEventListener("click", function () {
+        stopReplayToPlay();
+      });
+
+      document.getElementById("btn-submit").addEventListener("click", submitScore);
       document.getElementById("btn-share").addEventListener("click", shareReplay);
       document.getElementById("btn-copy").addEventListener("click", copyReplayLink);
       document.getElementById("btn-share-close").addEventListener("click", function () {
         showSharePanel(false);
+      });
+      document.getElementById("share-name").addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          submitScore();
+        }
       });
 
       document.getElementById("btn-fs").addEventListener("click", toggleFullscreen);
@@ -725,7 +885,7 @@
 
     /* Physical gamepad on web: right stick aim/fire; L/R triggers = shields. */
     function pollWebGamepad() {
-      if (!ready() || !navigator.getGamepads) return;
+      if (!ready() || !navigator.getGamepads || sharePanelOpen()) return;
       var pads = navigator.getGamepads();
       var gp = null;
       for (var i = 0; i < pads.length; i++) {
@@ -758,7 +918,7 @@
     }
     setInterval(pollWebGamepad, 16);
   </script>
-  <!-- Cache bust: make web stamps MSGORF_BUILD_ID; locateFile covers .wasm/.data -->
+  <!-- Cache bust: make web stamps 95571bd-1789419396; locateFile covers .wasm/.data -->
   <script>
     var Module = typeof Module !== "undefined" ? Module : {};
     Module["MSGORF_BUILD"] = "MSGORF_BUILD_ID";

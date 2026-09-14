@@ -142,6 +142,7 @@ EMSCRIPTEN_KEEPALIVE int msgorf_replay_play(const uint8_t *data, int len) {
   if (!data || len <= 0) return 0;
   return game_start_replay(&game, data, (size_t)len);
 }
+EMSCRIPTEN_KEEPALIVE void msgorf_replay_stop(void) { game_stop_replay(&game); }
 /* Copy recording into a JS-owned buffer (ptr from Module._malloc). */
 EMSCRIPTEN_KEEPALIVE int msgorf_replay_copy(uint8_t *dst, int max) {
   const uint8_t *src = replay_blob();
