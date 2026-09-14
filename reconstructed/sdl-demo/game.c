@@ -51,7 +51,7 @@
 #define CLONE_MORPH_VIDEO_FRAMES 5.5f
 #define CLONE_ROT_RATE (CLONE_VIDEO_FPS / CLONE_MORPH_VIDEO_FRAMES)
 #define CLONE_WAIT_R 40.f   /* hold outside body until yellow face aligns */
-#define CLONE_BODY_R 20.f
+#define CLONE_BODY_R 16.f   /* shot block + near-face hold (was 20) */
 #define CLONE_FACE_HALF ((float)M_PI / 8.f) /* ±22.5° per hex/oct face */
 /* GUESS: Lissajous from seg_c_late fit + readable omega floor. */
 #define CLONE_AMP_X 12.f
@@ -1152,8 +1152,8 @@ static void update_play(game_t *g, float dt) {
 
   if (burst.active) update_burst(dt);
 
-  /* Player control / fire only while alive. */
-  if (player_vis && !burst.active) {
+  /* Move while alive (including clear-burst); fire only outside burst. */
+  if (player_vis) {
     float dx = g->pad_move_x;
     float dy = g->pad_move_y;
     if (key_down(g, 4) || key_down(g, 80)) dx -= 1;
@@ -1166,7 +1166,6 @@ static void update_play(game_t *g, float dt) {
     if (dy < -1.f) dy = -1.f;
     float move_mag = hypotf(dx, dy);
     if (move_mag > 0.18f) {
-      /* Stick/key extremity scales speed up to PLAYER_SPEED_STICK_MAX × base. */
       float mag = fminf(1.f, move_mag);
       float spd = PLAYER_SPEED * mag * PLAYER_SPEED_STICK_MAX;
       player_x += (dx / move_mag) * spd * dt;
@@ -1177,26 +1176,28 @@ static void update_play(game_t *g, float dt) {
     if (player_y < 28) player_y = 28;
     if (player_y > FB_H - 12) player_y = FB_H - 12;
 
-    float aim_mag = hypotf(g->pad_aim_x, g->pad_aim_y);
-    float aim;
-    int stick_aim = aim_mag > 0.28f;
-    if (stick_aim)
-      aim = atan2f(g->pad_aim_y, g->pad_aim_x);
-    else
-      aim = atan2f(g->mouse_y - player_y, g->mouse_x - player_x);
     fire_cd -= dt;
-    int fire = g->mouse_down || g->pad_fire || stick_aim || key_down(g, 44) || key_down(g, 14);
-    if (fire && fire_cd <= 0 && n_bullets < MAX_BULLETS) {
-      fire_cd = FIRE_COOLDOWN;
-      float sp = 320.f; /* was 160; +50% */
-      float c = cosf(aim), s = sinf(aim);
-      bullet_t *b = &bullets[n_bullets++];
-      b->x = player_x + c * BULLET_MUZZLE;
-      b->y = player_y + s * BULLET_MUZZLE;
-      b->vx = c * sp;
-      b->vy = s * sp;
-      b->life = 1.f;
-      sound_play_shoot();
+    if (!burst.active) {
+      float aim_mag = hypotf(g->pad_aim_x, g->pad_aim_y);
+      float aim;
+      int stick_aim = aim_mag > 0.28f;
+      if (stick_aim)
+        aim = atan2f(g->pad_aim_y, g->pad_aim_x);
+      else
+        aim = atan2f(g->mouse_y - player_y, g->mouse_x - player_x);
+      int fire = g->mouse_down || g->pad_fire || stick_aim || key_down(g, 44) || key_down(g, 14);
+      if (fire && fire_cd <= 0 && n_bullets < MAX_BULLETS) {
+        fire_cd = FIRE_COOLDOWN;
+        float sp = 320.f;
+        float c = cosf(aim), s = sinf(aim);
+        bullet_t *b = &bullets[n_bullets++];
+        b->x = player_x + c * BULLET_MUZZLE;
+        b->y = player_y + s * BULLET_MUZZLE;
+        b->vx = c * sp;
+        b->vy = s * sp;
+        b->life = 1.f;
+        sound_play_shoot();
+      }
     }
   } else {
     fire_cd -= dt;
@@ -1316,13 +1317,21 @@ static void update_play(game_t *g, float dt) {
     if (fx[i].hp > 0) fx[wf++] = fx[i];
   n_fx = wf;
 
-  if (!burst.active && player_vis && death_linger <= 0.f) {
+  if (player_vis && death_linger <= 0.f) {
     for (int i = 0; i < n_foes; i++) {
       foe_t *f = &foes[i];
+      if (f->hp <= 0) continue;
       if (hypotf(f->x - player_x, f->y - player_y) < f->r + 8) {
+        f->hp = 0;
+        spawn_bang(f->x, f->y);
+        score += 1000;
         player_destroyed();
         break;
       }
+    }
+    if (player_vis && clone_vis &&
+        hypotf(clone_x - player_x, clone_y - player_y) < CLONE_BODY_R + 8.f) {
+      player_destroyed();
     }
     if (player_vis) {
       for (int i = 0; i < n_ebullets; i++) {
@@ -1334,6 +1343,10 @@ static void update_play(game_t *g, float dt) {
       }
     }
   }
+  wf = 0;
+  for (int i = 0; i < n_foes; i++)
+    if (foes[i].hp > 0) foes[wf++] = foes[i];
+  n_foes = wf;
 }
 
 static void draw_gorf_shot(uint8_t *rgb, int cx, int cy) {
