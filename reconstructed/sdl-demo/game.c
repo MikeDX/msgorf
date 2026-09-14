@@ -52,6 +52,7 @@
 #define SPAWN_SHLD 2
 #define SPAWN_LAZON 3
 #define SPAWN_KAMI 4
+#define SPAWN_MITE 5
 #define WAVE_EXTRAS_MAX 4
 #define LAZON_BEAM_PPS 320.f /* GUESS: laser tip advance */
 #define LAZON_STOP_T 0.28f
@@ -59,7 +60,12 @@
 #define KAMI_ANIM_HZ 10.f /* 4-frame spin */
 #define KAMI_PAUSE_T 0.3f /* GUESS: brief stop before re-aim */
 #define KAMI_ARRIVE_R 6.f
-#define KAMI_SPEED_MULT 1.5f
+#define KAMI_SPEED_MULT 2.8f /* faster so it can close on locked aim */
+#define SHLD_SPEED_MULT 1.35f
+#define MITE_SPEED_MULT 2.2f
+#define MITE_PAUSE_T 0.5f
+#define MITE_SPAWN_LO 2.f
+#define MITE_SPAWN_HI 5.f
 #define CLONE_PROCESS_T 1.f /* stop, wait 1s, eject first clone */
 #define CLONE_EMIT_GAP 1.f  /* then 1s later eject second, then spin again */
 #define CLONE_EXIT_SPEED 55.f
@@ -227,7 +233,8 @@ static const clone_frame_t CLONE_CYCLE[] = {
 
 static game_t *G;
 static float score;
-static int ships_left;
+static int ships_left; /* reserve ships shown in HUD; 0 = last ship in play */
+static int out_of_ships; /* died with no reserves → game over after linger */
 static float t_accum;
 static unsigned frame_n; /* increments once per update tick */
 static float fire_cd;
@@ -241,6 +248,7 @@ static float gorf_fire_cd;  /* countdown to next enemy volley */
 static float play_age;      /* time in PLAY this wave (player live) */
 static wave_spawn_t extra_queue[WAVE_EXTRAS_MAX];
 static int extra_qn, extra_qi; /* armed timed extras; cleared on death */
+static float mite_spawn_cd; /* next MITEi when player shields exist */
 static int pending_lastship; /* play lastship.wav when PLAY starts after last-life respawn */
 static float intro_black; /* >0: full black before frozen field + galaxy */
 static float clone_x, clone_y, clone_frame;
@@ -452,8 +460,11 @@ static int wave_can_fire(void) {
 }
 
 static float wave_speed_scale(void) {
-  /* Each full pass through the 6 waves bumps movement a bit. */
-  return 1.f + 0.12f * (float)wave_cycle();
+  /* "Level" = full pass through waves 1–6 (wave_cycle). L1 = 1×, L2 faster, … */
+  float level = 1.f + 0.28f * (float)wave_cycle();
+  /* Mild ramp within the current 6-wave set. */
+  float wave = 1.f + 0.05f * (float)wave_index();
+  return level * wave;
 }
 
 static float wave_fire_scale(void) {
@@ -478,9 +489,11 @@ static int foe_is_smine(const foe_t *f);
 static int foe_is_shld(const foe_t *f);
 static int foe_is_lazon(const foe_t *f);
 static int foe_is_kami(const foe_t *f);
+static int foe_is_mite(const foe_t *f);
 static void pick_shld_leg(foe_t *f);
 static void lazon_start_move(foe_t *f);
 static void kami_aim(foe_t *f);
+static void mite_pick_target(foe_t *f);
 static void player_destroyed(void);
 
 static void spawn_gorf(float x, float y, float vx, float vy, const char *kind, float cool) {
@@ -510,6 +523,7 @@ static void spawn_gorf(float x, float y, float vx, float vy, const char *kind, f
   if (foe_is_shld(f)) pick_shld_leg(f);
   if (foe_is_lazon(f)) lazon_start_move(f);
   if (foe_is_kami(f)) kami_aim(f);
+  if (foe_is_mite(f)) mite_pick_target(f);
 }
 
 /* Keep gorfs moving after wall/pair bounce (elastic swaps can kill speed). */
@@ -575,9 +589,13 @@ static int foe_is_kami(const foe_t *f) {
          name_eq(f->kind, "COMC5B") || name_eq(f->kind, "COMC6") || name_eq(f->kind, "SPINV");
 }
 
-/* Timed extras: pass through foes, skip cloner. SMINE is shot-proof. */
+static int foe_is_mite(const foe_t *f) {
+  return name_eq(f->kind, "MITE_P") || name_eq(f->kind, "MITE-P") || name_eq(f->kind, "MITE");
+}
+
+/* Timed extras / mites: skip cloner absorb. SMINE is shot-proof. */
 static int foe_is_special(const foe_t *f) {
-  return foe_is_smine(f) || foe_is_shld(f) || foe_is_lazon(f) || foe_is_kami(f);
+  return foe_is_smine(f) || foe_is_shld(f) || foe_is_lazon(f) || foe_is_kami(f) || foe_is_mite(f);
 }
 
 static const char *foe_draw_kind(const foe_t *f) {
@@ -659,7 +677,7 @@ static int lay_player_shield_at(float x, float y) {
 
 static void pick_shld_leg(foe_t *f) {
   static const int dirs[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-  float sp = wave_gorf_speed();
+  float sp = wave_gorf_speed() * SHLD_SPEED_MULT;
   for (int attempt = 0; attempt < 24; attempt++) {
     int d = rand() % 4;
     int dx = dirs[d][0], dy = dirs[d][1];
@@ -701,7 +719,7 @@ static void update_shld(foe_t *f, float dt) {
     return;
   }
 
-  float sp = wave_gorf_speed();
+  float sp = wave_gorf_speed() * SHLD_SPEED_MULT;
   if (f->shld_tiles_left <= 0 || (f->shld_dx == 0 && f->shld_dy == 0)) {
     pick_shld_leg(f);
     if (f->shld_tiles_left <= 0) return;
@@ -843,6 +861,17 @@ static void update_kami(foe_t *f, float dt) {
     if (f->kami_pause <= 0.f) kami_aim(f);
     return;
   }
+  /* Re-assert chase velocity each tick so pair-bounces don't stall it. */
+  {
+    float dx = f->kami_tx - f->x;
+    float dy = f->kami_ty - f->y;
+    float len = hypotf(dx, dy);
+    float sp = wave_gorf_speed() * KAMI_SPEED_MULT;
+    if (len > 1.f) {
+      f->vx = (dx / len) * sp;
+      f->vy = (dy / len) * sp;
+    }
+  }
   f->x += f->vx * dt;
   f->y += f->vy * dt;
   if (hypotf(f->x - f->kami_tx, f->y - f->kami_ty) <= KAMI_ARRIVE_R) {
@@ -850,6 +879,69 @@ static void update_kami(foe_t *f, float dt) {
     f->y = f->kami_ty;
     f->vx = f->vy = 0;
     f->kami_pause = KAMI_PAUSE_T;
+  }
+}
+
+static void mite_pick_target(foe_t *f) {
+  int idx[MAX_MINES];
+  int n = 0;
+  for (int i = 0; i < n_mines; i++)
+    if (mines[i].alive && mines[i].owner) idx[n++] = i;
+  f->kami_pause = 0;
+  if (n < 1) {
+    f->vx = f->vy = 0;
+    f->kami_tx = f->x;
+    f->kami_ty = f->y;
+    return;
+  }
+  int i = idx[rand() % n];
+  f->kami_tx = mines[i].x;
+  f->kami_ty = mines[i].y;
+  float dx = f->kami_tx - f->x;
+  float dy = f->kami_ty - f->y;
+  float len = hypotf(dx, dy);
+  float sp = wave_gorf_speed() * MITE_SPEED_MULT;
+  if (len < 1.f) {
+    f->vx = f->vy = 0;
+    return;
+  }
+  f->vx = (dx / len) * sp;
+  f->vy = (dy / len) * sp;
+}
+
+static void update_mite(foe_t *f, float dt) {
+  if (f->kami_pause > 0.f) {
+    f->vx = f->vy = 0;
+    f->kami_pause -= dt;
+    if (f->kami_pause <= 0.f) mite_pick_target(f);
+    return;
+  }
+  if (count_player_shields() < 1) {
+    f->vx = f->vy = 0;
+    return;
+  }
+  /* Keep chasing locked shield cell; re-assert speed after collisions. */
+  {
+    float dx = f->kami_tx - f->x;
+    float dy = f->kami_ty - f->y;
+    float len = hypotf(dx, dy);
+    float sp = wave_gorf_speed() * MITE_SPEED_MULT;
+    if (len > 1.f) {
+      f->vx = (dx / len) * sp;
+      f->vy = (dy / len) * sp;
+    }
+  }
+  f->x += f->vx * dt;
+  f->y += f->vy * dt;
+
+  for (int mi = 0; mi < n_mines; mi++) {
+    if (!mines[mi].alive || !mines[mi].owner) continue;
+    if (hypotf(f->x - mines[mi].x, f->y - mines[mi].y) < f->r + MINE_TILE * 0.5f) {
+      mines[mi].alive = 0;
+      f->vx = f->vy = 0;
+      f->kami_pause = MITE_PAUSE_T;
+      return;
+    }
   }
 }
 
@@ -982,6 +1074,7 @@ static void start_wave_intro(int gorf_count, int show_clone_in_intro) {
   death_linger = 0;
   play_age = 0;
   gorf_fire_cd = 999.f; /* armed when intro ends → PLAY */
+  mite_spawn_cd = MITE_SPAWN_LO + frand() * (MITE_SPAWN_HI - MITE_SPAWN_LO);
 
   pick_clone_home(); /* before gorfs so edge spawns avoid cloner */
 
@@ -1010,7 +1103,8 @@ static void start_wave_intro(int gorf_count, int show_clone_in_intro) {
 
 static void start_respawn_intro(void) {
   apply_wave_flags(); /* re-arm timed extras; play_age resets in intro */
-  pending_lastship = (ships_left == 1) ? 1 : 0;
+  pending_lastship = (ships_left == 0) ? 1 : 0; /* reserves empty → last ship */
+  mite_spawn_cd = MITE_SPAWN_LO + frand() * (MITE_SPAWN_HI - MITE_SPAWN_LO);
   start_wave_intro(respawn_gorf_count, 1); /* cloner stays visible through galaxy */
 }
 
@@ -1033,13 +1127,18 @@ static void player_destroyed(void) {
   /* Dying in the clear-burst does not cost a life — wave advances when burst ends. */
   if (burst.active) return;
 
-  ships_left -= 1;
   death_linger = PLAYER_DEATH_LINGER;
-  /* Remaining gorfs only — SMINE/SHLD do not carry into respawn count. */
-  respawn_gorf_count = 0;
-  for (int i = 0; i < n_foes; i++)
-    if (foe_is_gorf(&foes[i])) respawn_gorf_count++;
-  if (respawn_gorf_count < 1) respawn_gorf_count = 1;
+  /* ships_left = reserves only. 0 reserves while alive = last ship in play. */
+  if (ships_left <= 0) {
+    out_of_ships = 1; /* no reserves — game over after linger */
+  } else {
+    out_of_ships = 0;
+    ships_left -= 1;
+    respawn_gorf_count = 0;
+    for (int i = 0; i < n_foes; i++)
+      if (foe_is_gorf(&foes[i])) respawn_gorf_count++;
+    if (respawn_gorf_count < 1) respawn_gorf_count = 1;
+  }
 }
 
 static void start_clear_burst(void) {
@@ -1066,11 +1165,13 @@ static void begin_level(game_t *g) {
   sound_stop_title();
   sound_play_startup();
   score = 0;
-  ships_left = 3;
+  ships_left = 2; /* 2 reserves + current ship in play */
+  out_of_ships = 0;
   fire_cd = 0;
   t_accum = 0;
   level_num = 1;
   pending_lastship = 0;
+  mite_spawn_cd = MITE_SPAWN_LO + frand() * (MITE_SPAWN_HI - MITE_SPAWN_LO);
   apply_wave_flags();
   start_wave_intro(wave_gorf_count, 0); /* fresh start: gorfs only in intro */
 }
@@ -1377,7 +1478,7 @@ static void emit_one_clone(int exit_port, const char *kind, int side) {
              ey * CLONE_EXIT_SPEED + ox * 0.4f, kind, CLONE_COOL);
 }
 
-/* Timed extra: SMINE / SHLD-P / LAZON / KAMI exits a yellow cloner port. */
+/* Timed extra: SMINE / SHLD-P / LAZON / KAMI / MITE exits a yellow cloner port. */
 static void spawn_extra_kind(int extra) {
   if (!clone_vis || n_foes >= MAX_FOES || extra == SPAWN_NONE) return;
   const char *kind = "SMINE0";
@@ -1387,6 +1488,8 @@ static void spawn_extra_kind(int extra) {
     kind = "LAZON";
   else if (extra == SPAWN_KAMI)
     kind = "KAMI";
+  else if (extra == SPAWN_MITE)
+    kind = "MITE-P";
   port_t ports[2];
   clone_yellow_ports(ports);
   int exit_port = rand() & 1;
@@ -1602,7 +1705,7 @@ static void update_play(game_t *g, float dt) {
     death_linger -= dt;
     if (death_linger <= 0.f) {
       death_linger = 0.f;
-      if (ships_left <= 0) {
+      if (out_of_ships) {
         G->mode = MODE_DEAD;
         return;
       }
@@ -1696,21 +1799,30 @@ static void update_play(game_t *g, float dt) {
       if (!burst.active) update_kami(f, dt);
       continue;
     }
+    if (foe_is_mite(f)) {
+      if (!burst.active) update_mite(f, dt);
+      continue;
+    }
     if (!burst.active) steer_gorf_to_clone_port(f);
     f->x += f->vx * dt;
     f->y += f->vy * dt;
     bounce_walls(f);
   }
+  /* All enemies collide — no overlapping / pass-through. */
   for (int i = 0; i < n_foes; i++)
-    for (int j = i + 1; j < n_foes; j++) {
-      /* Timed extras pass through other foes (no bounce). */
-      if (foe_is_special(&foes[i]) || foe_is_special(&foes[j])) continue;
-      bounce_pair(&foes[i], &foes[j]);
-    }
+    for (int j = i + 1; j < n_foes; j++) bounce_pair(&foes[i], &foes[j]);
   for (int i = 0; i < n_foes; i++) {
-    if (foe_is_special(&foes[i])) continue;
+    if (foe_is_shld(&foes[i]) || foe_is_lazon(&foes[i]) || foe_is_kami(&foes[i]) ||
+        foe_is_mite(&foes[i]))
+      continue; /* their updaters own velocity */
     bounce_walls(&foes[i]);
     keep_gorf_speed(&foes[i]);
+  }
+  {
+    int wm = 0;
+    for (int i = 0; i < n_mines; i++)
+      if (mines[i].alive) mines[wm++] = mines[i];
+    n_mines = wm;
   }
 
   /* Wave table: fire / timed extras when current_wave allows. */
@@ -1719,6 +1831,16 @@ static void update_play(game_t *g, float dt) {
     while (extra_qi < extra_qn && play_age >= extra_queue[extra_qi].at) {
       spawn_extra_kind(extra_queue[extra_qi].kind);
       extra_qi++;
+    }
+    /* MITEi: while player shields exist, spawn from cloner every 2–5s. */
+    if (clone_vis && count_player_shields() > 0) {
+      mite_spawn_cd -= dt;
+      if (mite_spawn_cd <= 0.f) {
+        spawn_extra_kind(SPAWN_MITE);
+        mite_spawn_cd = MITE_SPAWN_LO + frand() * (MITE_SPAWN_HI - MITE_SPAWN_LO);
+      }
+    } else if (count_player_shields() < 1) {
+      mite_spawn_cd = MITE_SPAWN_LO + frand() * (MITE_SPAWN_HI - MITE_SPAWN_LO);
     }
     if (wave_can_fire()) {
       gorf_fire_cd -= dt;
@@ -1823,11 +1945,12 @@ static void update_play(game_t *g, float dt) {
     if (foes[i].hp > 0) foes[wf++] = foes[i];
   n_foes = wf;
 
-  /* Enemies colliding with player shields: both explode (shield removed). */
+  /* Enemies colliding with player shields: both explode (shield removed).
+   * MITEi eats shields without dying — handled in update_mite. */
   if (!burst.active) {
     for (int fi = 0; fi < n_foes; fi++) {
       foe_t *f = &foes[fi];
-      if (f->hp <= 0) continue;
+      if (f->hp <= 0 || foe_is_mite(f)) continue;
       for (int mi = 0; mi < n_mines; mi++) {
         if (!mines[mi].alive || !mines[mi].owner) continue;
         if (hypotf(f->x - mines[mi].x, f->y - mines[mi].y) < f->r + MINE_TILE * 0.5f) {
