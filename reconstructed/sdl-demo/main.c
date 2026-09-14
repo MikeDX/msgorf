@@ -4,6 +4,7 @@
 #include "sound.h"
 
 #include <SDL.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -11,9 +12,12 @@
 #define VIEW_SCALE 3
 #endif
 
+#define PAD_DEADZONE 0.18f
+
 static uint8_t fb[FB_W * FB_H * 3];
 static game_t game;
 static int running = 1;
+static SDL_GameController *pad;
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -61,6 +65,49 @@ static void map_mouse(int wx, int wy, int *ox, int *oy) {
   if (*oy >= FB_H) *oy = FB_H - 1;
 }
 
+static float pad_axis(SDL_GameController *c, SDL_GameControllerAxis axis) {
+  float v = (float)SDL_GameControllerGetAxis(c, axis) / 32767.f;
+  if (v > 1.f) v = 1.f;
+  if (v < -1.f) v = -1.f;
+  float a = fabsf(v);
+  if (a < PAD_DEADZONE) return 0.f;
+  float s = (a - PAD_DEADZONE) / (1.f - PAD_DEADZONE);
+  return (v < 0.f) ? -s : s;
+}
+
+static void open_pad_index(int index) {
+  if (pad) return;
+  if (!SDL_IsGameController(index)) return;
+  pad = SDL_GameControllerOpen(index);
+  if (pad) {
+    const char *name = SDL_GameControllerName(pad);
+    fprintf(stderr, "gamepad: %s\n", name ? name : "(unknown)");
+  }
+}
+
+static void close_pad(void) {
+  if (!pad) return;
+  SDL_GameControllerClose(pad);
+  pad = NULL;
+  game_pad_move(&game, 0.f, 0.f);
+  game_pad_aim(&game, 0.f, 0.f);
+  game_pad_fire(&game, 0);
+}
+
+static void poll_gamepad(void) {
+  if (!pad) return;
+  /* Left stick = move; right stick = aim (+ fire past deadzone in game). */
+  game_pad_move(&game, pad_axis(pad, SDL_CONTROLLER_AXIS_LEFTX),
+                pad_axis(pad, SDL_CONTROLLER_AXIS_LEFTY));
+  float ax = pad_axis(pad, SDL_CONTROLLER_AXIS_RIGHTX);
+  float ay = pad_axis(pad, SDL_CONTROLLER_AXIS_RIGHTY);
+  game_pad_aim(&game, ax, ay);
+  int fire = hypotf(ax, ay) > 0.28f ||
+             SDL_GameControllerGetButton(pad, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER) ||
+             SDL_GameControllerGetAxis(pad, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 12000;
+  game_pad_fire(&game, fire);
+}
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 
@@ -97,6 +144,15 @@ static void frame(void) {
       int mx, my;
       map_mouse(e.button.x, e.button.y, &mx, &my);
       game_mouse(&game, mx, my, 0);
+    } else if (e.type == SDL_CONTROLLERDEVICEADDED) {
+      open_pad_index(e.cdevice.which);
+    } else if (e.type == SDL_CONTROLLERDEVICEREMOVED) {
+      if (pad && e.cdevice.which == SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(pad)))
+        close_pad();
+    } else if (e.type == SDL_CONTROLLERBUTTONDOWN) {
+      if (e.cbutton.button == SDL_CONTROLLER_BUTTON_START ||
+          e.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+        game_pad_start(&game, 1); /* same as keyboard 1 / web Start */
     } else if (e.type == SDL_WINDOWEVENT &&
                (e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED ||
                 e.window.event == SDL_WINDOWEVENT_RESIZED)) {
@@ -104,6 +160,7 @@ static void frame(void) {
     }
   }
 
+  poll_gamepad();
   game_update(&game, dt);
   game_render(&game);
 
@@ -122,7 +179,8 @@ int main(int argc, char **argv) {
 
   /* Must be set before renderer/texture creation for nearest filtering. */
   SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO) != 0) {
+  SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER) != 0) {
     fprintf(stderr, "SDL_Init: %s\n", SDL_GetError());
     return 1;
   }
@@ -157,6 +215,8 @@ int main(int argc, char **argv) {
   SDL_SetTextureScaleMode(H.tex, SDL_ScaleModeNearest);
 #endif
 
+  for (int i = 0; i < SDL_NumJoysticks(); i++) open_pad_index(i);
+
   layout_present();
   game_init(&game, fb);
   H.last = SDL_GetPerformanceCounter();
@@ -167,6 +227,7 @@ int main(int argc, char **argv) {
   while (running) frame();
 #endif
 
+  close_pad();
   SDL_DestroyTexture(H.tex);
   SDL_DestroyRenderer(H.ren);
   SDL_DestroyWindow(H.win);

@@ -64,6 +64,10 @@ That updates `index.html` / `index.js` / `index.wasm` only. `--delete` drops lef
 | Click / Space / K | Fire |
 | Esc | Quit (native) |
 | Enter / `1` | After game over → select |
+| **Gamepad:** Start / A | Begin / again (same as `1`) |
+| **Gamepad:** Left stick | Move |
+| **Gamepad:** Right stick | Aim + fire |
+| **Gamepad:** RT / RB | Fire |
 | **Web:** Start button | Begin / again |
 | **Web:** Left stick | Move |
 | **Web:** Right stick | Aim + fire (past deadzone) |
