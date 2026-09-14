@@ -45,6 +45,8 @@
 #define SMINE_SPAWN_T 2.f /* first timed extra from cloner (typical) */
 #define SMINE_ANIM_HZ 2.5f
 #define MINE_TILE 8.f /* SHLD step / laid mine cell */
+#define PLAYER_SHIELD_WINDOW 2.f /* place shields after wave/respawn PLAY starts */
+#define PLAYER_SHIELD_MAX 64
 #define SPAWN_NONE 0
 #define SPAWN_SMINE 1
 #define SPAWN_SHLD 2
@@ -175,6 +177,7 @@ static const wave_def_t WAVES[WAVE_COUNT] = {
 typedef struct {
   float x, y; /* centre of 8×8 cell */
   int alive;
+  int owner; /* 0 = enemy SHLD drop, 1 = player shield */
 } mine_t;
 
 typedef struct {
@@ -623,7 +626,35 @@ static void lay_mine_at(float x, float y) {
   mines[n_mines].x = cx;
   mines[n_mines].y = cy;
   mines[n_mines].alive = 1;
+  mines[n_mines].owner = 0; /* enemy SHLD-P drop */
   n_mines++;
+}
+
+static int count_player_shields(void) {
+  int n = 0;
+  for (int i = 0; i < n_mines; i++)
+    if (mines[i].alive && mines[i].owner) n++;
+  return n;
+}
+
+/* Same 8×8 tile snap as enemy drops; returns 1 if a new cell was laid. */
+static int lay_player_shield_at(float x, float y) {
+  if (n_mines >= MAX_MINES) return 0;
+  if (count_player_shields() >= PLAYER_SHIELD_MAX) return 0;
+  int tx = ((int)floorf(x / MINE_TILE)) * (int)MINE_TILE;
+  int ty = ((int)floorf(y / MINE_TILE)) * (int)MINE_TILE;
+  float cx = (float)tx + MINE_TILE * 0.5f;
+  float cy = (float)ty + MINE_TILE * 0.5f;
+  for (int i = 0; i < n_mines; i++) {
+    if (!mines[i].alive) continue;
+    if (fabsf(mines[i].x - cx) < 1.f && fabsf(mines[i].y - cy) < 1.f) return 0;
+  }
+  mines[n_mines].x = cx;
+  mines[n_mines].y = cy;
+  mines[n_mines].alive = 1;
+  mines[n_mines].owner = 1;
+  n_mines++;
+  return 1;
 }
 
 static void pick_shld_leg(foe_t *f) {
@@ -838,17 +869,26 @@ static void draw_lazon_beam(uint8_t *rgb, const foe_t *f) {
   }
 }
 
-static void draw_mine(uint8_t *rgb, float x, float y) {
-  /* GUESS: 8×8 box with corners removed; flash red ↔ yellow every frame. */
+static void draw_mine(uint8_t *rgb, float x, float y, int owner) {
+  /* Same 8×8 corner-cut box; enemy red↔yellow, player blue↔red. */
   static const char mask[8][8] = {
       {0, 1, 1, 1, 1, 1, 1, 0}, {1, 1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1, 1},
       {1, 1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1, 1},
       {1, 1, 1, 1, 1, 1, 1, 1}, {0, 1, 1, 1, 1, 1, 1, 0},
   };
   int on = (int)(frame_n & 1u);
-  uint8_t r = 255;
-  uint8_t g = on ? 40 : 220;
-  uint8_t b = on ? 40 : 40;
+  uint8_t r, g, b;
+  if (owner) {
+    /* Player: blue ↔ red */
+    r = on ? 40 : 255;
+    g = on ? 80 : 40;
+    b = on ? 255 : 40;
+  } else {
+    /* Enemy SHLD drop: red ↔ yellow */
+    r = 255;
+    g = on ? 40 : 220;
+    b = on ? 40 : 40;
+  }
   int cx = pix(x), cy = pix(y);
   for (int dy = 0; dy < 8; dy++)
     for (int dx = 0; dx < 8; dx++)
@@ -1598,7 +1638,7 @@ static void update_play(game_t *g, float dt) {
     if (player_y > FB_H - 12) player_y = FB_H - 12;
 
     fire_cd -= dt;
-    if (!burst.active) {
+    if (!burst.active && death_linger <= 0.f) {
       float aim_mag = hypotf(g->pad_aim_x, g->pad_aim_y);
       float aim;
       int stick_aim = aim_mag > 0.28f;
@@ -1607,7 +1647,10 @@ static void update_play(game_t *g, float dt) {
       else
         aim = atan2f(g->mouse_y - player_y, g->mouse_x - player_x);
       int fire = g->mouse_down || g->pad_fire || stick_aim || key_down(g, 44) || key_down(g, 14);
-      if (fire && fire_cd <= 0 && n_bullets < MAX_BULLETS) {
+      /* First 2s of wave/respawn: fire lays player shields (no shooting). */
+      if (play_age < PLAYER_SHIELD_WINDOW) {
+        if (fire) lay_player_shield_at(player_x, player_y);
+      } else if (fire && fire_cd <= 0 && n_bullets < MAX_BULLETS) {
         fire_cd = FIRE_COOLDOWN;
         float sp = 320.f;
         float c = cosf(aim), s = sinf(aim);
@@ -1712,6 +1755,26 @@ static void update_play(game_t *g, float dt) {
   }
   n_ebullets = we;
 
+  /* Enemy shots destroy player shields (player shots pass through them). */
+  for (int bi = 0; bi < n_ebullets; bi++) {
+    bullet_t *b = &ebullets[bi];
+    if (b->life <= 0) continue;
+    for (int mi = 0; mi < n_mines; mi++) {
+      if (!mines[mi].alive || !mines[mi].owner) continue;
+      if (hypotf(b->x - mines[mi].x, b->y - mines[mi].y) < MINE_TILE * 0.5f + 2.f) {
+        mines[mi].alive = 0;
+        b->life = 0;
+        break;
+      }
+    }
+  }
+  {
+    int we2 = 0;
+    for (int i = 0; i < n_ebullets; i++)
+      if (ebullets[i].life > 0) ebullets[we2++] = ebullets[i];
+    n_ebullets = we2;
+  }
+
   for (int bi = 0; bi < n_bullets; bi++) {
     bullet_t *b = &bullets[bi];
     /* Cloner blocks player shots (indestructible shield) — no pass-through. */
@@ -1731,15 +1794,14 @@ static void update_play(game_t *g, float dt) {
         spawn_bang(f->x, f->y);
       }
     }
-    /* Laid shield mines: destroyable by player bullets. */
+    /* Enemy SHLD drops only — player shields do not block player shots. */
     if (b->life > 0) {
       for (int mi = 0; mi < n_mines; mi++) {
-        if (!mines[mi].alive) continue;
+        if (!mines[mi].alive || mines[mi].owner) continue;
         if (hypotf(b->x - mines[mi].x, b->y - mines[mi].y) < MINE_TILE * 0.5f + 2.f) {
           mines[mi].alive = 0;
           b->life = 0;
           score += 100;
-          /* No bang — shield drops vanish without FBEXP. */
           break;
         }
       }
@@ -1759,6 +1821,34 @@ static void update_play(game_t *g, float dt) {
   for (int i = 0; i < n_foes; i++)
     if (foes[i].hp > 0) foes[wf++] = foes[i];
   n_foes = wf;
+
+  /* Enemies colliding with player shields: both explode (shield removed). */
+  if (!burst.active) {
+    for (int fi = 0; fi < n_foes; fi++) {
+      foe_t *f = &foes[fi];
+      if (f->hp <= 0) continue;
+      for (int mi = 0; mi < n_mines; mi++) {
+        if (!mines[mi].alive || !mines[mi].owner) continue;
+        if (hypotf(f->x - mines[mi].x, f->y - mines[mi].y) < f->r + MINE_TILE * 0.5f) {
+          f->hp = 0;
+          mines[mi].alive = 0;
+          spawn_bang(f->x, f->y);
+          score += 1000;
+          break;
+        }
+      }
+    }
+    wf = 0;
+    for (int i = 0; i < n_foes; i++)
+      if (foes[i].hp > 0) foes[wf++] = foes[i];
+    n_foes = wf;
+    {
+      int wm = 0;
+      for (int i = 0; i < n_mines; i++)
+        if (mines[i].alive) mines[wm++] = mines[i];
+      n_mines = wm;
+    }
+  }
 
   /* Level ends when gorfs are gone — timed extras do not block clear. */
   if (!burst.active && player_vis && count_gorfs() == 0 && clone_vis && n_clone_jobs == 0)
@@ -1788,7 +1878,7 @@ static void update_play(game_t *g, float dt) {
     }
     if (player_vis) {
       for (int i = 0; i < n_mines; i++) {
-        if (!mines[i].alive) continue;
+        if (!mines[i].alive || mines[i].owner) continue; /* player can pass own shields */
         if (hypotf(mines[i].x - player_x, mines[i].y - player_y) < MINE_TILE * 0.5f + 6.f) {
           player_destroyed();
           break;
@@ -1831,7 +1921,7 @@ static void draw_world(uint8_t *rgb, int with_galaxy) {
   fb_clear(rgb);
   draw_burst_bg(rgb);
   for (int i = 0; i < n_mines; i++)
-    if (mines[i].alive) draw_mine(rgb, mines[i].x, mines[i].y);
+    if (mines[i].alive) draw_mine(rgb, mines[i].x, mines[i].y, mines[i].owner);
   for (int i = 0; i < n_foes; i++) {
     if (foe_is_lazon(&foes[i])) draw_lazon_beam(rgb, &foes[i]);
     blit_named(rgb, foe_draw_kind(&foes[i]), pix_draw(foes[i].x), pix_draw(foes[i].y), 0);
