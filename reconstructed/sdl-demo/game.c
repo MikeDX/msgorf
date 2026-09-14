@@ -58,8 +58,9 @@
 #define CLONE_OMEGA_Y 0.35f
 #define CLONE_PHASE_X 0.0979f
 #define CLONE_PHASE_Y 2.1879f
-#define CLONE_HOME_X (FB_W * (2.f / 3.f)) /* ~2/3 across — above-right of player */
-#define CLONE_HOME_Y (FB_H * (1.f / 3.f)) /* ~1/3 down */
+/* Home is one of the four (1/3|2/3)×(1/3|2/3) corners — set in place_clone_at_home. */
+#define PLAYER_SPEED 70.f
+#define PLAYER_SPEED_STICK_MAX 2.f /* full analogue / key = up to 2× base */
 /* GUESS: clear-burst — docs/findings/clone-burst-explosion.md (f00590–f00685). */
 #define BURST_DUR 2.9f
 #define BURST_FLASH_PERIOD (13.f / 30.f)
@@ -424,8 +425,9 @@ static float gorf_shot_speed(void) {
 
 static void place_clone_at_home(void) {
   clone_vis = 1;
-  clone_home_x = CLONE_HOME_X;
-  clone_home_y = CLONE_HOME_Y;
+  /* Four homes: 1/3 or 2/3 across × 1/3 or 2/3 down. */
+  clone_home_x = FB_W * ((rand() & 1) ? (2.f / 3.f) : (1.f / 3.f));
+  clone_home_y = FB_H * ((rand() & 1) ? (2.f / 3.f) : (1.f / 3.f));
   clone_x = clone_home_x + CLONE_AMP_X * sinf(CLONE_PHASE_X);
   clone_y = clone_home_y + CLONE_AMP_Y * cosf(CLONE_PHASE_Y);
   clone_frame = 0;
@@ -1051,7 +1053,6 @@ static void update_play(game_t *g, float dt) {
 
   /* Player control / fire only while alive. */
   if (player_vis && !burst.active) {
-    float speed = 70.f;
     float dx = g->pad_move_x;
     float dy = g->pad_move_y;
     if (key_down(g, 4) || key_down(g, 80)) dx -= 1;
@@ -1064,8 +1065,11 @@ static void update_play(game_t *g, float dt) {
     if (dy < -1.f) dy = -1.f;
     float move_mag = hypotf(dx, dy);
     if (move_mag > 0.18f) {
-      player_x += (dx / move_mag) * speed * dt * fminf(1.f, move_mag);
-      player_y += (dy / move_mag) * speed * dt * fminf(1.f, move_mag);
+      /* Stick/key extremity scales speed up to PLAYER_SPEED_STICK_MAX × base. */
+      float mag = fminf(1.f, move_mag);
+      float spd = PLAYER_SPEED * mag * PLAYER_SPEED_STICK_MAX;
+      player_x += (dx / move_mag) * spd * dt;
+      player_y += (dy / move_mag) * spd * dt;
     }
     if (player_x < 12) player_x = 12;
     if (player_x > FB_W - 12) player_x = FB_W - 12;
