@@ -40,7 +40,7 @@
 #define GORF_SHOT_PPF_L2 2.f
 #define GORF_SHOT_HIT_R 3.f
 #define SMINE_SPAWN_T 2.f /* L2+: one SMINE from cloner ~2s into play */
-#define SMINE_ANIM_HZ 8.f
+#define SMINE_ANIM_HZ 2.5f
 #define CLONE_PROCESS_T 0.35f
 #define CLONE_EXIT_SPEED 55.f
 #define CLONE_COOL 0.75f
@@ -1119,13 +1119,17 @@ static void update_play(game_t *g, float dt) {
     bounce_walls(f);
   }
   for (int i = 0; i < n_foes; i++)
-    for (int j = i + 1; j < n_foes; j++) bounce_pair(&foes[i], &foes[j]);
+    for (int j = i + 1; j < n_foes; j++) {
+      /* SMINEs pass through other foes (no bounce). */
+      if (foe_is_smine(&foes[i]) || foe_is_smine(&foes[j])) continue;
+      bounce_pair(&foes[i], &foes[j]);
+    }
   for (int i = 0; i < n_foes; i++) {
     bounce_walls(&foes[i]);
     keep_gorf_speed(&foes[i]);
   }
 
-  /* L2+: first shot 5–6s after play, then every 0.5–2s from a random foe (gorf/SMINE). */
+  /* L2+: first shot 5–6s after play, then every 0.5–2s from a random gorf (not SMINE). */
   if (level_num >= 2 && !burst.active && player_vis && death_linger <= 0.f) {
     play_age += dt;
     if (smine_armed && play_age >= SMINE_SPAWN_T) {
@@ -1133,20 +1137,26 @@ static void update_play(game_t *g, float dt) {
       smine_armed = 0;
     }
     gorf_fire_cd -= dt;
-    if (gorf_fire_cd <= 0.f && n_ebullets < MAX_EBULLETS && n_foes > 0) {
+    if (gorf_fire_cd <= 0.f && n_ebullets < MAX_EBULLETS) {
       gorf_fire_cd = GORF_FIRE_PERIOD_MIN + frand() * (GORF_FIRE_PERIOD_MAX - GORF_FIRE_PERIOD_MIN);
-      foe_t *shooter = &foes[rand() % n_foes];
-      float dx = player_x - shooter->x;
-      float dy = player_y - shooter->y;
-      float len = hypotf(dx, dy);
-      if (len < 1.f) len = 1.f;
-      float sp = gorf_shot_speed();
-      bullet_t *eb = &ebullets[n_ebullets++];
-      eb->x = shooter->x;
-      eb->y = shooter->y;
-      eb->vx = (dx / len) * sp;
-      eb->vy = (dy / len) * sp;
-      eb->life = 1.f;
+      int gorf_idx[MAX_FOES];
+      int n_g = 0;
+      for (int i = 0; i < n_foes; i++)
+        if (foe_is_gorf(&foes[i])) gorf_idx[n_g++] = i;
+      if (n_g > 0) {
+        foe_t *shooter = &foes[gorf_idx[rand() % n_g]];
+        float dx = player_x - shooter->x;
+        float dy = player_y - shooter->y;
+        float len = hypotf(dx, dy);
+        if (len < 1.f) len = 1.f;
+        float sp = gorf_shot_speed();
+        bullet_t *eb = &ebullets[n_ebullets++];
+        eb->x = shooter->x;
+        eb->y = shooter->y;
+        eb->vx = (dx / len) * sp;
+        eb->vy = (dy / len) * sp;
+        eb->life = 1.f;
+      }
     }
   }
 
