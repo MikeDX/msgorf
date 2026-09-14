@@ -111,12 +111,13 @@ typedef struct {
 
 static const wave_def_t WAVES[WAVE_COUNT] = {
     /* gorfs fire smine  first_lo/hi   period_lo/hi   shot_ppf  speed */
-    {4, 0, 0, 0.f, 0.f, 0.f, 0.f, 2.0f, 1.00f},             /* 1: quiet */
-    {8, 1, 1, 5.0f, 6.0f, 0.50f, 2.00f, 2.0f, 1.00f},       /* 2 */
-    {10, 1, 1, 4.0f, 5.0f, 0.40f, 1.50f, 2.2f, 1.05f},      /* 3 */
-    {12, 1, 1, 3.0f, 4.0f, 0.35f, 1.20f, 2.4f, 1.10f},      /* 4 */
-    {14, 1, 1, 2.5f, 3.5f, 0.30f, 1.00f, 2.6f, 1.15f},      /* 5 */
-    {16, 1, 1, 2.0f, 3.0f, 0.25f, 0.80f, 2.8f, 1.20f},      /* 6 */
+    /* W1: no fire on first loop; timings used from round 2 onward. */
+    {4, 0, 0, 2.5f, 3.0f, 0.50f, 2.00f, 2.0f, 1.00f},
+    {8, 1, 1, 2.5f, 3.0f, 0.50f, 2.00f, 2.0f, 1.00f},  /* first-shot times halved */
+    {10, 1, 1, 2.0f, 2.5f, 0.40f, 1.50f, 2.2f, 1.05f},
+    {12, 1, 1, 1.5f, 2.0f, 0.35f, 1.20f, 2.4f, 1.10f},
+    {14, 1, 1, 1.25f, 1.75f, 0.30f, 1.00f, 2.6f, 1.15f},
+    {16, 1, 1, 1.0f, 1.5f, 0.25f, 0.80f, 2.8f, 1.20f},
 };
 
 typedef struct {
@@ -365,6 +366,12 @@ static int wave_cycle(void) {
 
 static const wave_def_t *current_wave(void) { return &WAVES[wave_index()]; }
 
+/* Wave 1 is quiet on the first loop; from round 2 every wave can fire. */
+static int wave_can_fire(void) {
+  if (current_wave()->can_fire) return 1;
+  return wave_cycle() > 0;
+}
+
 static float wave_speed_scale(void) {
   /* Each full pass through the 6 waves bumps movement a bit. */
   return 1.f + 0.12f * (float)wave_cycle();
@@ -469,7 +476,7 @@ static float gorf_shot_speed(void) {
 
 static float gorf_fire_first_cd(void) {
   const wave_def_t *w = current_wave();
-  if (!w->can_fire) return 999.f;
+  if (!wave_can_fire()) return 999.f;
   float s = wave_fire_scale();
   float lo = w->fire_first_min * s;
   float hi = w->fire_first_max * s;
@@ -479,7 +486,7 @@ static float gorf_fire_first_cd(void) {
 
 static float gorf_fire_period_cd(void) {
   const wave_def_t *w = current_wave();
-  if (!w->can_fire) return 999.f;
+  if (!wave_can_fire()) return 999.f;
   float s = wave_fire_scale();
   float lo = w->fire_period_min * s;
   float hi = w->fire_period_max * s;
@@ -1211,7 +1218,7 @@ static void update_play(game_t *g, float dt) {
       spawn_smine_from_cloner();
       smine_armed = 0;
     }
-    if (current_wave()->can_fire) {
+    if (wave_can_fire()) {
       gorf_fire_cd -= dt;
       if (gorf_fire_cd <= 0.f && n_ebullets < MAX_EBULLETS) {
         gorf_fire_cd = gorf_fire_period_cd();
