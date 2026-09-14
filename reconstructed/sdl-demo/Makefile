@@ -14,6 +14,7 @@ SFX_STEMS := 1or2start startup galaxy p1shoot playerdie clonedestroy
 SFX_OGGS  := $(addsuffix .ogg,$(SFX_STEMS))
 
 VIEW_SCALE ?= 3
+DRAW_TILE_SNAP ?= 0
 CFLAGS     ?= -O2 -Wall -Wextra -std=c11
 INCLUDES   := -I. -I$(RUNTIME)
 SRCS       := main.c game.c sound.c $(ASSETS_C)
@@ -61,7 +62,7 @@ font_gen.h: ../video-demo/font_guess.json
 native: assets sync-sfx $(NATIVE_BIN)
 
 $(NATIVE_BIN): main.c game.c sound.c sound.h game.h font_gen.h $(ASSETS_C) $(ASSETS_H) $(SFX_FILES)
-	$(CC) $(CFLAGS) -DVIEW_SCALE=$(VIEW_SCALE) $(INCLUDES) $(SDL_CFLAGS) $(MIX_CFLAGS) \
+	$(CC) $(CFLAGS) -DVIEW_SCALE=$(VIEW_SCALE) -DDRAW_TILE_SNAP=$(DRAW_TILE_SNAP) $(INCLUDES) $(SDL_CFLAGS) $(MIX_CFLAGS) \
 	  -o $@ main.c game.c sound.c $(ASSETS_C) $(SDL_LIBS) -lSDL2_mixer -lm
 
 run: native
@@ -74,7 +75,7 @@ web: assets sync-sfx
 	  . "$(EMSDK)/emsdk_env.sh"; \
 	}
 	bash -lc 'source "$(EMSDK)/emsdk_env.sh" >/dev/null && \
-	  emcc -O1 -Wall -std=c11 -DVIEW_SCALE=$(VIEW_SCALE) $(INCLUDES) \
+	  emcc -O1 -Wall -std=c11 -DVIEW_SCALE=$(VIEW_SCALE) -DDRAW_TILE_SNAP=$(DRAW_TILE_SNAP) $(INCLUDES) \
 	    main.c game.c sound.c $(ASSETS_C) \
 	    -sUSE_SDL=2 -sUSE_SDL_MIXER=2 -sSDL2_MIXER_FORMATS='\''["ogg"]'\'' \
 	    -sALLOW_MEMORY_GROWTH=1 -sMINIFY_HTML=0 \

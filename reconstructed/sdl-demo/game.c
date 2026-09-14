@@ -14,6 +14,13 @@
 #define M_PI 3.14159265358979323846
 #endif
 
+/* Draw-only 8×8 char-cell snap for gorfs / shots (sim positions unchanged).
+ * Compare: make DRAW_TILE_SNAP=1  vs  default 0. */
+#ifndef DRAW_TILE_SNAP
+#define DRAW_TILE_SNAP 0
+#endif
+#define DRAW_TILE 8
+
 #define MAX_FOES 64
 #define MAX_BULLETS 48
 #define MAX_EBULLETS 24
@@ -205,6 +212,18 @@ static int galaxy_stars_drawn, galaxy_shells_peeled;
 
 static int pix(float v) {
   return (int)floorf(v);
+}
+
+/* Optional tilemap snap for drawn centres only. */
+static int pix_draw(float v) {
+  int p = pix(v);
+#if DRAW_TILE_SNAP
+  if (p >= 0)
+    return ((p + DRAW_TILE / 2) / DRAW_TILE) * DRAW_TILE;
+  return -(((-p + DRAW_TILE / 2) / DRAW_TILE) * DRAW_TILE);
+#else
+  return p;
+#endif
 }
 
 static int name_eq(const char *a, const char *b) {
@@ -526,9 +545,10 @@ static void reveal_player_center(void) {
   player_y = FB_H * 0.5f;
 }
 
-/* Shared wave entry: black → frozen gorfs+cloner → galaxy → player.
- * Used after clear-burst, player death, and fresh start. */
-static void start_wave_intro(int gorf_count) {
+/* Shared wave entry: black → frozen field → galaxy → player.
+ * show_clone_in_intro: 1 on death-respawn (cloner visible during galaxy);
+ * 0 on new wave / fresh start (gorfs only until PLAY). */
+static void start_wave_intro(int gorf_count, int show_clone_in_intro) {
   n_bullets = 0;
   n_ebullets = 0;
   n_fx = 0;
@@ -548,7 +568,10 @@ static void start_wave_intro(int gorf_count) {
   player_x = FB_W * 0.5f;
   player_y = FB_H * 0.5f;
   t_accum = 0;
-  place_clone_at_home();
+  if (show_clone_in_intro)
+    place_clone_at_home();
+  else
+    clone_vis = 0;
 
   intro_black = INTRO_BLACK_T;
   galaxy_phase = 0;
@@ -561,7 +584,7 @@ static void start_wave_intro(int gorf_count) {
 
 static void start_respawn_intro(void) {
   smine_armed = 0; /* SMINE does not return after death / wave restart */
-  start_wave_intro(respawn_gorf_count);
+  start_wave_intro(respawn_gorf_count, 1); /* cloner stays visible through galaxy */
 }
 
 static void spawn_bang(float x, float y) {
@@ -604,7 +627,7 @@ static void start_clear_burst(void) {
 static void end_clear_burst(void) {
   level_num += 1;
   apply_wave_flags();
-  start_wave_intro(wave_gorf_count);
+  start_wave_intro(wave_gorf_count, 0); /* new wave: no cloner during galaxy */
 }
 
 static void begin_level(game_t *g) {
@@ -617,7 +640,7 @@ static void begin_level(game_t *g) {
   t_accum = 0;
   level_num = 1;
   apply_wave_flags();
-  start_wave_intro(wave_gorf_count);
+  start_wave_intro(wave_gorf_count, 0); /* fresh start: gorfs only in intro */
 }
 
 static void enter_select(game_t *g) {
@@ -1020,9 +1043,9 @@ static void update_intro(float dt) {
     if (galaxy_shells_peeled > total) galaxy_shells_peeled = total;
     if (galaxy_shells_peeled >= total) {
       galaxy_phase = 2;
+      if (!clone_vis) place_clone_at_home(); /* new-wave intro deferred cloner */
       reveal_player_center();
       play_age = 0;
-      /* Brief quiet, then first L2+ shot in 1–3s. */
       gorf_fire_cd = gorf_fire_first_cd();
       G->mode = MODE_PLAY;
     }
@@ -1256,6 +1279,12 @@ static void update_play(game_t *g, float dt) {
 
   for (int bi = 0; bi < n_bullets; bi++) {
     bullet_t *b = &bullets[bi];
+    /* Cloner blocks player shots (indestructible shield) — no pass-through. */
+    if (clone_vis && !burst.active &&
+        hypotf(b->x - clone_x, b->y - clone_y) < CLONE_BODY_R + 3.f) {
+      b->life = 0;
+      continue;
+    }
     for (int fi = 0; fi < n_foes; fi++) {
       foe_t *f = &foes[fi];
       if (f->hp <= 0) continue;
@@ -1327,7 +1356,7 @@ static void draw_world(uint8_t *rgb, int with_galaxy) {
   fb_clear(rgb);
   draw_burst_bg(rgb);
   for (int i = 0; i < n_foes; i++)
-    blit_named(rgb, foe_draw_kind(&foes[i]), pix(foes[i].x), pix(foes[i].y), 0);
+    blit_named(rgb, foe_draw_kind(&foes[i]), pix_draw(foes[i].x), pix_draw(foes[i].y), 0);
   if (with_galaxy) draw_galaxy(rgb);
   for (int i = 0; i < n_fx; i++)
     blit_named(rgb, fx[i].hp > 0.22f ? "FBEXP5" : "FBEXP6", pix(fx[i].x), pix(fx[i].y), 0);
@@ -1341,14 +1370,16 @@ static void draw_world(uint8_t *rgb, int with_galaxy) {
     bullet_t *b = &bullets[i];
     float ang = atan2f(b->vy, b->vx);
     float len = 2.5f; /* ~3–4 px streak (GUESS) */
-    int x0 = pix(b->x - cosf(ang) * len);
-    int y0 = pix(b->y - sinf(ang) * len);
-    int x1 = pix(b->x + cosf(ang) * len);
-    int y1 = pix(b->y + sinf(ang) * len);
+    int cx = pix_draw(b->x);
+    int cy = pix_draw(b->y);
+    int x0 = cx + pix(-cosf(ang) * len);
+    int y0 = cy + pix(-sinf(ang) * len);
+    int x1 = cx + pix(cosf(ang) * len);
+    int y1 = cy + pix(sinf(ang) * len);
     draw_line(rgb, x0, y0, x1, y1, 240, 220, 180);
   }
   for (int i = 0; i < n_ebullets; i++)
-    draw_gorf_shot(rgb, pix(ebullets[i].x), pix(ebullets[i].y));
+    draw_gorf_shot(rgb, pix_draw(ebullets[i].x), pix_draw(ebullets[i].y));
   draw_hud(rgb);
 }
 

@@ -20,6 +20,13 @@ Needs `sdl2-config` (Homebrew `sdl2` / `sdl2-compat`) and `SDL2_mixer`
 (Homebrew `sdl2_mixer`). SFX are OGG Vorbis in `sfx/` (encoded from
 `work/video_refs/audio/*.wav` via `ffmpeg` on `make`).
 
+Optional draw snap (gorfs + shots only, sim unchanged):
+
+```bash
+make DRAW_TILE_SNAP=1
+make DRAW_TILE_SNAP=1 web
+```
+
 ### Web (Emscripten)
 
 Emscripten on this machine: `/Users/mike/src/emsdk` (not `~/emsdk`).
