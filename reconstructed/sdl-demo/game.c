@@ -31,15 +31,10 @@
 #define FIRE_COOLDOWN (1.f / FIRE_ROUNDS_PER_SEC)
 #define PLAYER_DEATH_LINGER 2.5f /* continue play after ship destroyed */
 #define INTRO_BLACK_T 0.45f      /* black beat before field + galaxy */
-/* GUESS: L2+ gorf return fire — first shot 5–6s after play, then every 1–3s. */
-#define GORF_FIRE_FIRST_MIN 5.f
-#define GORF_FIRE_FIRST_MAX 6.f
-#define GORF_FIRE_PERIOD_MIN 0.5f
-#define GORF_FIRE_PERIOD_MAX 2.f
-/* L2: 2 px/frame @ 60Hz; higher levels can ramp later. */
-#define GORF_SHOT_PPF_L2 2.f
+#define WAVE_COUNT 6
+#define WAVE_GORF_CAP 16 /* hard cap on gorfs per wave */
 #define GORF_SHOT_HIT_R 3.f
-#define SMINE_SPAWN_T 2.f /* L2+: one SMINE from cloner ~2s into play */
+#define SMINE_SPAWN_T 2.f /* timed SMINE from cloner when wave.spawn_smine */
 #define SMINE_ANIM_HZ 2.5f
 #define CLONE_PROCESS_T 0.35f
 #define CLONE_EXIT_SPEED 55.f
@@ -103,6 +98,27 @@ typedef struct {
   float anim; /* SMINE frame timer */
 } foe_t;
 
+/* GUESS wave table — loops after 6; cycle bumps speeds / fire rate. */
+typedef struct {
+  int gorfs;
+  int can_fire;
+  int spawn_smine;
+  float fire_first_min, fire_first_max;   /* delay after PLAY before first shot */
+  float fire_period_min, fire_period_max; /* between shots */
+  float shot_ppf;                         /* enemy bullet px/frame @ 60Hz */
+  float gorf_speed_mult;
+} wave_def_t;
+
+static const wave_def_t WAVES[WAVE_COUNT] = {
+    /* gorfs fire smine  first_lo/hi   period_lo/hi   shot_ppf  speed */
+    {4, 0, 0, 0.f, 0.f, 0.f, 0.f, 2.0f, 1.00f},             /* 1: quiet */
+    {8, 1, 1, 5.0f, 6.0f, 0.50f, 2.00f, 2.0f, 1.00f},       /* 2 */
+    {10, 1, 1, 4.0f, 5.0f, 0.40f, 1.50f, 2.2f, 1.05f},      /* 3 */
+    {12, 1, 1, 3.0f, 4.0f, 0.35f, 1.20f, 2.4f, 1.10f},      /* 4 */
+    {14, 1, 1, 2.5f, 3.5f, 0.30f, 1.00f, 2.6f, 1.15f},      /* 5 */
+    {16, 1, 1, 2.0f, 3.0f, 0.25f, 0.80f, 2.8f, 1.20f},      /* 6 */
+};
+
 typedef struct {
   float x, y, hp;
 } fx_t;
@@ -155,11 +171,11 @@ static float player_x, player_y;
 static int player_vis;
 static float death_linger; /* >0: ship gone, world still runs */
 static int respawn_gorf_count;
-static int level_num;       /* 1-based wave */
-static int wave_gorf_count; /* gorfs at this level's start */
-static float gorf_fire_cd;  /* countdown to next enemy volley (L2+) */
+static int level_num;       /* 1-based; indexes WAVES with wrap */
+static int wave_gorf_count; /* gorfs at this wave's start */
+static float gorf_fire_cd;  /* countdown to next enemy volley */
 static float play_age;      /* time in PLAY this wave (player live) */
-static int smine_armed;     /* L2+: pending one SMINE spawn; cleared on death */
+static int smine_armed;     /* pending timed SMINE; cleared on death */
 static float intro_black; /* >0: full black before frozen field + galaxy */
 static float clone_x, clone_y, clone_frame;
 static float clone_home_x, clone_home_y;
@@ -337,9 +353,37 @@ static void build_galaxy(void) {
 
 static float frand(void) { return (float)(rand() % 10000) / 10000.f; }
 
+static int wave_index(void) {
+  int i = (level_num - 1) % WAVE_COUNT;
+  return i < 0 ? 0 : i;
+}
+
+static int wave_cycle(void) {
+  int c = (level_num - 1) / WAVE_COUNT;
+  return c < 0 ? 0 : c;
+}
+
+static const wave_def_t *current_wave(void) { return &WAVES[wave_index()]; }
+
+static float wave_speed_scale(void) {
+  /* Each full pass through the 6 waves bumps movement a bit. */
+  return 1.f + 0.12f * (float)wave_cycle();
+}
+
+static float wave_fire_scale(void) {
+  /* Cycles compress fire delays (more frequent shots). Floor ~55%. */
+  float s = 1.f - 0.15f * (float)wave_cycle();
+  return s < 0.55f ? 0.55f : s;
+}
+
+static float wave_gorf_speed(void) {
+  return GORF_SPEED * current_wave()->gorf_speed_mult * wave_speed_scale();
+}
+
 static void rand_vel(float *vx, float *vy) {
   float a = frand() * (float)(M_PI * 2.0);
-  float s = GORF_SPEED * (1.f - GORF_SPEED_SPREAD + frand() * (2.f * GORF_SPEED_SPREAD));
+  float base = wave_gorf_speed();
+  float s = base * (1.f - GORF_SPEED_SPREAD + frand() * (2.f * GORF_SPEED_SPREAD));
   *vx = cosf(a) * s;
   *vy = sinf(a) * s;
 }
@@ -361,8 +405,9 @@ static void spawn_gorf(float x, float y, float vx, float vy, const char *kind, f
 /* Keep gorfs moving after wall/pair bounce (elastic swaps can kill speed). */
 static void keep_gorf_speed(foe_t *e) {
   float sp = hypotf(e->vx, e->vy);
-  float lo = GORF_SPEED * (1.f - GORF_SPEED_SPREAD);
-  float hi = GORF_SPEED * (1.f + GORF_SPEED_SPREAD);
+  float base = wave_gorf_speed();
+  float lo = base * (1.f - GORF_SPEED_SPREAD);
+  float hi = base * (1.f + GORF_SPEED_SPREAD);
   if (sp < 8.f) {
     rand_vel(&e->vx, &e->vy);
     return;
@@ -418,9 +463,44 @@ static int count_gorfs(void) {
 }
 
 static float gorf_shot_speed(void) {
-  float ppf = GORF_SHOT_PPF_L2;
-  if (level_num > 2) ppf += (float)(level_num - 2) * 0.5f; /* mild ramp later */
+  float ppf = current_wave()->shot_ppf * (1.f + 0.2f * (float)wave_cycle());
   return ppf * 60.f;
+}
+
+static float gorf_fire_first_cd(void) {
+  const wave_def_t *w = current_wave();
+  if (!w->can_fire) return 999.f;
+  float s = wave_fire_scale();
+  float lo = w->fire_first_min * s;
+  float hi = w->fire_first_max * s;
+  if (hi < lo) hi = lo;
+  return lo + frand() * (hi - lo);
+}
+
+static float gorf_fire_period_cd(void) {
+  const wave_def_t *w = current_wave();
+  if (!w->can_fire) return 999.f;
+  float s = wave_fire_scale();
+  float lo = w->fire_period_min * s;
+  float hi = w->fire_period_max * s;
+  if (lo < 0.15f) lo = 0.15f;
+  if (hi < lo) hi = lo;
+  return lo + frand() * (hi - lo);
+}
+
+static int gorfs_for_level(int level) {
+  int idx = (level - 1) % WAVE_COUNT;
+  if (idx < 0) idx = 0;
+  int n = WAVES[idx].gorfs;
+  if (n > WAVE_GORF_CAP) n = WAVE_GORF_CAP;
+  if (n > MAX_FOES) n = MAX_FOES;
+  return n;
+}
+
+static void apply_wave_flags(void) {
+  const wave_def_t *w = current_wave();
+  smine_armed = w->spawn_smine ? 1 : 0;
+  wave_gorf_count = gorfs_for_level(level_num);
 }
 
 static void place_clone_at_home(void) {
@@ -472,12 +552,6 @@ static void start_wave_intro(int gorf_count) {
   G->mode = MODE_INTRO;
 }
 
-static int gorfs_for_level(int level) {
-  if (level <= 1) return 4;
-  /* L2 = 8; later levels +2 each (L3=10, …). */
-  return 8 + (level - 2) * 2;
-}
-
 static void start_respawn_intro(void) {
   smine_armed = 0; /* SMINE does not return after death / wave restart */
   start_wave_intro(respawn_gorf_count);
@@ -522,9 +596,7 @@ static void start_clear_burst(void) {
 
 static void end_clear_burst(void) {
   level_num += 1;
-  wave_gorf_count = gorfs_for_level(level_num);
-  if (wave_gorf_count > MAX_FOES) wave_gorf_count = MAX_FOES;
-  smine_armed = (level_num >= 2) ? 1 : 0;
+  apply_wave_flags();
   start_wave_intro(wave_gorf_count);
 }
 
@@ -537,8 +609,7 @@ static void begin_level(game_t *g) {
   fire_cd = 0;
   t_accum = 0;
   level_num = 1;
-  wave_gorf_count = gorfs_for_level(level_num);
-  smine_armed = 0;
+  apply_wave_flags();
   start_wave_intro(wave_gorf_count);
 }
 
@@ -613,7 +684,7 @@ static void bounce_walls(foe_t *e) {
   if (!hit) return;
   /* Bounce with a new outbound angle (not a perfect specular reflect). */
   float sp = hypotf(e->vx, e->vy);
-  if (sp < 8.f) sp = GORF_SPEED;
+  if (sp < 8.f) sp = wave_gorf_speed();
   float ang;
   if (side == 0)
     ang = (frand() - 0.5f) * (float)M_PI; /* leave left wall → mostly +x */
@@ -783,7 +854,7 @@ static void set_vel_toward(foe_t *f, float tx, float ty, float seek, float sp) {
   float dx = tx - f->x, dy = ty - f->y;
   float dist = hypotf(dx, dy);
   if (dist < 1.f) return;
-  if (sp < 1.f) sp = GORF_SPEED;
+  if (sp < 1.f) sp = wave_gorf_speed();
   float wx = f->vx, wy = f->vy;
   float wn = hypotf(wx, wy);
   if (wn > 1.f) {
@@ -818,7 +889,7 @@ static void steer_gorf_to_clone_port(foe_t *f) {
     float hy = clone_y + sinf(ang) * hold;
     f->vx *= 0.72f;
     f->vy *= 0.72f;
-    set_vel_toward(f, hx, hy, 0.55f, GORF_SPEED * 0.2f);
+    set_vel_toward(f, hx, hy, 0.55f, wave_gorf_speed() * 0.2f);
   }
   /* On yellow face: keep current velocity — enter when overlap hits the port. */
 }
@@ -945,7 +1016,7 @@ static void update_intro(float dt) {
       reveal_player_center();
       play_age = 0;
       /* Brief quiet, then first L2+ shot in 1–3s. */
-      gorf_fire_cd = GORF_FIRE_FIRST_MIN + frand() * (GORF_FIRE_FIRST_MAX - GORF_FIRE_FIRST_MIN);
+      gorf_fire_cd = gorf_fire_first_cd();
       G->mode = MODE_PLAY;
     }
   }
@@ -1133,33 +1204,35 @@ static void update_play(game_t *g, float dt) {
     keep_gorf_speed(&foes[i]);
   }
 
-  /* L2+: first shot 5–6s after play, then every 0.5–2s from a random gorf (not SMINE). */
-  if (level_num >= 2 && !burst.active && player_vis && death_linger <= 0.f) {
+  /* Wave table: fire / SMINE when current_wave allows; delays shrink each cycle. */
+  if (!burst.active && player_vis && death_linger <= 0.f) {
     play_age += dt;
     if (smine_armed && play_age >= SMINE_SPAWN_T) {
       spawn_smine_from_cloner();
       smine_armed = 0;
     }
-    gorf_fire_cd -= dt;
-    if (gorf_fire_cd <= 0.f && n_ebullets < MAX_EBULLETS) {
-      gorf_fire_cd = GORF_FIRE_PERIOD_MIN + frand() * (GORF_FIRE_PERIOD_MAX - GORF_FIRE_PERIOD_MIN);
-      int gorf_idx[MAX_FOES];
-      int n_g = 0;
-      for (int i = 0; i < n_foes; i++)
-        if (foe_is_gorf(&foes[i])) gorf_idx[n_g++] = i;
-      if (n_g > 0) {
-        foe_t *shooter = &foes[gorf_idx[rand() % n_g]];
-        float dx = player_x - shooter->x;
-        float dy = player_y - shooter->y;
-        float len = hypotf(dx, dy);
-        if (len < 1.f) len = 1.f;
-        float sp = gorf_shot_speed();
-        bullet_t *eb = &ebullets[n_ebullets++];
-        eb->x = shooter->x;
-        eb->y = shooter->y;
-        eb->vx = (dx / len) * sp;
-        eb->vy = (dy / len) * sp;
-        eb->life = 1.f;
+    if (current_wave()->can_fire) {
+      gorf_fire_cd -= dt;
+      if (gorf_fire_cd <= 0.f && n_ebullets < MAX_EBULLETS) {
+        gorf_fire_cd = gorf_fire_period_cd();
+        int gorf_idx[MAX_FOES];
+        int n_g = 0;
+        for (int i = 0; i < n_foes; i++)
+          if (foe_is_gorf(&foes[i])) gorf_idx[n_g++] = i;
+        if (n_g > 0) {
+          foe_t *shooter = &foes[gorf_idx[rand() % n_g]];
+          float dx = player_x - shooter->x;
+          float dy = player_y - shooter->y;
+          float len = hypotf(dx, dy);
+          if (len < 1.f) len = 1.f;
+          float sp = gorf_shot_speed();
+          bullet_t *eb = &ebullets[n_ebullets++];
+          eb->x = shooter->x;
+          eb->y = shooter->y;
+          eb->vx = (dx / len) * sp;
+          eb->vy = (dy / len) * sp;
+          eb->life = 1.f;
+        }
       }
     }
   }
