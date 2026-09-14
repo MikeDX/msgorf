@@ -17,6 +17,7 @@ static Mix_Chunk *galaxy;
 static Mix_Chunk *shoot;
 static Mix_Chunk *playerdie;
 static Mix_Chunk *clonedestroy;
+static Mix_Chunk *lastship;
 static int ready;
 
 static Mix_Chunk *load_chunk(const char *name) {
@@ -46,6 +47,7 @@ int sound_init(void) {
   shoot = load_chunk("p1shoot.ogg");
   playerdie = load_chunk("playerdie.ogg");
   clonedestroy = load_chunk("clonedestroy.ogg");
+  lastship = load_chunk("lastship.ogg");
   ready = 1;
   return 0;
 }
@@ -60,8 +62,9 @@ void sound_quit(void) {
   if (shoot) Mix_FreeChunk(shoot);
   if (playerdie) Mix_FreeChunk(playerdie);
   if (clonedestroy) Mix_FreeChunk(clonedestroy);
+  if (lastship) Mix_FreeChunk(lastship);
   title = NULL;
-  startup = galaxy = shoot = playerdie = clonedestroy = NULL;
+  startup = galaxy = shoot = playerdie = clonedestroy = lastship = NULL;
   Mix_CloseAudio();
   ready = 0;
 }
@@ -100,4 +103,9 @@ void sound_play_playerdie(void) {
 void sound_play_clonedestroy(void) {
   if (!ready || !clonedestroy) return;
   Mix_PlayChannel(-1, clonedestroy, 0);
+}
+
+void sound_play_lastship(void) {
+  if (!ready || !lastship) return;
+  Mix_PlayChannel(-1, lastship, 0);
 }

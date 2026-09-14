@@ -12,5 +12,6 @@ void sound_play_galaxy(void);
 void sound_play_shoot(void);
 void sound_play_playerdie(void);
 void sound_play_clonedestroy(void); /* clear-burst / level end */
+void sound_play_lastship(void);     /* respawn on final life */
 
 #endif

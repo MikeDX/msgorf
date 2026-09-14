@@ -184,6 +184,7 @@ static int wave_gorf_count; /* gorfs at this wave's start */
 static float gorf_fire_cd;  /* countdown to next enemy volley */
 static float play_age;      /* time in PLAY this wave (player live) */
 static int smine_armed;     /* pending timed SMINE; cleared on death */
+static int pending_lastship; /* play lastship.wav when PLAY starts after last-life respawn */
 static float intro_black; /* >0: full black before frozen field + galaxy */
 static float clone_x, clone_y, clone_frame;
 static float clone_home_x, clone_home_y;
@@ -584,6 +585,7 @@ static void start_wave_intro(int gorf_count, int show_clone_in_intro) {
 
 static void start_respawn_intro(void) {
   smine_armed = 0; /* SMINE does not return after death / wave restart */
+  pending_lastship = (ships_left == 1) ? 1 : 0;
   start_wave_intro(respawn_gorf_count, 1); /* cloner stays visible through galaxy */
 }
 
@@ -597,18 +599,22 @@ static void spawn_bang(float x, float y) {
 
 static void player_destroyed(void) {
   if (!player_vis || death_linger > 0.f) return;
-  ships_left -= 1;
   spawn_bang(player_x, player_y);
   player_vis = 0;
   n_bullets = 0;
   n_ebullets = 0;
+  sound_play_playerdie();
+
+  /* Dying in the clear-burst does not cost a life — wave advances when burst ends. */
+  if (burst.active) return;
+
+  ships_left -= 1;
   death_linger = PLAYER_DEATH_LINGER;
   /* Remaining gorfs only — SMINEs do not carry into respawn count. */
   respawn_gorf_count = 0;
   for (int i = 0; i < n_foes; i++)
     if (foe_is_gorf(&foes[i])) respawn_gorf_count++;
   if (respawn_gorf_count < 1) respawn_gorf_count = 1;
-  sound_play_playerdie();
 }
 
 static void start_clear_burst(void) {
@@ -639,6 +645,7 @@ static void begin_level(game_t *g) {
   fire_cd = 0;
   t_accum = 0;
   level_num = 1;
+  pending_lastship = 0;
   apply_wave_flags();
   start_wave_intro(wave_gorf_count, 0); /* fresh start: gorfs only in intro */
 }
@@ -1047,6 +1054,10 @@ static void update_intro(float dt) {
       reveal_player_center();
       play_age = 0;
       gorf_fire_cd = gorf_fire_first_cd();
+      if (pending_lastship) {
+        sound_play_lastship();
+        pending_lastship = 0;
+      }
       G->mode = MODE_PLAY;
     }
   }
