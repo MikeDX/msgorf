@@ -54,7 +54,9 @@ Reinforce applies on **every** wave (including W1), so camping to farm clones wi
 
 ## Lives / shields (related)
 
-- `ships_left` = **reserves**; 0 icons = last ship in play.
+- `ships_left` = **reserves** in the HUD; meter does **not** drop on death.
+- A life is spent when **retrying** after death linger; if `ships_left == 0` at that point → game over.
+- After spending the last reserve, meter shows 0 = last ship in play.
 - First **2s** of PLAY: L/R triggers place player shields (max 64).
 - Enemy contact (not MITE) destroys ship; MITE eats shields only.
 

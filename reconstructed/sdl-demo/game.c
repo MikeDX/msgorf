@@ -242,8 +242,8 @@ static const clone_frame_t CLONE_CYCLE[] = {
 
 static game_t *G;
 static float score;
-static int ships_left; /* reserve ships shown in HUD; 0 = last ship in play */
-static int out_of_ships; /* died with no reserves → game over after linger */
+static int ships_left; /* reserve ships in HUD; spent on respawn, not on death */
+static int out_of_ships; /* set when retry with ships_left==0 → game over */
 static float t_accum;
 static unsigned frame_n; /* increments once per update tick */
 static float fire_cd;
@@ -1126,9 +1126,21 @@ static void start_wave_intro(int gorf_count, int show_clone_in_intro) {
 
 static void start_respawn_intro(void) {
   apply_wave_flags(); /* re-arm timed extras; play_age resets in intro */
-  pending_lastship = (ships_left == 0) ? 1 : 0; /* reserves empty → last ship */
+  pending_lastship = (ships_left == 0) ? 1 : 0; /* meter empty → last ship */
   mite_spawn_cd = MITE_SPAWN_LO + frand() * (MITE_SPAWN_HI - MITE_SPAWN_LO);
   start_wave_intro(respawn_gorf_count, 1); /* cloner stays visible through galaxy */
+}
+
+/* After death linger: spend a reserve to retry, or game over if none left. */
+static void try_respawn_or_gameover(void) {
+  if (ships_left <= 0) {
+    out_of_ships = 1;
+    G->mode = MODE_DEAD;
+    return;
+  }
+  ships_left -= 1;
+  out_of_ships = 0;
+  start_respawn_intro();
 }
 
 static void spawn_bang(float x, float y) {
@@ -1151,17 +1163,11 @@ static void player_destroyed(void) {
   if (burst.active) return;
 
   death_linger = PLAYER_DEATH_LINGER;
-  /* ships_left = reserves only. 0 reserves while alive = last ship in play. */
-  if (ships_left <= 0) {
-    out_of_ships = 1; /* no reserves — game over after linger */
-  } else {
-    out_of_ships = 0;
-    ships_left -= 1;
-    respawn_gorf_count = 0;
-    for (int i = 0; i < n_foes; i++)
-      if (foe_is_gorf(&foes[i])) respawn_gorf_count++;
-    if (respawn_gorf_count < 1) respawn_gorf_count = 1;
-  }
+  /* Meter stays until retry; life is spent in try_respawn_or_gameover. */
+  respawn_gorf_count = 0;
+  for (int i = 0; i < n_foes; i++)
+    if (foe_is_gorf(&foes[i])) respawn_gorf_count++;
+  if (respawn_gorf_count < 1) respawn_gorf_count = 1;
 }
 
 static void start_clear_burst(void) {
@@ -1753,11 +1759,7 @@ static void update_play(game_t *g, float dt) {
     death_linger -= dt;
     if (death_linger <= 0.f) {
       death_linger = 0.f;
-      if (out_of_ships) {
-        G->mode = MODE_DEAD;
-        return;
-      }
-      start_respawn_intro();
+      try_respawn_or_gameover();
       return;
     }
   }
