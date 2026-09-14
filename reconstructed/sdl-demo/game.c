@@ -1135,6 +1135,7 @@ static void start_respawn_intro(void) {
 static void try_respawn_or_gameover(void) {
   if (ships_left <= 0) {
     out_of_ships = 1;
+    sound_play_gameover();
     G->mode = MODE_DEAD;
     return;
   }

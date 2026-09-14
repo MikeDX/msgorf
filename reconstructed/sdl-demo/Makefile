@@ -10,7 +10,7 @@ ASSETS_H  := $(RUNTIME)/assets_gen.h
 PLAY_JSON := $(ROOT)/play/assets.json
 AUDIO_SRC := $(ROOT)/work/video_refs/audio
 SFX_DIR   := sfx
-SFX_STEMS := 1or2start startup galaxy p1shoot playerdie clonedestroy lastship
+SFX_STEMS := 1or2start startup galaxy p1shoot playerdie clonedestroy lastship gameover
 SFX_OGGS  := $(addsuffix .ogg,$(SFX_STEMS))
 
 VIEW_SCALE ?= 3
