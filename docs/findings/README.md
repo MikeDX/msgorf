@@ -40,3 +40,4 @@ Working conclusions from the Ms. Gorf disks and references. Parent map: [`../REA
 - [`gorf-motion-from-video.md`](gorf-motion-from-video.md) — earlier noisy yellow-blob probe
 - [`yt-transcript-gameplay.md`](yt-transcript-gameplay.md) — Jamie YT captions: 10 rds/s, dual stick, 256 aim
 - [`clone-burst-explosion.md`](clone-burst-explosion.md) — clear-burst rays + BG strobe
+- [`gameplay-rules-guess.md`](gameplay-rules-guess.md) — levels/waves, speed, roster, anti-farm, cloner collision

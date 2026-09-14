@@ -66,6 +66,13 @@
 #define MITE_PAUSE_T 0.5f
 #define MITE_SPAWN_LO 2.f
 #define MITE_SPAWN_HI 5.f
+/* Level = full pass of WAVE_COUNT waves. Speed / fire / reinforce (GUESS). */
+#define LEVEL_SPEED_PER 0.28f /* +28% move speed each completed 6-wave set */
+#define WAVE_SPEED_PER 0.05f  /* +5% per wave index within the set */
+#define GORF_FIRE_MAX_HZ 2.f  /* never faster than 2 volleys/sec */
+#define GORF_FIRE_RAMP_T 30.f /* PLAY seconds to reach max fire rate */
+#define REINFORCE_FIRST_T 20.f /* first KAMI/LAZON top-up if missing */
+#define REINFORCE_EVERY_T 5.f  /* then every 5s while missing */
 #define CLONE_PROCESS_T 1.f /* stop, wait 1s, eject first clone */
 #define CLONE_EMIT_GAP 1.f  /* then 1s later eject second, then spin again */
 #define CLONE_EXIT_SPEED 55.f
@@ -148,36 +155,38 @@ typedef struct {
   float at; /* seconds after PLAY starts */
 } wave_spawn_t;
 
-/* GUESS wave table — loops after 6; cycle bumps speeds / fire rate. */
+/* GUESS wave table — see docs/findings/gameplay-rules-guess.md.
+ * level_num 1..∞ → wave_index = (level-1)%6, wave_cycle = (level-1)/6.
+ * Timed extras arm at PLAY; KAMI/LAZON also reinforce (anti-farm). */
 typedef struct {
   int gorfs;
   int can_fire;
   wave_spawn_t extras[WAVE_EXTRAS_MAX];
   float fire_first_min, fire_first_max;   /* delay after PLAY before first shot */
-  float fire_period_min, fire_period_max; /* between shots */
+  float fire_period_min, fire_period_max; /* between shots (before play-age ramp) */
   float shot_ppf;                         /* enemy bullet px/frame @ 60Hz */
   float gorf_speed_mult;
 } wave_def_t;
 
 static const wave_def_t WAVES[WAVE_COUNT] = {
-    /* W1: gorfs only */
-    {4, 0, {{SPAWN_NONE, 0}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}}, 2.5f, 3.0f, 0.50f, 2.00f, 2.0f,
+    /* W1: 4 gorfs, no fire on cycle 0 */
+    {4, 0, {{SPAWN_NONE, 0}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}}, 2.5f, 3.0f, 1.00f, 2.00f, 2.0f,
      1.00f},
-    /* W2: SMINE */
-    {8, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}}, 2.5f, 3.0f, 0.50f, 2.00f, 2.0f,
+    /* W2: 8 gorfs + SMINE @ 2s */
+    {8, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}}, 2.5f, 3.0f, 0.90f, 1.80f, 2.0f,
      1.00f},
-    /* W3: SMINE then SHLD-P */
-    {9, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_SHLD, 3.5f}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}}, 2.0f, 2.5f, 0.40f, 1.50f, 2.2f,
+    /* W3: 9 gorfs + SMINE @ 2s, SHLD-P @ 3.5s */
+    {9, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_SHLD, 3.5f}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}}, 2.0f, 2.5f, 0.80f, 1.60f, 2.2f,
      1.05f},
-    /* W4: SHLD-P, LAZON, KAMI */
-    {10, 1, {{SPAWN_SHLD, 2.f}, {SPAWN_LAZON, 3.5f}, {SPAWN_KAMI, 5.f}, {SPAWN_NONE, 0}}, 1.5f, 2.0f, 0.35f, 1.20f,
+    /* W4: 10 gorfs + SHLD @ 2s, LAZON @ 3.5s, KAMI @ 5s */
+    {10, 1, {{SPAWN_SHLD, 2.f}, {SPAWN_LAZON, 3.5f}, {SPAWN_KAMI, 5.f}, {SPAWN_NONE, 0}}, 1.5f, 2.0f, 0.70f, 1.40f,
      2.4f, 1.10f},
-    /* W5: LAZON, SMINE, KAMI, SHLD-P */
-    {10, 1, {{SPAWN_LAZON, 2.f}, {SPAWN_SMINE, 3.5f}, {SPAWN_KAMI, 5.f}, {SPAWN_SHLD, 7.f}}, 1.25f, 1.75f, 0.30f,
-     1.00f, 2.6f, 1.15f},
-    /* W6 TBD (+ KAMI @ 5s) */
-    {10, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_KAMI, 5.f}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}}, 1.0f, 1.5f, 0.25f, 0.80f, 2.8f,
-     1.20f},
+    /* W5: 10 gorfs + LAZON @ 2s, SMINE @ 3.5s, KAMI @ 5s, SHLD @ 7s */
+    {10, 1, {{SPAWN_LAZON, 2.f}, {SPAWN_SMINE, 3.5f}, {SPAWN_KAMI, 5.f}, {SPAWN_SHLD, 7.f}}, 1.25f, 1.75f, 0.60f,
+     1.20f, 2.6f, 1.15f},
+    /* W6: 10 gorfs + SMINE @ 2s, LAZON @ 3.5s, KAMI @ 5s (roster TBD) */
+    {10, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_LAZON, 3.5f}, {SPAWN_KAMI, 5.f}, {SPAWN_NONE, 0}}, 1.0f, 1.5f, 0.55f, 1.00f,
+     2.8f, 1.20f},
 };
 
 typedef struct {
@@ -249,6 +258,7 @@ static float play_age;      /* time in PLAY this wave (player live) */
 static wave_spawn_t extra_queue[WAVE_EXTRAS_MAX];
 static int extra_qn, extra_qi; /* armed timed extras; cleared on death */
 static float mite_spawn_cd; /* next MITEi when player shields exist */
+static float reinforce_cd; /* KAMI/LAZON anti-farm top-up timer */
 static int pending_lastship; /* play lastship.wav when PLAY starts after last-life respawn */
 static float intro_black; /* >0: full black before frozen field + galaxy */
 static float clone_x, clone_y, clone_frame;
@@ -460,17 +470,16 @@ static int wave_can_fire(void) {
 }
 
 static float wave_speed_scale(void) {
-  /* "Level" = full pass through waves 1–6 (wave_cycle). L1 = 1×, L2 faster, … */
-  float level = 1.f + 0.28f * (float)wave_cycle();
-  /* Mild ramp within the current 6-wave set. */
-  float wave = 1.f + 0.05f * (float)wave_index();
+  /* Level = completed 6-wave sets (wave_cycle). Within-set mild ramp by wave_index. */
+  float level = 1.f + LEVEL_SPEED_PER * (float)wave_cycle();
+  float wave = 1.f + WAVE_SPEED_PER * (float)wave_index();
   return level * wave;
 }
 
 static float wave_fire_scale(void) {
-  /* Cycles compress fire delays (more frequent shots). Floor ~55%. */
-  float s = 1.f - 0.15f * (float)wave_cycle();
-  return s < 0.55f ? 0.55f : s;
+  /* Cycles compress base fire delays; play-age ramp + GORF_FIRE_MAX_HZ do the rest. */
+  float s = 1.f - 0.12f * (float)wave_cycle();
+  return s < 0.60f ? 0.60f : s;
 }
 
 static float wave_gorf_speed(void) {
@@ -1015,9 +1024,22 @@ static float gorf_fire_period_cd(void) {
   float s = wave_fire_scale();
   float lo = w->fire_period_min * s;
   float hi = w->fire_period_max * s;
-  if (lo < 0.15f) lo = 0.15f;
   if (hi < lo) hi = lo;
-  return lo + frand() * (hi - lo);
+  float base = lo + frand() * (hi - lo);
+  float min_p = 1.f / GORF_FIRE_MAX_HZ; /* 0.5s → 2/s cap */
+  float u = play_age / GORF_FIRE_RAMP_T;
+  if (u > 1.f) u = 1.f;
+  /* Longer sit → faster gorf fire, never below min_p. */
+  float p = base + (min_p - base) * u;
+  if (p < min_p) p = min_p;
+  return p;
+}
+
+static int count_kind(int (*pred)(const foe_t *)) {
+  int n = 0;
+  for (int i = 0; i < n_foes; i++)
+    if (pred(&foes[i])) n++;
+  return n;
 }
 
 static int gorfs_for_level(int level) {
@@ -1075,6 +1097,7 @@ static void start_wave_intro(int gorf_count, int show_clone_in_intro) {
   play_age = 0;
   gorf_fire_cd = 999.f; /* armed when intro ends → PLAY */
   mite_spawn_cd = MITE_SPAWN_LO + frand() * (MITE_SPAWN_HI - MITE_SPAWN_LO);
+  reinforce_cd = REINFORCE_FIRST_T;
 
   pick_clone_home(); /* before gorfs so edge spawns avoid cloner */
 
@@ -1289,7 +1312,7 @@ static void bounce_pair(foe_t *a, foe_t *b) {
   b->vy += (avn - bvn) * ny;
 }
 
-/* Solid body for foes that do not enter the cloner (e.g. SMINE). */
+/* Solid body bounce off cloner (caller skips KAMI and gorfs on yellow ports). */
 static void bounce_foe_off_cloner(foe_t *f) {
   if (!clone_vis || burst.active) return;
   float dx = f->x - clone_x;
@@ -1630,6 +1653,7 @@ static void update_intro(float dt) {
       if (!clone_vis) place_clone_at_home(); /* new-wave intro deferred cloner */
       reveal_player_center();
       play_age = 0;
+      reinforce_cd = REINFORCE_FIRST_T;
       gorf_fire_cd = gorf_fire_first_cd();
       if (pending_lastship) {
         sound_play_lastship();
@@ -1843,12 +1867,12 @@ static void update_play(game_t *g, float dt) {
     bounce_walls(&foes[i]);
     keep_gorf_speed(&foes[i]);
   }
-  /* SMINE (and other non-entering extras) bounce off cloner body. */
+  /* Cloner solid body: everyone except KAMI. Gorfs on yellow face may enter. */
   if (!burst.active && clone_vis) {
     for (int i = 0; i < n_foes; i++) {
-      if (foe_is_smine(&foes[i]) || foe_is_shld(&foes[i]) || foe_is_lazon(&foes[i]) ||
-          foe_is_kami(&foes[i]) || foe_is_mite(&foes[i]))
-        bounce_foe_off_cloner(&foes[i]);
+      if (foe_is_kami(&foes[i])) continue;
+      if (foe_is_gorf(&foes[i]) && gorf_on_yellow_face(&foes[i])) continue;
+      bounce_foe_off_cloner(&foes[i]);
     }
   }
   {
@@ -1874,6 +1898,13 @@ static void update_play(game_t *g, float dt) {
       }
     } else if (count_player_shields() < 1) {
       mite_spawn_cd = MITE_SPAWN_LO + frand() * (MITE_SPAWN_HI - MITE_SPAWN_LO);
+    }
+    /* Anti-farm: after 20s, then every 5s, replace missing KAMI / LAZON. */
+    reinforce_cd -= dt;
+    if (reinforce_cd <= 0.f) {
+      reinforce_cd = REINFORCE_EVERY_T;
+      if (count_kind(foe_is_kami) < 1) spawn_extra_kind(SPAWN_KAMI);
+      if (count_kind(foe_is_lazon) < 1) spawn_extra_kind(SPAWN_LAZON);
     }
     if (wave_can_fire()) {
       gorf_fire_cd -= dt;
