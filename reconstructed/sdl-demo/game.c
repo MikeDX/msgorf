@@ -40,7 +40,7 @@
 #define PLAYER_DEATH_LINGER 2.5f /* continue play after ship destroyed */
 #define INTRO_BLACK_T 0.45f      /* black beat before field + galaxy */
 #define WAVE_COUNT 6
-#define WAVE_GORF_CAP 16 /* hard cap on gorfs per wave */
+#define WAVE_GORF_CAP 10 /* hard cap on gorfs at wave start */
 #define GORF_SHOT_HIT_R 3.f
 #define SMINE_SPAWN_T 2.f /* first timed extra from cloner (typical) */
 #define SMINE_ANIM_HZ 2.5f
@@ -59,8 +59,10 @@
 #define KAMI_ARRIVE_R 6.f
 #define KAMI_SPEED_MULT 1.5f
 #define CLONE_PROCESS_T 0.35f
+#define CLONE_EMIT_GAP 1.f /* seconds between the two ejected clones */
 #define CLONE_EXIT_SPEED 55.f
 #define CLONE_COOL 0.75f
+#define CLONE_SPAWN_CLEAR 48.f /* gorfs must spawn this far from cloner home */
 /* gameplay.mp4 is ~29.97 fps (30000/1001). Morph step ≈ 5–6 video frames → ~5.45 steps/s. */
 #define CLONE_VIDEO_FPS (30000.f / 1001.f)
 #define CLONE_MORPH_VIDEO_FRAMES 5.5f
@@ -160,13 +162,13 @@ static const wave_def_t WAVES[WAVE_COUNT] = {
     {9, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_SHLD, 3.5f}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}}, 2.0f, 2.5f, 0.40f, 1.50f, 2.2f,
      1.05f},
     /* W4: SHLD-P, LAZON, KAMI */
-    {12, 1, {{SPAWN_SHLD, 2.f}, {SPAWN_LAZON, 3.5f}, {SPAWN_KAMI, 5.f}, {SPAWN_NONE, 0}}, 1.5f, 2.0f, 0.35f, 1.20f,
+    {10, 1, {{SPAWN_SHLD, 2.f}, {SPAWN_LAZON, 3.5f}, {SPAWN_KAMI, 5.f}, {SPAWN_NONE, 0}}, 1.5f, 2.0f, 0.35f, 1.20f,
      2.4f, 1.10f},
     /* W5: LAZON, SMINE, KAMI, SHLD-P */
-    {14, 1, {{SPAWN_LAZON, 2.f}, {SPAWN_SMINE, 3.5f}, {SPAWN_KAMI, 5.f}, {SPAWN_SHLD, 7.f}}, 1.25f, 1.75f, 0.30f,
+    {10, 1, {{SPAWN_LAZON, 2.f}, {SPAWN_SMINE, 3.5f}, {SPAWN_KAMI, 5.f}, {SPAWN_SHLD, 7.f}}, 1.25f, 1.75f, 0.30f,
      1.00f, 2.6f, 1.15f},
     /* W6 TBD (+ KAMI @ 5s) */
-    {16, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_KAMI, 5.f}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}}, 1.0f, 1.5f, 0.25f, 0.80f, 2.8f,
+    {10, 1, {{SPAWN_SMINE, 2.f}, {SPAWN_KAMI, 5.f}, {SPAWN_NONE, 0}, {SPAWN_NONE, 0}}, 1.0f, 1.5f, 0.25f, 0.80f, 2.8f,
      1.20f},
 };
 
@@ -183,6 +185,8 @@ typedef struct {
   float t;
   int exit_port; /* 0 or 1 — opposite yellow port index */
   const char *kind;
+  int left; /* clones still to eject (staggered) */
+  int emit_i; /* which of the pair (0/1) for side offset */
 } clone_job_t;
 
 typedef struct {
@@ -530,18 +534,22 @@ static void spawn_gorf_at_edge(int side) {
   const float margin = 18.f;
   float x, y, vx, vy;
   side = side % 4;
-  if (side == 0) {
-    x = margin + frand() * (FB_W - margin * 2);
-    y = margin + 22 + frand() * 20;
-  } else if (side == 1) {
-    x = margin + frand() * (FB_W - margin * 2);
-    y = FB_H - margin - frand() * 24;
-  } else if (side == 2) {
-    x = margin + frand() * 24;
-    y = margin + 28 + frand() * (FB_H - margin * 2 - 28);
-  } else {
-    x = FB_W - margin - frand() * 24;
-    y = margin + 28 + frand() * (FB_H - margin * 2 - 28);
+  for (int attempt = 0; attempt < 24; attempt++) {
+    if (side == 0) {
+      x = margin + frand() * (FB_W - margin * 2);
+      y = margin + 22 + frand() * 20;
+    } else if (side == 1) {
+      x = margin + frand() * (FB_W - margin * 2);
+      y = FB_H - margin - frand() * 24;
+    } else if (side == 2) {
+      x = margin + frand() * 24;
+      y = margin + 28 + frand() * (FB_H - margin * 2 - 28);
+    } else {
+      x = FB_W - margin - frand() * 24;
+      y = margin + 28 + frand() * (FB_H - margin * 2 - 28);
+    }
+    /* Keep clear of cloner home (picked before edge spawns). */
+    if (hypotf(x - clone_home_x, y - clone_home_y) >= CLONE_SPAWN_CLEAR) break;
   }
   rand_vel(&vx, &vy);
   spawn_gorf(x, y, vx, vy, "GORF_PAT", 0);
@@ -900,11 +908,14 @@ static void apply_wave_flags(void) {
   }
 }
 
-static void place_clone_at_home(void) {
-  clone_vis = 1;
+static void pick_clone_home(void) {
   /* Four homes: 1/3 or 2/3 across × 1/3 or 2/3 down. */
   clone_home_x = FB_W * ((rand() & 1) ? (2.f / 3.f) : (1.f / 3.f));
   clone_home_y = FB_H * ((rand() & 1) ? (2.f / 3.f) : (1.f / 3.f));
+}
+
+static void place_clone_at_home(void) {
+  clone_vis = 1;
   clone_x = clone_home_x + CLONE_AMP_X * sinf(CLONE_PHASE_X);
   clone_y = clone_home_y + CLONE_AMP_Y * cosf(CLONE_PHASE_Y);
   clone_frame = 0;
@@ -932,7 +943,10 @@ static void start_wave_intro(int gorf_count, int show_clone_in_intro) {
   play_age = 0;
   gorf_fire_cd = 999.f; /* armed when intro ends → PLAY */
 
+  pick_clone_home(); /* before gorfs so edge spawns avoid cloner */
+
   if (gorf_count < 1) gorf_count = 4;
+  if (gorf_count > WAVE_GORF_CAP) gorf_count = WAVE_GORF_CAP;
   if (gorf_count > MAX_FOES) gorf_count = MAX_FOES;
   for (int i = 0; i < gorf_count; i++) spawn_gorf_at_edge(i % 4);
 
@@ -955,8 +969,7 @@ static void start_wave_intro(int gorf_count, int show_clone_in_intro) {
 }
 
 static void start_respawn_intro(void) {
-  extra_qn = 0; /* extras do not return after death / wave restart */
-  extra_qi = 0;
+  apply_wave_flags(); /* re-arm timed extras; play_age resets in intro */
   pending_lastship = (ships_left == 1) ? 1 : 0;
   start_wave_intro(respawn_gorf_count, 1); /* cloner stays visible through galaxy */
 }
@@ -1308,7 +1321,7 @@ static int overlaps_port(const foe_t *f, const port_t *p) {
          f->y - f->r < p->y1;
 }
 
-static void emit_clones(int exit_port, const char *kind) {
+static void emit_one_clone(int exit_port, const char *kind, int side) {
   port_t ports[2];
   clone_yellow_ports(ports);
   if (exit_port < 0 || exit_port > 1) exit_port = 1;
@@ -1317,13 +1330,11 @@ static void emit_clones(int exit_port, const char *kind) {
   float mid_y = (port->y0 + port->y1) * 0.5f;
   float ex = port->ex, ey = port->ey;
   float perp_x = -ey, perp_y = ex;
-  float offs[2] = {-6.f, 6.f};
-  for (int i = 0; i < 2; i++) {
-    float ox = perp_x * offs[i];
-    float oy = perp_y * offs[i];
-    spawn_gorf(mid_x + ex * 8.f + ox, mid_y + ey * 8.f + oy, ex * CLONE_EXIT_SPEED + oy * 0.4f,
-               ey * CLONE_EXIT_SPEED + ox * 0.4f, kind, CLONE_COOL);
-  }
+  float off = (side & 1) ? 6.f : -6.f;
+  float ox = perp_x * off;
+  float oy = perp_y * off;
+  spawn_gorf(mid_x + ex * 8.f + ox, mid_y + ey * 8.f + oy, ex * CLONE_EXIT_SPEED + oy * 0.4f,
+             ey * CLONE_EXIT_SPEED + ox * 0.4f, kind, CLONE_COOL);
 }
 
 /* Timed extra: SMINE / SHLD-P / LAZON / KAMI exits a yellow cloner port. */
@@ -1381,6 +1392,8 @@ static void process_clone_machine(float dt) {
       clone_jobs[n_clone_jobs].t = CLONE_PROCESS_T;
       clone_jobs[n_clone_jobs].exit_port = 1 - hit; /* opposite yellow */
       clone_jobs[n_clone_jobs].kind = f->kind;
+      clone_jobs[n_clone_jobs].left = 2;
+      clone_jobs[n_clone_jobs].emit_i = 0;
       n_clone_jobs++;
     }
   }
@@ -1389,7 +1402,13 @@ static void process_clone_machine(float dt) {
   for (int i = 0; i < n_clone_jobs; i++) {
     clone_jobs[i].t -= dt;
     if (clone_jobs[i].t <= 0) {
-      emit_clones(clone_jobs[i].exit_port, clone_jobs[i].kind);
+      emit_one_clone(clone_jobs[i].exit_port, clone_jobs[i].kind, clone_jobs[i].emit_i);
+      clone_jobs[i].emit_i++;
+      clone_jobs[i].left--;
+      if (clone_jobs[i].left > 0) {
+        clone_jobs[i].t = CLONE_EMIT_GAP; /* 1s between ejects */
+        clone_jobs[w++] = clone_jobs[i];
+      }
     } else {
       clone_jobs[w++] = clone_jobs[i];
     }
