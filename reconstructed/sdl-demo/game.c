@@ -1289,6 +1289,30 @@ static void bounce_pair(foe_t *a, foe_t *b) {
   b->vy += (avn - bvn) * ny;
 }
 
+/* Solid body for foes that do not enter the cloner (e.g. SMINE). */
+static void bounce_foe_off_cloner(foe_t *f) {
+  if (!clone_vis || burst.active) return;
+  float dx = f->x - clone_x;
+  float dy = f->y - clone_y;
+  float dist = hypotf(dx, dy);
+  float min_d = f->r + CLONE_BODY_R;
+  if (dist < 1e-3f) {
+    f->x = clone_x + min_d;
+    f->vx = fabsf(f->vx) + 8.f;
+    return;
+  }
+  if (dist >= min_d) return;
+  float nx = dx / dist, ny = dy / dist;
+  float overlap = min_d - dist + 0.5f;
+  f->x += nx * overlap;
+  f->y += ny * overlap;
+  float vn = f->vx * nx + f->vy * ny;
+  if (vn < 0.f) {
+    f->vx -= vn * nx;
+    f->vy -= vn * ny;
+  }
+}
+
 static const clone_frame_t *current_clone_frame(void) {
   int i = ((int)clone_frame) % CLONE_CYCLE_N;
   if (i < 0) i = 0;
@@ -1803,7 +1827,8 @@ static void update_play(game_t *g, float dt) {
       if (!burst.active) update_mite(f, dt);
       continue;
     }
-    if (!burst.active) steer_gorf_to_clone_port(f);
+    /* SMINE: free roam + collisions; do not steer into cloner ports. */
+    if (!foe_is_smine(f) && !burst.active) steer_gorf_to_clone_port(f);
     f->x += f->vx * dt;
     f->y += f->vy * dt;
     bounce_walls(f);
@@ -1817,6 +1842,14 @@ static void update_play(game_t *g, float dt) {
       continue; /* their updaters own velocity */
     bounce_walls(&foes[i]);
     keep_gorf_speed(&foes[i]);
+  }
+  /* SMINE (and other non-entering extras) bounce off cloner body. */
+  if (!burst.active && clone_vis) {
+    for (int i = 0; i < n_foes; i++) {
+      if (foe_is_smine(&foes[i]) || foe_is_shld(&foes[i]) || foe_is_lazon(&foes[i]) ||
+          foe_is_kami(&foes[i]) || foe_is_mite(&foes[i]))
+        bounce_foe_off_cloner(&foes[i]);
+    }
   }
   {
     int wm = 0;
