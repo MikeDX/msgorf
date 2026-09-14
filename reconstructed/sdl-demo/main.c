@@ -12,6 +12,10 @@
 #define VIEW_SCALE 3
 #endif
 
+/* Arcade-style fixed tick. Sim + present aim for 60Hz so SHLD mines flash 1:1. */
+#define SIM_HZ 60
+#define SIM_DT (1.f / (float)SIM_HZ)
+
 #define PAD_DEADZONE 0.18f
 
 static uint8_t fb[FB_W * FB_H * 3];
@@ -28,6 +32,7 @@ typedef struct {
   SDL_Renderer *ren;
   SDL_Texture *tex;
   Uint64 last;
+  Uint64 frame_start;
   int scale; /* integer pixels of window per buffer pixel */
   SDL_Rect dst; /* letterboxed dest in window pixels */
 } host_t;
@@ -120,9 +125,8 @@ EMSCRIPTEN_KEEPALIVE int msgorf_get_mode(void) { return game_get_mode(&game); }
 #endif
 
 static void frame(void) {
-  Uint64 now = SDL_GetPerformanceCounter();
-  float dt = (float)(now - H.last) / (float)SDL_GetPerformanceFrequency();
-  H.last = now;
+  Uint64 freq = SDL_GetPerformanceFrequency();
+  H.frame_start = SDL_GetPerformanceCounter();
 
   SDL_Event e;
   while (SDL_PollEvent(&e)) {
@@ -161,7 +165,8 @@ static void frame(void) {
   }
 
   poll_gamepad();
-  game_update(&game, dt);
+  /* Fixed 60Hz tick — one sim step per paced frame (mines flash every tick). */
+  game_update(&game, SIM_DT);
   game_render(&game);
 
   layout_present();
@@ -171,6 +176,23 @@ static void frame(void) {
   /* Exact integer scale: each buffer pixel → scale×scale window pixels. */
   SDL_RenderCopy(H.ren, H.tex, NULL, &H.dst);
   SDL_RenderPresent(H.ren);
+
+#ifndef __EMSCRIPTEN__
+  /* Pace to 60Hz when vsync is off or display is faster than 60. */
+  {
+    Uint64 elapsed = SDL_GetPerformanceCounter() - H.frame_start;
+    Uint64 budget = freq / (Uint64)SIM_HZ;
+    if (elapsed < budget) {
+      double remain_s = (double)(budget - elapsed) / (double)freq;
+      if (remain_s > 0.001)
+        SDL_Delay((Uint32)(remain_s * 1000.0));
+      /* Busy-wait the last ~1ms for tighter cadence. */
+      while (SDL_GetPerformanceCounter() - H.frame_start < budget) {
+      }
+    }
+  }
+#endif
+  H.last = SDL_GetPerformanceCounter();
 }
 
 int main(int argc, char **argv) {
@@ -197,7 +219,9 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  H.ren = SDL_CreateRenderer(H.win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  /* No vsync — we pace to a fixed 60Hz tick ourselves (120Hz panels would
+   * otherwise double the mine flash rate). */
+  H.ren = SDL_CreateRenderer(H.win, -1, SDL_RENDERER_ACCELERATED);
   if (!H.ren) H.ren = SDL_CreateRenderer(H.win, -1, 0);
   if (!H.ren) {
     fprintf(stderr, "renderer: %s\n", SDL_GetError());
@@ -222,7 +246,7 @@ int main(int argc, char **argv) {
   H.last = SDL_GetPerformanceCounter();
 
 #ifdef __EMSCRIPTEN__
-  emscripten_set_main_loop(frame, 0, 1);
+  emscripten_set_main_loop(frame, SIM_HZ, 1);
 #else
   while (running) frame();
 #endif
