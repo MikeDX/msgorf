@@ -1824,8 +1824,9 @@ static void update_play(game_t *g, float dt) {
         aim = atan2f(g->mouse_y - player_y, g->mouse_x - player_x);
       /* Shoot: right stick / mouse / keys only — never triggers. */
       int shoot = g->mouse_down || stick_aim || key_down(g, 44) || key_down(g, 14);
-      /* L/R triggers lay shields only in the first seconds after wave/respawn. */
-      if (play_age < PLAYER_SHIELD_WINDOW && g->pad_shield)
+      /* L/R triggers / Shift lay shields only in the first seconds after wave/respawn. */
+      if (play_age < PLAYER_SHIELD_WINDOW &&
+          (g->pad_shield || key_down(g, 225) || key_down(g, 229)))
         lay_player_shield_at(player_x, player_y);
       if (shoot && fire_cd <= 0 && n_bullets < MAX_BULLETS) {
         fire_cd = FIRE_COOLDOWN;
